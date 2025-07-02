@@ -1,0 +1,95 @@
+export interface DCFScenarios {
+  low: DCFParams;
+  base: DCFParams;
+  high: DCFParams;
+}
+
+export interface DCFParams {
+  revenueGrowth: number;
+  netMargin: number;
+  fcfGrowth: number;
+  exitMultiple: number;
+  discountRate: number;
+}
+
+export interface InvestmentThesis {
+  moat: string;
+  risks: string;
+  opportunities: string;
+}
+
+export interface StockPillar {
+  score: number;
+  status: string;
+  value: string;
+}
+
+export interface StockTechnicals {
+  trend: string;
+  ma50: number;
+  ma200: number;
+  rsi: number;
+  macd: string;
+}
+
+export interface StockRatios {
+  quickRatio: number;
+  assetTurnover: number;
+  grossMargin: number;
+  operatingMargin: number;
+}
+
+export interface StockData {
+  symbol: string;
+  price: number;
+  pe: number;
+  pbv: number;
+  roe: number;
+  debtToEquity: number;
+  currentRatio: number;
+  score: number;
+  intrinsicValue: number;
+  recommendation: string;
+  chartData: any[];
+  pillars: Record<string, StockPillar>;
+  technicals: StockTechnicals;
+  ratios: StockRatios;
+}
+
+export interface ValuationResult {
+  revenueMultiple: number;
+  earningsMultiple: number;
+  dcfValue: number;
+  averageValue: number;
+}
+
+export interface CashFlowResult {
+  netCashFlow: number;
+  runway: number;
+  projections: Array<{
+    month: number;
+    cash: number;
+    status: string;
+  }>;
+}
+
+export interface RetirementResult {
+  futureValue: number;
+  yearsToRetirement: number;
+  recommendedSavings: number;
+  onTrack: boolean;
+}
+
+export interface RealEstateResult {
+  monthlyPayment: number;
+  netCashFlow: number;
+  cashOnCashReturn: number;
+  capRate: number;
+  profitable: boolean;
+}
+
+export interface Module {
+  id: string;
+  name: string;
+  icon: any;
+}
