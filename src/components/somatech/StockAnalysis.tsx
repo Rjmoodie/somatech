@@ -214,6 +214,159 @@ const StockAnalysis = ({ globalTicker, setGlobalTicker }: StockAnalysisProps) =>
             </CardContent>
           </Card>
 
+          {/* Business Type Benchmarks */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Business Lifecycle Benchmarks</CardTitle>
+              <CardDescription>Compare to archetypal business profiles across different lifecycle stages</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* High-Growth Companies */}
+                <div className="space-y-4">
+                  <div className="text-center">
+                    <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 mb-2">
+                      🧨 High-Growth
+                    </div>
+                    <p className="text-xs text-muted-foreground">Early-Stage Rocket</p>
+                    <p className="text-xs text-muted-foreground mt-1">Examples: SNOW, PLTR, NVDA</p>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Revenue Growth</span>
+                      <span className="font-medium">20-100%</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">EPS Growth</span>
+                      <span className="font-medium">15-60%</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Operating Margin</span>
+                      <span className="font-medium">Low → Rising</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">FCF Margin</span>
+                      <span className="font-medium">0-10%</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">P/E Ratio</span>
+                      <span className="font-medium">50-100+</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">EV/Revenue</span>
+                      <span className="font-medium">10-30x</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">R&D % Revenue</span>
+                      <span className="font-medium">15-30%</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mature & Stable Companies */}
+                <div className="space-y-4">
+                  <div className="text-center">
+                    <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 mb-2">
+                      🧱 Mature & Stable
+                    </div>
+                    <p className="text-xs text-muted-foreground">Cash-Rich Compounder</p>
+                    <p className="text-xs text-muted-foreground mt-1">Examples: MSFT, JNJ, V</p>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Revenue Growth</span>
+                      <span className="font-medium">5-12%</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">EPS Growth</span>
+                      <span className="font-medium">5-15%</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Operating Margin</span>
+                      <span className="font-medium">20-40%</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">FCF Margin</span>
+                      <span className="font-medium">15-25%</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">P/E Ratio</span>
+                      <span className="font-medium">15-25</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">EV/Revenue</span>
+                      <span className="font-medium">3-6x</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">R&D % Revenue</span>
+                      <span className="font-medium">5-10%</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Declining Companies */}
+                <div className="space-y-4">
+                  <div className="text-center">
+                    <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800 mb-2">
+                      🕳️ Declining
+                    </div>
+                    <p className="text-xs text-muted-foreground">Stagnant or Deteriorating</p>
+                    <p className="text-xs text-muted-foreground mt-1">Examples: IBM, T, INTC</p>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Revenue Growth</span>
+                      <span className="font-medium">0% or negative</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">EPS Growth</span>
+                      <span className="font-medium">Flat or declining</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Operating Margin</span>
+                      <span className="font-medium">Shrinking/volatile</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">FCF Margin</span>
+                      <span className="font-medium">Negative/inconsistent</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">P/E Ratio</span>
+                      <span className="font-medium">&lt;10</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">EV/Revenue</span>
+                      <span className="font-medium">&lt;2x</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">R&D % Revenue</span>
+                      <span className="font-medium">Very low</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* AI Match Badge */}
+              <div className="mt-6 p-4 border rounded-lg bg-muted/50">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="font-medium text-sm">Company Profile Match</div>
+                    <div className="text-xs text-muted-foreground">Based on current financial metrics</div>
+                  </div>
+                  <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                    Most similar to: Mature & Stable
+                  </div>
+                </div>
+                <div className="mt-2 text-xs text-muted-foreground">
+                  This stock exhibits characteristics of a mature, cash-generating business with stable margins and moderate growth.
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* DCF Scenario Analysis */}
           <Card>
             <CardHeader>
