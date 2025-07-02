@@ -353,15 +353,15 @@ const StockAnalysis = ({ globalTicker, setGlobalTicker }: StockAnalysisProps) =>
               <div className="mt-6 p-4 border rounded-lg bg-muted/50">
                 <div className="flex items-center justify-between">
                   <div>
-                    <div className="font-medium text-sm">Company Profile Match</div>
-                    <div className="text-xs text-muted-foreground">Based on current financial metrics</div>
+                    <div className="font-medium text-sm">{globalTicker} Profile Match</div>
+                    <div className="text-xs text-muted-foreground">Based on {globalTicker}'s current financial metrics</div>
                   </div>
                   <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                    Most similar to: Mature & Stable
+                    {globalTicker} most similar to: Mature & Stable
                   </div>
                 </div>
                 <div className="mt-2 text-xs text-muted-foreground">
-                  This stock exhibits characteristics of a mature, cash-generating business with stable margins and moderate growth.
+                  {globalTicker} exhibits characteristics of a mature, cash-generating business with stable margins and moderate growth, similar to companies like MSFT and V.
                 </div>
               </div>
             </CardContent>
@@ -370,8 +370,8 @@ const StockAnalysis = ({ globalTicker, setGlobalTicker }: StockAnalysisProps) =>
           {/* DCF Scenario Analysis */}
           <Card>
             <CardHeader>
-              <CardTitle>DCF Scenario Analysis</CardTitle>
-              <CardDescription>Three-scenario valuation model with customizable inputs</CardDescription>
+              <CardTitle>{globalTicker} DCF Scenario Analysis</CardTitle>
+              <CardDescription>Three-scenario valuation model for {globalTicker} with customizable inputs</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
@@ -431,35 +431,35 @@ const StockAnalysis = ({ globalTicker, setGlobalTicker }: StockAnalysisProps) =>
           {/* Investment Thesis Generator */}
           <Card>
             <CardHeader>
-              <CardTitle>Investment Thesis Generator</CardTitle>
-              <CardDescription>Document your investment analysis and thesis</CardDescription>
+              <CardTitle>{globalTicker} Investment Thesis Generator</CardTitle>
+              <CardDescription>Document your {globalTicker} investment analysis and thesis</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>Economic Moat & Competitive Advantages</Label>
+                <Label>{globalTicker} Economic Moat & Competitive Advantages</Label>
                 <textarea
                   className="w-full min-h-20 p-3 border rounded-lg resize-none"
-                  placeholder="Describe the company's competitive moats, brand strength, network effects, switching costs..."
+                  placeholder={`Describe ${globalTicker}'s competitive moats, brand strength, network effects, switching costs...`}
                   value={investmentThesis.moat}
                   onChange={(e) => setInvestmentThesis(prev => ({ ...prev, moat: e.target.value }))}
                 />
               </div>
               
               <div className="space-y-2">
-                <Label>Key Risks & Concerns</Label>
+                <Label>{globalTicker} Key Risks & Concerns</Label>
                 <textarea
                   className="w-full min-h-20 p-3 border rounded-lg resize-none"
-                  placeholder="Regulatory risks, competition, balance sheet concerns, market risks..."
+                  placeholder={`${globalTicker} regulatory risks, competition, balance sheet concerns, market risks...`}
                   value={investmentThesis.risks}
                   onChange={(e) => setInvestmentThesis(prev => ({ ...prev, risks: e.target.value }))}
                 />
               </div>
               
               <div className="space-y-2">
-                <Label>Growth Opportunities</Label>
+                <Label>{globalTicker} Growth Opportunities</Label>
                 <textarea
                   className="w-full min-h-20 p-3 border rounded-lg resize-none"
-                  placeholder="Market expansion, product innovation, M&A opportunities, margin improvement..."
+                  placeholder={`${globalTicker} market expansion, product innovation, M&A opportunities, margin improvement...`}
                   value={investmentThesis.opportunities}
                   onChange={(e) => setInvestmentThesis(prev => ({ ...prev, opportunities: e.target.value }))}
                 />
@@ -470,18 +470,18 @@ const StockAnalysis = ({ globalTicker, setGlobalTicker }: StockAnalysisProps) =>
           {/* Export/Save Actions */}
           <Card>
             <CardHeader>
-              <CardTitle>Export & Save</CardTitle>
-              <CardDescription>Save your analysis or export as a report</CardDescription>
+              <CardTitle>Export & Save {globalTicker} Analysis</CardTitle>
+              <CardDescription>Save your {globalTicker} analysis or export as a report</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex space-x-4">
                 <Button className="flex-1">
                   <Download className="h-4 w-4 mr-2" />
-                  Export PDF Report
+                  Export {globalTicker} PDF Report
                 </Button>
                 <Button variant="outline" className="flex-1">
                   <Save className="h-4 w-4 mr-2" />
-                  Save to Portfolio
+                  Save {globalTicker} to Portfolio
                 </Button>
               </div>
             </CardContent>
