@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { Slider } from "@/components/ui/slider";
 import { Calculator, TrendingUp, BarChart3, Target, Users, FileText, Activity, Home, Search, DollarSign, PieChart, Clock, Brain } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from "recharts";
+import TradingViewWidget from "react-tradingview-widget";
 
 const SomaTech = () => {
   const [activeModule, setActiveModule] = useState("dashboard");
@@ -263,32 +264,27 @@ const SomaTech = () => {
 
       {stockData && (
         <div className="space-y-6">
-          {/* Stock Price Chart */}
+          {/* TradingView Chart */}
           <Card>
             <CardHeader>
-              <CardTitle>Price History - {stockData.symbol}</CardTitle>
-              <CardDescription>30-day price trend analysis</CardDescription>
+              <CardTitle>Live Chart - {stockData.symbol}</CardTitle>
+              <CardDescription>Professional TradingView chart with real-time data</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={stockData.chartData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <Tooltip 
-                      formatter={(value, name) => [`$${value}`, name === 'price' ? 'Price' : 'Volume']}
-                      labelFormatter={(label) => `Date: ${label}`}
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="price" 
-                      stroke="hsl(var(--primary))" 
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+              <div className="h-96">
+                <TradingViewWidget
+                  symbol={globalTicker}
+                  theme="Light"
+                  autosize
+                  hide_side_toolbar={false}
+                  studies={["RSI", "MACD"]}
+                  interval="D"
+                  toolbar_bg="#f1f3f6"
+                  enable_publishing={false}
+                  allow_symbol_change={true}
+                  save_image={false}
+                  hide_volume={false}
+                />
               </div>
             </CardContent>
           </Card>
