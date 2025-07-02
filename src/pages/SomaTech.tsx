@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { Slider } from "@/components/ui/slider";
 import { Calculator, TrendingUp, BarChart3, Target, Users, FileText, Activity, Home, Search, DollarSign, PieChart, Clock, Brain } from "lucide-react";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from "recharts";
 
 const SomaTech = () => {
   const [activeModule, setActiveModule] = useState("dashboard");
@@ -174,6 +175,46 @@ const SomaTech = () => {
     });
   };
 
+  const generateStockChartData = () => {
+    const data = [];
+    let price = 150;
+    for (let i = 0; i < 30; i++) {
+      const change = (Math.random() - 0.5) * 10;
+      price = Math.max(price + change, 50);
+      data.push({
+        date: `Day ${i + 1}`,
+        price: Math.round(price * 100) / 100,
+        volume: Math.floor(Math.random() * 1000000) + 500000
+      });
+    }
+    return data;
+  };
+
+  const generateRetirementChartData = () => {
+    if (!currentAge || !retirementAge || !currentSavings || !monthlyContribution) return [];
+    
+    const age = parseInt(currentAge);
+    const retAge = parseInt(retirementAge);
+    const savings = parseFloat(currentSavings);
+    const contribution = parseFloat(monthlyContribution);
+    const returnRate = expectedReturn[0] / 100;
+    
+    const data = [];
+    let currentBalance = savings;
+    
+    for (let year = age; year <= retAge; year++) {
+      data.push({
+        age: year,
+        balance: Math.round(currentBalance),
+        contributions: Math.round(contribution * 12 * (year - age + 1)),
+        growth: Math.round(currentBalance - savings - (contribution * 12 * (year - age)))
+      });
+      currentBalance = currentBalance * (1 + returnRate) + (contribution * 12);
+    }
+    
+    return data;
+  };
+
   const analyzeStock = () => {
     // Mock stock analysis data
     const mockData = {
@@ -186,7 +227,8 @@ const SomaTech = () => {
       currentRatio: 1.05,
       score: 85,
       intrinsicValue: 165,
-      recommendation: "BUY"
+      recommendation: "BUY",
+      chartData: generateStockChartData()
     };
     setStockData(mockData);
   };
@@ -220,69 +262,102 @@ const SomaTech = () => {
       </Card>
 
       {stockData && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="space-y-6">
+          {/* Stock Price Chart */}
           <Card>
             <CardHeader>
-              <CardTitle>Valuation Summary</CardTitle>
+              <CardTitle>Price History - {stockData.symbol}</CardTitle>
+              <CardDescription>30-day price trend analysis</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span>Current Price:</span>
-                  <span className="font-semibold">${stockData.price}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Intrinsic Value:</span>
-                  <span className="font-semibold">${stockData.intrinsicValue}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Recommendation:</span>
-                  <span className={`font-semibold ${stockData.recommendation === 'BUY' ? 'text-green-600' : 'text-red-600'}`}>
-                    {stockData.recommendation}
-                  </span>
-                </div>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={stockData.chartData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip 
+                      formatter={(value, name) => [`$${value}`, name === 'price' ? 'Price' : 'Volume']}
+                      labelFormatter={(label) => `Date: ${label}`}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="price" 
+                      stroke="hsl(var(--primary))" 
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Financial Ratios</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span>P/E Ratio:</span>
-                  <span className="font-semibold">{stockData.pe}</span>
+          {/* Analysis Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Valuation Summary</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span>Current Price:</span>
+                    <span className="font-semibold">${stockData.price}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Intrinsic Value:</span>
+                    <span className="font-semibold">${stockData.intrinsicValue}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Recommendation:</span>
+                    <span className={`font-semibold ${stockData.recommendation === 'BUY' ? 'text-green-600' : 'text-red-600'}`}>
+                      {stockData.recommendation}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span>P/B Ratio:</span>
-                  <span className="font-semibold">{stockData.pbv}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>ROE:</span>
-                  <span className="font-semibold">{stockData.roe}%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Debt/Equity:</span>
-                  <span className="font-semibold">{stockData.debtToEquity}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>8-Pillar Scorecard</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">{stockData.score}/100</div>
-                <Progress value={stockData.score} className="mb-2" />
-                <p className="text-sm text-muted-foreground">Overall Investment Score</p>
-              </div>
-            </CardContent>
-          </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Financial Ratios</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span>P/E Ratio:</span>
+                    <span className="font-semibold">{stockData.pe}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>P/B Ratio:</span>
+                    <span className="font-semibold">{stockData.pbv}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>ROE:</span>
+                    <span className="font-semibold">{stockData.roe}%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Debt/Equity:</span>
+                    <span className="font-semibold">{stockData.debtToEquity}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>8-Pillar Scorecard</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-primary mb-2">{stockData.score}/100</div>
+                  <Progress value={stockData.score} className="mb-2" />
+                  <p className="text-sm text-muted-foreground">Overall Investment Score</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       )}
     </div>
@@ -585,6 +660,60 @@ const SomaTech = () => {
           </Card>
         )}
       </div>
+
+      {/* Retirement Growth Chart */}
+      {retirementResult && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Retirement Savings Projection</CardTitle>
+            <CardDescription>Growth timeline from age {currentAge} to {retirementAge}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={generateRetirementChartData()}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="age" />
+                  <YAxis tickFormatter={(value) => `$${(value / 1000)}k`} />
+                  <Tooltip 
+                    formatter={(value, name) => {
+                      const labels: Record<string, string> = {
+                        balance: 'Total Balance',
+                        contributions: 'Total Contributions',
+                        growth: 'Investment Growth'
+                      };
+                      return [`$${Number(value).toLocaleString()}`, labels[name as string] || name];
+                    }}
+                    labelFormatter={(label) => `Age: ${label}`}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="contributions" 
+                    stackId="1"
+                    stroke="hsl(var(--muted-foreground))" 
+                    fill="hsl(var(--muted))"
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="growth" 
+                    stackId="1"
+                    stroke="hsl(var(--primary))" 
+                    fill="hsl(var(--primary))"
+                    fillOpacity={0.8}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="balance" 
+                    stroke="hsl(var(--foreground))" 
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 
