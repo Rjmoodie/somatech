@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { StockData, DCFScenarios, InvestmentThesis } from "./types";
 import { generateStockChartData } from "./utils";
 import StockTickerInput from "./StockTickerInput";
@@ -29,17 +29,28 @@ const StockAnalysis = ({ globalTicker, setGlobalTicker }: StockAnalysisProps) =>
     opportunities: ""
   });
 
-  const analyzeStock = () => {
-    const mockData: StockData = {
-      symbol: globalTicker,
-      price: 175.43,
-      pe: 25.4,
+  const generateMockData = (ticker: string): StockData => {
+    // Generate different mock data based on ticker
+    const baseData: Record<string, Partial<StockData>> = {
+      AAPL: { price: 175.43, pe: 25.4 },
+      TSLA: { price: 248.50, pe: 45.2 },
+      MSFT: { price: 412.30, pe: 28.1 },
+      GOOGL: { price: 138.21, pe: 22.8 },
+      AMZN: { price: 145.86, pe: 35.7 }
+    };
+
+    const tickerData = baseData[ticker] || { price: 185.20, pe: 20.5 };
+    
+    return {
+      symbol: ticker,
+      price: tickerData.price || 185.20,
+      pe: tickerData.pe || 20.5,
       pbv: 4.2,
       roe: 26.8,
       debtToEquity: 1.73,
       currentRatio: 1.05,
       score: 85,
-      intrinsicValue: 165,
+      intrinsicValue: (tickerData.price || 185.20) * 0.94,
       recommendation: "BUY",
       chartData: generateStockChartData(),
       pillars: {
@@ -54,8 +65,8 @@ const StockAnalysis = ({ globalTicker, setGlobalTicker }: StockAnalysisProps) =>
       },
       technicals: {
         trend: "bullish",
-        ma50: 168.50,
-        ma200: 155.20,
+        ma50: (tickerData.price || 185.20) * 0.96,
+        ma200: (tickerData.price || 185.20) * 0.89,
         rsi: 62,
         macd: "positive"
       },
@@ -66,36 +77,64 @@ const StockAnalysis = ({ globalTicker, setGlobalTicker }: StockAnalysisProps) =>
         operatingMargin: 28.1
       }
     };
-    setStockData(mockData);
   };
 
+  const analyzeStock = () => {
+    setStockData(generateMockData(globalTicker));
+  };
+
+  // Auto-update data when ticker changes
+  useEffect(() => {
+    if (globalTicker && stockData) {
+      setStockData(generateMockData(globalTicker));
+    }
+  }, [globalTicker]);
+
   return (
-    <div className="space-y-6">
-      <StockTickerInput 
-        globalTicker={globalTicker}
-        setGlobalTicker={setGlobalTicker}
-        onAnalyze={analyzeStock}
-      />
+    <div className="space-y-8">
+      <div className="elevated-card p-6 primary-glow">
+        <StockTickerInput 
+          globalTicker={globalTicker}
+          setGlobalTicker={setGlobalTicker}
+          onAnalyze={analyzeStock}
+        />
+      </div>
 
       {stockData && (
-        <div className="space-y-6">
-          <CompanySnapshot ticker={globalTicker} />
-          <FinancialStatements ticker={globalTicker} />
-          <TradingViewChart ticker={globalTicker} />
-          <EnhancedPillarScorecard ticker={globalTicker} />
-          <BusinessBenchmarks ticker={globalTicker} />
-          <DCFAnalysis 
-            ticker={globalTicker}
-            dcfScenarios={dcfScenarios}
-            setDcfScenarios={setDcfScenarios}
-            stockData={stockData}
-          />
-          <InvestmentThesisGenerator 
-            ticker={globalTicker}
-            investmentThesis={investmentThesis}
-            setInvestmentThesis={setInvestmentThesis}
-          />
-          <ExportActions ticker={globalTicker} />
+        <div className="space-y-8">
+          <div className="glass-card smooth-transition">
+            <CompanySnapshot ticker={globalTicker} />
+          </div>
+          <div className="glass-card smooth-transition">
+            <FinancialStatements ticker={globalTicker} />
+          </div>
+          <div className="glass-card smooth-transition">
+            <TradingViewChart ticker={globalTicker} />
+          </div>
+          <div className="glass-card smooth-transition">
+            <EnhancedPillarScorecard ticker={globalTicker} />
+          </div>
+          <div className="glass-card smooth-transition">
+            <BusinessBenchmarks ticker={globalTicker} />
+          </div>
+          <div className="glass-card smooth-transition">
+            <DCFAnalysis 
+              ticker={globalTicker}
+              dcfScenarios={dcfScenarios}
+              setDcfScenarios={setDcfScenarios}
+              stockData={stockData}
+            />
+          </div>
+          <div className="glass-card smooth-transition">
+            <InvestmentThesisGenerator 
+              ticker={globalTicker}
+              investmentThesis={investmentThesis}
+              setInvestmentThesis={setInvestmentThesis}
+            />
+          </div>
+          <div className="glass-card smooth-transition">
+            <ExportActions ticker={globalTicker} />
+          </div>
         </div>
       )}
     </div>

@@ -226,30 +226,107 @@ const EnhancedPillarScorecard = ({ ticker }: EnhancedPillarScorecardProps) => {
                         Close
                       </Button>
                     </div>
-                    <div className="grid grid-cols-5 gap-2 mb-4">
-                      {pillar.chartData.map((dataPoint, index) => (
-                        <div key={dataPoint.period} className="text-center">
-                          <div className="text-xs text-muted-foreground mb-1">{dataPoint.period}</div>
-                          <div className="h-20 bg-muted rounded flex items-end justify-center relative">
-                            <div 
-                              className={`w-full rounded-t ${
-                                pillar.status === 'pass' ? 'bg-green-500' : 
-                                pillar.status === 'neutral' ? 'bg-yellow-500' : 'bg-red-500'
-                              }`}
-                              style={{ 
-                                height: `${Math.max((dataPoint.value / Math.max(...pillar.chartData.map(d => d.value))) * 100, 10)}%` 
-                              }}
-                            />
-                            <div className="absolute -top-6 text-xs font-medium">
-                              {typeof dataPoint.value === 'number' ? 
-                                (dataPoint.value > 10 ? `${dataPoint.value.toFixed(1)}` : `${dataPoint.value.toFixed(1)}%`) : 
-                                dataPoint.value
-                              }
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                     <div className="h-40 mb-4 relative">
+                       <svg className="w-full h-full" viewBox="0 0 500 160">
+                         {/* Grid lines */}
+                         <defs>
+                           <linearGradient id={`gradient-${key}`} x1="0%" y1="0%" x2="0%" y2="100%">
+                             <stop offset="0%" style={{
+                               stopColor: pillar.status === 'pass' ? 'hsl(var(--success))' : 
+                                         pillar.status === 'neutral' ? 'hsl(var(--warning))' : 'hsl(var(--destructive))',
+                               stopOpacity: 0.3
+                             }} />
+                             <stop offset="100%" style={{
+                               stopColor: pillar.status === 'pass' ? 'hsl(var(--success))' : 
+                                         pillar.status === 'neutral' ? 'hsl(var(--warning))' : 'hsl(var(--destructive))',
+                               stopOpacity: 0.05
+                             }} />
+                           </linearGradient>
+                         </defs>
+                         
+                         {/* Horizontal grid lines */}
+                         {[0, 1, 2, 3, 4].map(i => (
+                           <line
+                             key={i}
+                             x1="60"
+                             y1={30 + i * 25}
+                             x2="480"
+                             y2={30 + i * 25}
+                             stroke="hsl(var(--border))"
+                             strokeWidth="1"
+                             opacity="0.3"
+                           />
+                         ))}
+                         
+                         {/* Data line */}
+                         <polyline
+                           points={pillar.chartData.map((point, index) => {
+                             const x = 60 + (index * 105);
+                             const maxValue = Math.max(...pillar.chartData.map(d => d.value));
+                             const y = 130 - ((point.value / maxValue) * 100);
+                             return `${x},${y}`;
+                           }).join(' ')}
+                           fill="none"
+                           stroke={pillar.status === 'pass' ? 'hsl(var(--success))' : 
+                                  pillar.status === 'neutral' ? 'hsl(var(--warning))' : 'hsl(var(--destructive))'}
+                           strokeWidth="3"
+                           strokeLinecap="round"
+                           strokeLinejoin="round"
+                         />
+                         
+                         {/* Area fill */}
+                         <polygon
+                           points={`60,130 ${pillar.chartData.map((point, index) => {
+                             const x = 60 + (index * 105);
+                             const maxValue = Math.max(...pillar.chartData.map(d => d.value));
+                             const y = 130 - ((point.value / maxValue) * 100);
+                             return `${x},${y}`;
+                           }).join(' ')} 480,130`}
+                           fill={`url(#gradient-${key})`}
+                         />
+                         
+                         {/* Data points */}
+                         {pillar.chartData.map((point, index) => {
+                           const x = 60 + (index * 105);
+                           const maxValue = Math.max(...pillar.chartData.map(d => d.value));
+                           const y = 130 - ((point.value / maxValue) * 100);
+                           return (
+                             <g key={index}>
+                               <circle
+                                 cx={x}
+                                 cy={y}
+                                 r="4"
+                                 fill={pillar.status === 'pass' ? 'hsl(var(--success))' : 
+                                      pillar.status === 'neutral' ? 'hsl(var(--warning))' : 'hsl(var(--destructive))'}
+                                 stroke="hsl(var(--background))"
+                                 strokeWidth="2"
+                               />
+                               {/* Year labels */}
+                               <text
+                                 x={x}
+                                 y="150"
+                                 textAnchor="middle"
+                                 className="text-xs fill-muted-foreground"
+                               >
+                                 {point.period}
+                               </text>
+                               {/* Value labels */}
+                               <text
+                                 x={x}
+                                 y={y - 10}
+                                 textAnchor="middle"
+                                 className="text-xs font-medium fill-foreground"
+                               >
+                                 {typeof point.value === 'number' ? 
+                                   (point.value > 10 ? point.value.toFixed(1) : `${point.value.toFixed(1)}%`) : 
+                                   point.value
+                                 }
+                               </text>
+                             </g>
+                           );
+                         })}
+                       </svg>
+                     </div>
                     <div className="text-sm text-muted-foreground">
                       <strong>Analysis:</strong> {pillar.name} shows a {pillar.trend === 'up' ? 'positive' : pillar.trend === 'down' ? 'declining' : 'stable'} trend 
                       over the past 5 years, currently {pillar.status === 'pass' ? 'outperforming' : pillar.status === 'neutral' ? 'meeting' : 'underperforming'} industry benchmarks.
