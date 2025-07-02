@@ -3,11 +3,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
 import { Search, Download, Save } from "lucide-react";
 import TradingViewWidget from "react-tradingview-widget";
 import { StockData, DCFScenarios, InvestmentThesis } from "./types";
-import { getStatusColor, getStatusIcon, generateStockChartData, calculateDCF } from "./utils";
+import { calculateDCF, generateStockChartData } from "./utils";
+import CompanySnapshot from "./CompanySnapshot";
+import EnhancedPillarScorecard from "./EnhancedPillarScorecard";
+import FinancialStatements from "./FinancialStatements";
 
 interface StockAnalysisProps {
   globalTicker: string;
@@ -92,6 +94,12 @@ const StockAnalysis = ({ globalTicker, setGlobalTicker }: StockAnalysisProps) =>
 
       {stockData && (
         <div className="space-y-6">
+          {/* Company Snapshot */}
+          <CompanySnapshot ticker={globalTicker} />
+
+          {/* Financial Statements */}
+          <FinancialStatements ticker={globalTicker} />
+
           {/* TradingView Chart */}
           <Card>
             <CardHeader>
@@ -117,102 +125,8 @@ const StockAnalysis = ({ globalTicker, setGlobalTicker }: StockAnalysisProps) =>
             </CardContent>
           </Card>
 
-          {/* Technical Analysis Summary */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Technical & Momentum Snapshot</CardTitle>
-              <CardDescription>Key technical indicators and trend analysis</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center">
-                  <div className={`inline-flex px-3 py-1 rounded-full text-sm font-medium mb-2 ${
-                    stockData.technicals.trend === 'bullish' ? 'bg-green-100 text-green-800' : 
-                    stockData.technicals.trend === 'bearish' ? 'bg-red-100 text-red-800' : 
-                    'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {stockData.technicals.trend.toUpperCase()}
-                  </div>
-                  <p className="text-xs text-muted-foreground">Overall Trend</p>
-                </div>
-                <div className="text-center">
-                  <div className="font-semibold">${stockData.technicals.ma50}</div>
-                  <p className="text-xs text-muted-foreground">50-Day MA</p>
-                </div>
-                <div className="text-center">
-                  <div className="font-semibold">${stockData.technicals.ma200}</div>
-                  <p className="text-xs text-muted-foreground">200-Day MA</p>
-                </div>
-                <div className="text-center">
-                  <div className="font-semibold">{stockData.technicals.rsi}</div>
-                  <p className="text-xs text-muted-foreground">RSI</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Enhanced Financial Ratios with Color Coding */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Enhanced Financial Ratios</CardTitle>
-              <CardDescription>Color-coded analysis with industry benchmarks</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {Object.entries(stockData.ratios).map(([key, value]) => (
-                  <div key={key} className="p-3 border rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium">{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</span>
-                      <div className={`w-3 h-3 rounded-full ${
-                        typeof value === 'number' && value > 1 ? 'bg-green-500' : 
-                        typeof value === 'number' && value > 0.5 ? 'bg-yellow-500' : 
-                        'bg-red-500'
-                      }`} />
-                    </div>
-                    <div className="text-lg font-semibold">{typeof value === 'number' ? value.toFixed(2) : String(value)}{typeof value === 'number' && value > 1 ? 'x' : '%'}</div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* 8-Pillar Scorecard Detailed */}
-          <Card>
-            <CardHeader>
-              <CardTitle>8-Pillar Financial Strength Scorecard</CardTitle>
-              <CardDescription>Proprietary scoring system analyzing key financial metrics</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {Object.entries(stockData.pillars).map(([key, pillar]) => {
-                  const Icon = getStatusIcon(pillar.status);
-                  return (
-                    <div key={key} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <Icon className={`h-5 w-5 ${getStatusColor(pillar.status)}`} />
-                        <div>
-                          <div className="font-medium">{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</div>
-                          <div className="text-sm text-muted-foreground">{pillar.value}</div>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Progress value={pillar.score} className="w-20" />
-                        <span className="text-sm font-medium w-8">{pillar.score}</span>
-                      </div>
-                    </div>
-                  );
-                })}
-                
-                <div className="mt-6 p-4 bg-primary/5 rounded-lg">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-primary mb-2">{stockData.score}/100</div>
-                    <Progress value={stockData.score} className="mb-2" />
-                    <p className="text-sm text-muted-foreground">Overall Somatic Investment Score</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Enhanced 8-Pillar Scorecard */}
+          <EnhancedPillarScorecard ticker={globalTicker} />
 
           {/* Business Type Benchmarks */}
           <Card>
