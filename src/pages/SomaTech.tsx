@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { Slider } from "@/components/ui/slider";
-import { Calculator, TrendingUp, BarChart3, Target, Users, FileText, Activity, Home, Search, DollarSign, PieChart, Clock, Brain } from "lucide-react";
+import { Calculator, TrendingUp, BarChart3, Target, Users, FileText, Activity, Home, Search, DollarSign, PieChart, Clock, Brain, Download, Save, CheckCircle, XCircle, AlertTriangle, Zap, Shield, TrendingDown, Building2 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from "recharts";
 import TradingViewWidget from "react-tradingview-widget";
 
@@ -52,6 +52,16 @@ const SomaTech = () => {
 
   // Stock Analysis State
   const [stockData, setStockData] = useState<any>(null);
+  const [dcfScenarios, setDcfScenarios] = useState({
+    low: { revenueGrowth: 5, netMargin: 8, fcfGrowth: 3, exitMultiple: 15, discountRate: 12 },
+    base: { revenueGrowth: 12, netMargin: 15, fcfGrowth: 8, exitMultiple: 20, discountRate: 10 },
+    high: { revenueGrowth: 20, netMargin: 22, fcfGrowth: 15, exitMultiple: 25, discountRate: 8 }
+  });
+  const [investmentThesis, setInvestmentThesis] = useState({
+    moat: "",
+    risks: "",
+    opportunities: ""
+  });
 
   const modules = [
     { id: "dashboard", name: "Dashboard", icon: Home },
@@ -217,7 +227,7 @@ const SomaTech = () => {
   };
 
   const analyzeStock = () => {
-    // Mock stock analysis data
+    // Mock advanced stock analysis data
     const mockData = {
       symbol: globalTicker,
       price: 175.43,
@@ -229,9 +239,71 @@ const SomaTech = () => {
       score: 85,
       intrinsicValue: 165,
       recommendation: "BUY",
-      chartData: generateStockChartData()
+      chartData: generateStockChartData(),
+      pillars: {
+        revenueGrowth: { score: 85, status: "good", value: "15.2%" },
+        epsGrowth: { score: 78, status: "good", value: "12.8%" },
+        returnOnCapital: { score: 92, status: "excellent", value: "26.8%" },
+        debtLevels: { score: 65, status: "moderate", value: "1.73x" },
+        freeCashFlow: { score: 88, status: "good", value: "$12.4B" },
+        valuation: { score: 72, status: "moderate", value: "25.4x P/E" },
+        shareDilution: { score: 90, status: "excellent", value: "-2.1%" },
+        insiderOwnership: { score: 95, status: "excellent", value: "8.4%" }
+      },
+      technicals: {
+        trend: "bullish",
+        ma50: 168.50,
+        ma200: 155.20,
+        rsi: 62,
+        macd: "positive"
+      },
+      ratios: {
+        quickRatio: 0.98,
+        assetTurnover: 1.1,
+        grossMargin: 42.5,
+        operatingMargin: 28.1
+      }
     };
     setStockData(mockData);
+  };
+
+  const calculateDCF = (scenario: 'low' | 'base' | 'high') => {
+    const params = dcfScenarios[scenario];
+    const currentPrice = stockData?.price || 175;
+    const revenue = 380000; // Mock current revenue in millions
+    
+    const projectedRevenue = revenue * Math.pow(1 + params.revenueGrowth / 100, 5);
+    const projectedEarnings = projectedRevenue * (params.netMargin / 100);
+    const terminalValue = projectedEarnings * params.exitMultiple;
+    const discountFactor = Math.pow(1 + params.discountRate / 100, 5);
+    const intrinsicValue = terminalValue / discountFactor;
+    const sharePrice = intrinsicValue / 16000; // Mock shares outstanding in millions
+    
+    return {
+      intrinsicValue: Math.round(sharePrice),
+      cagr: Math.round(((sharePrice / currentPrice) ** (1/5) - 1) * 100 * 100) / 100,
+      upside: Math.round(((sharePrice - currentPrice) / currentPrice) * 100)
+    };
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'excellent': return 'text-green-600';
+      case 'good': return 'text-blue-600';
+      case 'moderate': return 'text-yellow-600';
+      case 'poor': return 'text-red-600';
+      default: return 'text-muted-foreground';
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'excellent': return CheckCircle;
+      case 'good': return CheckCircle;
+      case 'moderate': return AlertTriangle;
+      case 'poor': return XCircle;
+      default: return AlertTriangle;
+    }
   };
 
   const calculateSomaticScore = () => {
@@ -289,71 +361,222 @@ const SomaTech = () => {
             </CardContent>
           </Card>
 
-          {/* Analysis Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Valuation Summary</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span>Current Price:</span>
-                    <span className="font-semibold">${stockData.price}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Intrinsic Value:</span>
-                    <span className="font-semibold">${stockData.intrinsicValue}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Recommendation:</span>
-                    <span className={`font-semibold ${stockData.recommendation === 'BUY' ? 'text-green-600' : 'text-red-600'}`}>
-                      {stockData.recommendation}
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Financial Ratios</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span>P/E Ratio:</span>
-                    <span className="font-semibold">{stockData.pe}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>P/B Ratio:</span>
-                    <span className="font-semibold">{stockData.pbv}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>ROE:</span>
-                    <span className="font-semibold">{stockData.roe}%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Debt/Equity:</span>
-                    <span className="font-semibold">{stockData.debtToEquity}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>8-Pillar Scorecard</CardTitle>
-              </CardHeader>
-              <CardContent>
+          {/* Technical Analysis Summary */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Technical & Momentum Snapshot</CardTitle>
+              <CardDescription>Key technical indicators and trend analysis</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-primary mb-2">{stockData.score}/100</div>
-                  <Progress value={stockData.score} className="mb-2" />
-                  <p className="text-sm text-muted-foreground">Overall Investment Score</p>
+                  <div className={`inline-flex px-3 py-1 rounded-full text-sm font-medium mb-2 ${
+                    stockData.technicals.trend === 'bullish' ? 'bg-green-100 text-green-800' : 
+                    stockData.technicals.trend === 'bearish' ? 'bg-red-100 text-red-800' : 
+                    'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    {stockData.technicals.trend.toUpperCase()}
+                  </div>
+                  <p className="text-xs text-muted-foreground">Overall Trend</p>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+                <div className="text-center">
+                  <div className="font-semibold">${stockData.technicals.ma50}</div>
+                  <p className="text-xs text-muted-foreground">50-Day MA</p>
+                </div>
+                <div className="text-center">
+                  <div className="font-semibold">${stockData.technicals.ma200}</div>
+                  <p className="text-xs text-muted-foreground">200-Day MA</p>
+                </div>
+                <div className="text-center">
+                  <div className="font-semibold">{stockData.technicals.rsi}</div>
+                  <p className="text-xs text-muted-foreground">RSI</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Enhanced Financial Ratios with Color Coding */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Enhanced Financial Ratios</CardTitle>
+              <CardDescription>Color-coded analysis with industry benchmarks</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {Object.entries(stockData.ratios).map(([key, value]) => (
+                  <div key={key} className="p-3 border rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium">{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</span>
+                      <div className={`w-3 h-3 rounded-full ${
+                        typeof value === 'number' && value > 1 ? 'bg-green-500' : 
+                        typeof value === 'number' && value > 0.5 ? 'bg-yellow-500' : 
+                        'bg-red-500'
+                      }`} />
+                    </div>
+                    <div className="text-lg font-semibold">{typeof value === 'number' ? value.toFixed(2) : String(value)}{typeof value === 'number' && value > 1 ? 'x' : '%'}</div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 8-Pillar Scorecard Detailed */}
+          <Card>
+            <CardHeader>
+              <CardTitle>8-Pillar Financial Strength Scorecard</CardTitle>
+              <CardDescription>Proprietary scoring system analyzing key financial metrics</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {Object.entries(stockData.pillars).map(([key, pillar]: [string, any]) => {
+                  const Icon = getStatusIcon(pillar.status);
+                  return (
+                    <div key={key} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <Icon className={`h-5 w-5 ${getStatusColor(pillar.status)}`} />
+                        <div>
+                          <div className="font-medium">{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</div>
+                          <div className="text-sm text-muted-foreground">{pillar.value}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Progress value={pillar.score} className="w-20" />
+                        <span className="text-sm font-medium w-8">{pillar.score}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+                
+                <div className="mt-6 p-4 bg-primary/5 rounded-lg">
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-primary mb-2">{stockData.score}/100</div>
+                    <Progress value={stockData.score} className="mb-2" />
+                    <p className="text-sm text-muted-foreground">Overall Somatic Investment Score</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* DCF Scenario Analysis */}
+          <Card>
+            <CardHeader>
+              <CardTitle>DCF Scenario Analysis</CardTitle>
+              <CardDescription>Three-scenario valuation model with customizable inputs</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {/* Input Table */}
+                <div className="grid grid-cols-4 gap-4">
+                  <div className="font-medium">Variable</div>
+                  <div className="font-medium text-center">Low Case</div>
+                  <div className="font-medium text-center">Base Case</div>
+                  <div className="font-medium text-center">High Case</div>
+                  
+                  {Object.entries(dcfScenarios.low).map(([key, _]) => (
+                    <div key={key} className="contents">
+                      <div className="text-sm py-2">{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</div>
+                      {(['low', 'base', 'high'] as const).map(scenario => (
+                        <Input
+                          key={`${key}-${scenario}`}
+                          type="number"
+                          value={dcfScenarios[scenario][key as keyof typeof dcfScenarios.low]}
+                          onChange={(e) => setDcfScenarios(prev => ({
+                            ...prev,
+                            [scenario]: { ...prev[scenario], [key]: parseFloat(e.target.value) }
+                          }))}
+                          className="text-center"
+                        />
+                      ))}
+                    </div>
+                  ))}
+                </div>
+
+                {/* DCF Results */}
+                <div className="grid grid-cols-3 gap-4">
+                  {(['low', 'base', 'high'] as const).map(scenario => {
+                    const result = calculateDCF(scenario);
+                    return (
+                      <Card key={scenario} className={scenario === 'base' ? 'border-primary' : ''}>
+                        <CardHeader>
+                          <CardTitle className="text-center">{scenario.toUpperCase()} CASE</CardTitle>
+                        </CardHeader>
+                        <CardContent className="text-center space-y-2">
+                          <div className="text-2xl font-bold text-primary">${result.intrinsicValue}</div>
+                          <div className="text-sm text-muted-foreground">Intrinsic Value</div>
+                          <div className="text-lg font-semibold">{result.cagr}%</div>
+                          <div className="text-sm text-muted-foreground">5-Year CAGR</div>
+                          <div className={`text-lg font-semibold ${result.upside > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {result.upside > 0 ? '+' : ''}{result.upside}%
+                          </div>
+                          <div className="text-sm text-muted-foreground">Upside/Downside</div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Investment Thesis Generator */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Investment Thesis Generator</CardTitle>
+              <CardDescription>Document your investment analysis and thesis</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label>Economic Moat & Competitive Advantages</Label>
+                <textarea
+                  className="w-full min-h-20 p-3 border rounded-lg resize-none"
+                  placeholder="Describe the company's competitive moats, brand strength, network effects, switching costs..."
+                  value={investmentThesis.moat}
+                  onChange={(e) => setInvestmentThesis(prev => ({ ...prev, moat: e.target.value }))}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Key Risks & Concerns</Label>
+                <textarea
+                  className="w-full min-h-20 p-3 border rounded-lg resize-none"
+                  placeholder="Regulatory risks, competition, balance sheet concerns, market risks..."
+                  value={investmentThesis.risks}
+                  onChange={(e) => setInvestmentThesis(prev => ({ ...prev, risks: e.target.value }))}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Growth Opportunities</Label>
+                <textarea
+                  className="w-full min-h-20 p-3 border rounded-lg resize-none"
+                  placeholder="Market expansion, product innovation, M&A opportunities, margin improvement..."
+                  value={investmentThesis.opportunities}
+                  onChange={(e) => setInvestmentThesis(prev => ({ ...prev, opportunities: e.target.value }))}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Export/Save Actions */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Export & Save</CardTitle>
+              <CardDescription>Save your analysis or export as a report</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex space-x-4">
+                <Button className="flex-1">
+                  <Download className="h-4 w-4 mr-2" />
+                  Export PDF Report
+                </Button>
+                <Button variant="outline" className="flex-1">
+                  <Save className="h-4 w-4 mr-2" />
+                  Save to Portfolio
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
     </div>
