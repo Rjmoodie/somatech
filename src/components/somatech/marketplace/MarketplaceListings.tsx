@@ -71,11 +71,13 @@ const MarketplaceListings = ({ filters }: MarketplaceListingsProps) => {
         valuation_summary: listing.valuation_summary as BusinessListing['valuation_summary'],
         visibility: listing.visibility as BusinessListing['visibility'],
         status: listing.status as BusinessListing['status'],
+        bor_visibility: (listing.bor_visibility || 'public') as BusinessListing['bor_visibility'],
         cash_flow: listing.cash_flow || undefined,
         key_value_drivers: listing.key_value_drivers || undefined,
         growth_potential: listing.growth_potential || undefined,
         competitive_advantages: listing.competitive_advantages || undefined,
         documents: listing.documents || undefined,
+        bor_documents: listing.bor_documents || undefined,
         views_count: listing.views_count || 0,
         contact_requests_count: listing.contact_requests_count || 0
       })));
@@ -152,6 +154,11 @@ const MarketplaceListings = ({ filters }: MarketplaceListingsProps) => {
                 <CardTitle className="text-lg line-clamp-1">{listing.business_name}</CardTitle>
                 <div className="flex items-center gap-2 mt-1">
                   <Badge variant="secondary" className="text-xs">{listing.industry}</Badge>
+                  {listing.bor_documents && listing.bor_documents.length > 0 && (
+                    <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                      📘 Book of Record Available
+                    </Badge>
+                  )}
                   <div className="flex items-center gap-1 text-muted-foreground text-xs">
                     <MapPin className="h-3 w-3" />
                     {listing.location}

@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ListingFormData } from "../types";
+import BookOfRecordUpload from "./BookOfRecordUpload";
 
 interface CreateListingFormProps {
   onSuccess: () => void;
@@ -24,9 +25,15 @@ const CreateListingForm = ({ onSuccess, onBack }: CreateListingFormProps) => {
   
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<ListingFormData>({
     defaultValues: {
-      visibility: 'public'
+      visibility: 'public',
+      bor_visibility: 'public'
     }
   });
+
+  const handleDocumentsChange = (documents: string[], visibility: 'public' | 'premium' | 'on_request') => {
+    setValue('bor_documents', documents);
+    setValue('bor_visibility', visibility);
+  };
 
   const industries = [
     "Technology", "Healthcare", "Financial Services", "Manufacturing",
@@ -77,7 +84,7 @@ const CreateListingForm = ({ onSuccess, onBack }: CreateListingFormProps) => {
     }
   };
 
-  const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, 3));
+  const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, 4));
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
 
   return (
@@ -85,19 +92,19 @@ const CreateListingForm = ({ onSuccess, onBack }: CreateListingFormProps) => {
       {/* Progress Indicator */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center space-x-4">
-          {[1, 2, 3].map((step) => (
+          {[1, 2, 3, 4].map((step) => (
             <div key={step} className="flex items-center">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                 step <= currentStep ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
               }`}>
                 {step}
               </div>
-              {step < 3 && <div className={`w-12 h-1 ${step < currentStep ? 'bg-primary' : 'bg-muted'}`} />}
+              {step < 4 && <div className={`w-12 h-1 ${step < currentStep ? 'bg-primary' : 'bg-muted'}`} />}
             </div>
           ))}
         </div>
         <div className="text-sm text-muted-foreground">
-          Step {currentStep} of 3
+          Step {currentStep} of 4
         </div>
       </div>
 
@@ -288,6 +295,15 @@ const CreateListingForm = ({ onSuccess, onBack }: CreateListingFormProps) => {
         </div>
       )}
 
+      {/* Step 4: Book of Record Upload */}
+      {currentStep === 4 && (
+        <BookOfRecordUpload
+          onDocumentsChange={handleDocumentsChange}
+          initialDocuments={watch('bor_documents') || []}
+          initialVisibility={watch('bor_visibility') || 'public'}
+        />
+      )}
+
       {/* Navigation Buttons */}
       <div className="flex items-center justify-between pt-6">
         <div className="flex gap-3">
@@ -304,7 +320,7 @@ const CreateListingForm = ({ onSuccess, onBack }: CreateListingFormProps) => {
         </div>
 
         <div className="flex gap-3">
-          {currentStep < 3 ? (
+          {currentStep < 4 ? (
             <Button type="button" onClick={nextStep}>
               Next
               <ArrowRight className="h-4 w-4 ml-2" />

@@ -12,6 +12,8 @@ export type Database = {
       business_listings: {
         Row: {
           asking_price: number
+          bor_documents: string[] | null
+          bor_visibility: string | null
           business_name: string
           cash_flow: number | null
           competitive_advantages: string | null
@@ -35,6 +37,8 @@ export type Database = {
         }
         Insert: {
           asking_price: number
+          bor_documents?: string[] | null
+          bor_visibility?: string | null
           business_name: string
           cash_flow?: number | null
           competitive_advantages?: string | null
@@ -58,6 +62,8 @@ export type Database = {
         }
         Update: {
           asking_price?: number
+          bor_documents?: string[] | null
+          bor_visibility?: string | null
           business_name?: string
           cash_flow?: number | null
           competitive_advantages?: string | null

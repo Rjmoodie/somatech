@@ -250,6 +250,8 @@ export interface BusinessListing {
   growth_potential?: string;
   competitive_advantages?: string;
   documents?: string[];
+  bor_documents?: string[];
+  bor_visibility: 'public' | 'premium' | 'on_request';
   visibility: 'public' | 'verified_only';
   status: 'draft' | 'live' | 'under_negotiation' | 'sold';
   views_count: number;
@@ -281,6 +283,8 @@ export interface ListingFormData {
   growth_potential?: string;
   competitive_advantages?: string;
   visibility: 'public' | 'verified_only';
+  bor_documents?: string[];
+  bor_visibility: 'public' | 'premium' | 'on_request';
 }
 
 export interface MarketplaceFilters {
