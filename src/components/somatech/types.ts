@@ -139,14 +139,71 @@ export interface BusinessValuationReport {
   };
 }
 
-export interface CashFlowResult {
-  netCashFlow: number;
-  runway: number;
-  projections: Array<{
-    month: number;
-    cash: number;
-    status: string;
+export interface CashFlowInputs {
+  businessName: string;
+  industry: string;
+  startingCash: number;
+  timeframe: number;
+  monthlyRevenue: number;
+  revenueGrowthRate: number;
+  hasSeasonality: boolean;
+  seasonalityMultiplier: number;
+  accountsReceivableDays: number;
+  accountsPayableDays: number;
+  fixedExpenses: Array<{
+    name: string;
+    amount: number;
+    isPercentage: boolean;
   }>;
+  variableExpenses: Array<{
+    name: string;
+    amount: number;
+    isPercentage: boolean;
+  }>;
+  taxRate: number;
+  loanAmount: number;
+  interestRate: number;
+  loanTermMonths: number;
+  equityRaised: number;
+  equityRaiseMonth: number;
+}
+
+export interface CashFlowScenario {
+  monthlyProjections: Array<{
+    month: number;
+    inflows: number;
+    outflows: number;
+    netFlow: number;
+    cashBalance: number;
+    revenue: number;
+    expenses: number;
+  }>;
+  totalInflows: number;
+  totalOutflows: number;
+  endingCash: number;
+  avgMonthlyCashFlow: number;
+  runway: number;
+  breakEvenMonth: number;
+  alerts: Array<{
+    title: string;
+    description: string;
+    severity: 'low' | 'medium' | 'high';
+  }>;
+  keyMilestones: Array<{
+    month: number;
+    description: string;
+    type: 'positive' | 'warning';
+  }>;
+}
+
+export interface CashFlowReport {
+  inputs: CashFlowInputs;
+  scenarios: {
+    conservative: CashFlowScenario;
+    base: CashFlowScenario;
+    optimistic: CashFlowScenario;
+  };
+  generatedAt: string;
 }
 
 export interface RetirementResult {

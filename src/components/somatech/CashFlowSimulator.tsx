@@ -1,129 +1,94 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { CashFlowResult } from "./types";
+import { CashFlowInputs, CashFlowReport } from "./types";
+import CashFlowInputForm from "./cash-flow/CashFlowInputForm";
+import CashFlowResults from "./cash-flow/CashFlowResults";
+import CashFlowChart from "./cash-flow/CashFlowChart";
+import CashFlowExport from "./cash-flow/CashFlowExport";
+import { calculateCashFlow } from "./cash-flow/cashFlowEngine";
 
 const CashFlowSimulator = () => {
-  const [monthlyIncome, setMonthlyIncome] = useState("");
-  const [monthlyExpenses, setMonthlyExpenses] = useState("");
-  const [currentCash, setCurrentCash] = useState("");
-  const [cashFlowResult, setCashFlowResult] = useState<CashFlowResult | null>(null);
+  const [inputs, setInputs] = useState<CashFlowInputs>({
+    businessName: "",
+    industry: "",
+    startingCash: 0,
+    timeframe: 12,
+    monthlyRevenue: 0,
+    revenueGrowthRate: 0,
+    hasSeasonality: false,
+    seasonalityMultiplier: 1.2,
+    accountsReceivableDays: 30,
+    accountsPayableDays: 30,
+    fixedExpenses: [
+      { name: "Rent", amount: 0, isPercentage: false },
+      { name: "Payroll", amount: 0, isPercentage: false }
+    ],
+    variableExpenses: [
+      { name: "Cost of Goods Sold", amount: 30, isPercentage: true },
+      { name: "Marketing", amount: 0, isPercentage: false }
+    ],
+    taxRate: 25,
+    loanAmount: 0,
+    interestRate: 0,
+    loanTermMonths: 0,
+    equityRaised: 0,
+    equityRaiseMonth: 1
+  });
 
-  const calculateCashFlow = () => {
-    if (!monthlyIncome || !monthlyExpenses || !currentCash) return;
+  const [report, setReport] = useState<CashFlowReport | null>(null);
+  const [isCalculating, setIsCalculating] = useState(false);
+  const [activeScenario, setActiveScenario] = useState<'conservative' | 'base' | 'optimistic'>('base');
 
-    const income = parseFloat(monthlyIncome);
-    const expenses = parseFloat(monthlyExpenses);
-    const cash = parseFloat(currentCash);
-    const netCashFlow = income - expenses;
-    const runway = netCashFlow <= 0 ? Math.floor(cash / Math.abs(netCashFlow)) : 0;
+  const handleInputChange = (field: keyof CashFlowInputs, value: any) => {
+    setInputs(prev => ({ ...prev, [field]: value }));
+  };
 
-    const projections = [];
-    let runningCash = cash;
-    for (let i = 1; i <= 12; i++) {
-      runningCash += netCashFlow;
-      projections.push({
-        month: i,
-        cash: Math.round(runningCash),
-        status: runningCash > 0 ? 'positive' : 'negative'
-      });
+  const handleCalculate = async () => {
+    setIsCalculating(true);
+    
+    // Simulate calculation delay for better UX
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    try {
+      const calculatedReport = calculateCashFlow(inputs);
+      setReport(calculatedReport);
+    } catch (error) {
+      console.error("Error calculating cash flow:", error);
+    } finally {
+      setIsCalculating(false);
     }
+  };
 
-    setCashFlowResult({
-      netCashFlow: Math.round(netCashFlow),
-      runway,
-      projections
-    });
+  const handleScenarioChange = (scenario: 'conservative' | 'base' | 'optimistic') => {
+    setActiveScenario(scenario);
   };
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Cash Flow Inputs</CardTitle>
-            <CardDescription>Enter your financial data</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>Monthly Income ($)</Label>
-              <Input
-                type="number"
-                placeholder="10000"
-                value={monthlyIncome}
-                onChange={(e) => setMonthlyIncome(e.target.value)}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label>Monthly Expenses ($)</Label>
-              <Input
-                type="number"
-                placeholder="8000"
-                value={monthlyExpenses}
-                onChange={(e) => setMonthlyExpenses(e.target.value)}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label>Current Cash ($)</Label>
-              <Input
-                type="number"
-                placeholder="50000"
-                value={currentCash}
-                onChange={(e) => setCurrentCash(e.target.value)}
-              />
-            </div>
-            
-            <Button onClick={calculateCashFlow} className="w-full">
-              Run Simulation
-            </Button>
-          </CardContent>
-        </Card>
-
-        {cashFlowResult && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Cash Flow Analysis</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex justify-between">
-                  <span>Net Monthly Cash Flow:</span>
-                  <span className={`font-semibold ${cashFlowResult.netCashFlow >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    ${cashFlowResult.netCashFlow.toLocaleString()}
-                  </span>
-                </div>
-                
-                {cashFlowResult.runway > 0 && (
-                  <div className="flex justify-between">
-                    <span>Cash Runway:</span>
-                    <span className="font-semibold text-orange-600">
-                      {cashFlowResult.runway} months
-                    </span>
-                  </div>
-                )}
-                
-                <div className="mt-4">
-                  <h4 className="font-medium mb-2">12-Month Projection</h4>
-                  <div className="space-y-1 max-h-32 overflow-y-auto">
-                    {cashFlowResult.projections.slice(0, 6).map((projection) => (
-                      <div key={projection.month} className="flex justify-between text-sm">
-                        <span>Month {projection.month}:</span>
-                        <span className={projection.status === 'positive' ? 'text-green-600' : 'text-red-600'}>
-                          ${projection.cash.toLocaleString()}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="space-y-6">
+          <CashFlowInputForm
+            inputs={inputs}
+            onInputChange={handleInputChange}
+            onCalculate={handleCalculate}
+            isCalculating={isCalculating}
+          />
+        </div>
+        
+        {report && (
+          <div className="space-y-6">
+            <CashFlowChart report={report} activeScenario={activeScenario} />
+            <CashFlowExport report={report} activeScenario={activeScenario} />
+          </div>
         )}
       </div>
+
+      {report && (
+        <CashFlowResults 
+          report={report} 
+          onScenarioChange={handleScenarioChange}
+          activeScenario={activeScenario}
+        />
+      )}
     </div>
   );
 };
