@@ -135,16 +135,16 @@ const StockAnalysis = ({ globalTicker, setGlobalTicker }: StockAnalysisProps) =>
       {stockData && (
         <div className="space-y-8">
           <div className="glass-card smooth-transition">
-            <CompanySnapshot ticker={globalTicker} />
+            <CompanySnapshot ticker={globalTicker} stockData={stockData} />
           </div>
           <div className="glass-card smooth-transition">
-            <FinancialStatements ticker={globalTicker} />
+            <FinancialStatements ticker={globalTicker} stockData={stockData} />
           </div>
           <div className="glass-card smooth-transition">
             <TradingViewChart ticker={globalTicker} />
           </div>
           <div className="glass-card smooth-transition">
-            <EnhancedPillarScorecard ticker={globalTicker} />
+            <EnhancedPillarScorecard ticker={globalTicker} stockData={stockData} />
           </div>
           <div className="glass-card smooth-transition">
             <BusinessBenchmarks ticker={globalTicker} />

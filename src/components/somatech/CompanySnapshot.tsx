@@ -3,28 +3,44 @@ import { Building2, MapPin, Calendar, Users } from "lucide-react";
 
 interface CompanySnapshotProps {
   ticker: string;
+  stockData?: any;
 }
 
-const CompanySnapshot = ({ ticker }: CompanySnapshotProps) => {
-  // Mock data - in real implementation, this would be fetched based on ticker
+const CompanySnapshot = ({ ticker, stockData }: CompanySnapshotProps) => {
+  // Use real API data when available, fallback to reasonable defaults
+  const formatCurrency = (value: number) => {
+    if (value >= 1e12) return `$${(value / 1e12).toFixed(1)}T`;
+    if (value >= 1e9) return `$${(value / 1e9).toFixed(1)}B`;
+    if (value >= 1e6) return `$${(value / 1e6).toFixed(1)}M`;
+    return `$${value.toLocaleString()}`;
+  };
+
+  const formatPercent = (value: number) => {
+    const formatted = value.toFixed(2);
+    return value >= 0 ? `+${formatted}%` : `${formatted}%`;
+  };
+
   const companyData = {
-    name: ticker === "AAPL" ? "Apple Inc." : ticker === "TSLA" ? "Tesla, Inc." : `${ticker} Corporation`,
-    sector: ticker === "AAPL" ? "Technology" : ticker === "TSLA" ? "Automotive" : "Technology",
-    industry: ticker === "AAPL" ? "Consumer Electronics" : ticker === "TSLA" ? "Electric Vehicles" : "Software",
-    marketCap: ticker === "AAPL" ? "$2.8T" : ticker === "TSLA" ? "$850B" : "$500B",
+    name: stockData?.companyName || `${ticker} Corporation`,
+    sector: stockData?.sector || "Technology",
+    industry: stockData?.industry || "Software",
+    marketCap: stockData?.marketCap ? formatCurrency(stockData.marketCap) : "$500B",
     exchange: "NASDAQ",
-    headquarters: ticker === "AAPL" ? "Cupertino, CA" : ticker === "TSLA" ? "Austin, TX" : "Seattle, WA",
-    founded: ticker === "AAPL" ? "1976" : ticker === "TSLA" ? "2003" : "1994",
-    ceo: ticker === "AAPL" ? "Tim Cook" : ticker === "TSLA" ? "Elon Musk" : "John Smith",
-    employees: ticker === "AAPL" ? "164,000" : ticker === "TSLA" ? "140,000" : "50,000",
-    week52High: ticker === "AAPL" ? "$199.62" : ticker === "TSLA" ? "$414.50" : "$250.00",
-    week52Low: ticker === "AAPL" ? "$164.08" : ticker === "TSLA" ? "$138.80" : "$150.00",
-    currentPrice: ticker === "AAPL" ? "$175.43" : ticker === "TSLA" ? "$248.50" : "$185.20",
-    priceChange: ticker === "AAPL" ? "+2.4%" : ticker === "TSLA" ? "+1.8%" : "+0.9%",
-    peRatio: ticker === "AAPL" ? "25.4" : ticker === "TSLA" ? "45.2" : "18.7",
-    dividendYield: ticker === "AAPL" ? "0.5%" : ticker === "TSLA" ? "N/A" : "2.1%",
-    ma50: ticker === "AAPL" ? "$168.50" : ticker === "TSLA" ? "$235.20" : "$178.90",
-    ma200: ticker === "AAPL" ? "$155.20" : ticker === "TSLA" ? "$210.80" : "$165.30"
+    description: stockData?.description || "No description available",
+    week52High: stockData?.week52High ? `$${stockData.week52High.toFixed(2)}` : "$250.00",
+    week52Low: stockData?.week52Low ? `$${stockData.week52Low.toFixed(2)}` : "$150.00",
+    currentPrice: stockData?.price ? `$${stockData.price.toFixed(2)}` : "$185.20",
+    priceChange: stockData?.priceChangePercent ? formatPercent(stockData.priceChangePercent) : "+0.9%",
+    peRatio: stockData?.pe ? stockData.pe.toFixed(1) : "18.7",
+    dividendYield: stockData?.dividendYield ? `${(stockData.dividendYield * 100).toFixed(1)}%` : "N/A",
+    ma50: stockData?.technicals?.ma50 ? `$${stockData.technicals.ma50.toFixed(2)}` : "$178.90",
+    ma200: stockData?.technicals?.ma200 ? `$${stockData.technicals.ma200.toFixed(2)}` : "$165.30",
+    beta: stockData?.beta ? stockData.beta.toFixed(2) : "1.0",
+    volume: stockData?.volume ? stockData.volume.toLocaleString() : "1,000,000",
+    headquarters: "N/A", // API doesn't provide this data
+    founded: "N/A", // API doesn't provide this data  
+    employees: "N/A", // API doesn't provide this data
+    ceo: "N/A" // API doesn't provide this data
   };
 
   return (

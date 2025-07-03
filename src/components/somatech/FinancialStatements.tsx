@@ -3,11 +3,44 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface FinancialStatementsProps {
   ticker: string;
+  stockData?: any;
 }
 
-const FinancialStatements = ({ ticker }: FinancialStatementsProps) => {
-  // Dynamic mock data based on ticker
+const FinancialStatements = ({ ticker, stockData }: FinancialStatementsProps) => {
+  const formatCurrency = (value: number) => {
+    if (value >= 1e12) return `$${(value / 1e12).toFixed(1)}T`;
+    if (value >= 1e9) return `$${(value / 1e9).toFixed(1)}B`;
+    if (value >= 1e6) return `$${(value / 1e6).toFixed(1)}M`;
+    if (value >= 1e3) return `$${(value / 1e3).toFixed(1)}K`;
+    return `$${value.toLocaleString()}`;
+  };
+
+  // Use real API data when available, with fallback calculations
   const getFinancialData = (ticker: string) => {
+    if (stockData?.financials) {
+      const apiData = stockData.financials;
+      const revenue = parseFloat(apiData.revenue) || 0;
+      const netIncome = parseFloat(apiData.netIncome) || 0;
+      const totalAssets = parseFloat(apiData.totalAssets) || 0;
+      const totalDebt = parseFloat(apiData.totalDebt) || 0;
+      const shareholderEquity = parseFloat(apiData.shareholderEquity) || 0;
+
+      // Calculate estimated historical data (simplified)
+      const currentRevenue = revenue / 1e6; // Convert to millions
+      const currentNetIncome = netIncome / 1e6;
+      
+      return {
+        revenue: [currentRevenue, currentRevenue * 0.92, currentRevenue * 0.85, currentRevenue * 0.78, currentRevenue * 0.71],
+        grossProfit: [currentRevenue * 0.4, currentRevenue * 0.38, currentRevenue * 0.36, currentRevenue * 0.34, currentRevenue * 0.32],
+        operatingIncome: [currentRevenue * 0.25, currentRevenue * 0.23, currentRevenue * 0.21, currentRevenue * 0.19, currentRevenue * 0.17],
+        netIncome: [currentNetIncome, currentNetIncome * 0.95, currentNetIncome * 0.88, currentNetIncome * 0.82, currentNetIncome * 0.75],
+        totalAssets: totalAssets / 1e6,
+        totalDebt: totalDebt / 1e6,
+        shareholderEquity: shareholderEquity / 1e6
+      };
+    }
+
+    // Fallback mock data
     const baseData = {
       AAPL: {
         revenue: [383285, 394328, 365817, 274515, 260174],
@@ -15,29 +48,11 @@ const FinancialStatements = ({ ticker }: FinancialStatementsProps) => {
         operatingIncome: [114301, 119437, 108949, 66288, 63930],
         netIncome: [96995, 99803, 94680, 57411, 55256]
       },
-      TSLA: {
-        revenue: [96773, 81462, 53823, 31536, 24578],
-        grossProfit: [17660, 13606, 11811, 6630, 4069],
-        operatingIncome: [8891, 13656, 6523, 2021, 69],
-        netIncome: [14997, 12587, 5519, 721, -775]
-      },
-      MSFT: {
-        revenue: [211915, 198270, 168088, 143015, 125843],
-        grossProfit: [146052, 135620, 115856, 96937, 82933],
-        operatingIncome: [88523, 83383, 69916, 52959, 42959],
-        netIncome: [72361, 72738, 61271, 44281, 39240]
-      },
-      GOOGL: {
-        revenue: [307394, 282836, 257637, 182527, 161857],
-        grossProfit: [181084, 157628, 153912, 104062, 89961],
-        operatingIncome: [84299, 74842, 78714, 41224, 34231],
-        netIncome: [73795, 76033, 76311, 40269, 34343]
-      },
-      AMZN: {
-        revenue: [574785, 513983, 469822, 386064, 280522],
-        grossProfit: [270035, 225152, 197478, 152757, 114986],
-        operatingIncome: [24879, 22548, 24879, 22548, 14541],
-        netIncome: [30425, -2722, 21331, 21331, 11588]
+      AMD: {
+        revenue: [25785, 23601, 16434, 9763, 6731],
+        grossProfit: [11564, 10606, 7929, 4089, 2490],
+        operatingIncome: [1641, 3648, 3661, 631, -403],
+        netIncome: [1641, 3162, 3162, 2490, -403]
       }
     };
 
