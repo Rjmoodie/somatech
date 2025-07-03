@@ -169,6 +169,7 @@ const StockAnalysis = ({ globalTicker, setGlobalTicker }: StockAnalysisProps) =>
               ticker={globalTicker}
               stockData={stockData}
               dcfScenarios={dcfScenarios}
+              investmentThesis={investmentThesis}
             />
           </div>
         </div>

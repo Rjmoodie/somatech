@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { StockData, DCFScenarios } from "./types";
+import { StockData, DCFScenarios, InvestmentThesis } from "./types";
 import { calculateDCF } from "./utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -15,9 +15,10 @@ interface WatchlistDialogProps {
   ticker: string;
   stockData: StockData | null;
   dcfScenarios: DCFScenarios;
+  investmentThesis: InvestmentThesis;
 }
 
-const WatchlistDialog = ({ open, onOpenChange, ticker, stockData, dcfScenarios }: WatchlistDialogProps) => {
+const WatchlistDialog = ({ open, onOpenChange, ticker, stockData, dcfScenarios, investmentThesis }: WatchlistDialogProps) => {
   const [selectedScenario, setSelectedScenario] = useState<'low' | 'base' | 'high'>('base');
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
@@ -32,6 +33,23 @@ const WatchlistDialog = ({ open, onOpenChange, ticker, stockData, dcfScenarios }
     try {
       const dcfResult = calculateDCF(dcfScenarios[selectedScenario], stockData);
       
+      // Combine investment thesis into notes
+      const thesisNotes = [];
+      if (investmentThesis.moat.trim()) {
+        thesisNotes.push(`Economic Moat: ${investmentThesis.moat.trim()}`);
+      }
+      if (investmentThesis.risks.trim()) {
+        thesisNotes.push(`Key Risks: ${investmentThesis.risks.trim()}`);
+      }
+      if (investmentThesis.opportunities.trim()) {
+        thesisNotes.push(`Growth Opportunities: ${investmentThesis.opportunities.trim()}`);
+      }
+      if (notes.trim()) {
+        thesisNotes.push(`Additional Notes: ${notes.trim()}`);
+      }
+      
+      const combinedNotes = thesisNotes.join('\n\n');
+      
       const { error } = await supabase
         .from('watchlist')
         .insert({
@@ -45,7 +63,7 @@ const WatchlistDialog = ({ open, onOpenChange, ticker, stockData, dcfScenarios }
           score: stockData.score,
           market_cap: stockData.marketCap,
           pe_ratio: stockData.pe,
-          notes: notes.trim() || null
+          notes: combinedNotes || null
         });
 
       if (error) throw error;
@@ -110,10 +128,13 @@ const WatchlistDialog = ({ open, onOpenChange, ticker, stockData, dcfScenarios }
           </div>
 
           <div>
-            <Label htmlFor="notes">Notes (Optional)</Label>
+            <Label htmlFor="notes">Additional Notes (Optional)</Label>
+            <p className="text-sm text-muted-foreground mb-2">
+              Investment thesis will be automatically included from your analysis
+            </p>
             <Textarea
               id="notes"
-              placeholder="Add your investment thesis or notes..."
+              placeholder="Add any additional notes or comments..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               className="mt-2"
