@@ -56,6 +56,22 @@ export interface StockData {
   ratios: StockRatios;
   marketCap?: number;
   eps?: number;
+  companyName?: string;
+  headquarters?: string;
+  founded?: string;
+  employees?: string;
+  ceo?: string;
+  exchange?: string;
+  sector?: string;
+  industry?: string;
+  description?: string;
+  week52High?: number;
+  week52Low?: number;
+  dividendYield?: number;
+  beta?: number;
+  volume?: number;
+  priceChange?: number;
+  priceChangePercent?: number;
   financials?: {
     revenue: string;
     netIncome: string;

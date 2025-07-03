@@ -115,6 +115,9 @@ const SomaTech = () => {
               </p>
             </div>
             <div className="flex items-center space-x-4">
+              <Button variant="outline" onClick={() => window.location.href = '/watchlist'}>
+                View Watchlist
+              </Button>
               <Button variant="outline">Free Trial</Button>
               <Button>Upgrade to Pro</Button>
             </div>

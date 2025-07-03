@@ -165,7 +165,11 @@ const StockAnalysis = ({ globalTicker, setGlobalTicker }: StockAnalysisProps) =>
             />
           </div>
           <div className="glass-card smooth-transition">
-            <ExportActions ticker={globalTicker} />
+            <ExportActions 
+              ticker={globalTicker}
+              stockData={stockData}
+              dcfScenarios={dcfScenarios}
+            />
           </div>
         </div>
       )}

@@ -25,7 +25,7 @@ const CompanySnapshot = ({ ticker, stockData }: CompanySnapshotProps) => {
     sector: stockData?.sector || "Technology",
     industry: stockData?.industry || "Software",
     marketCap: stockData?.marketCap ? formatCurrency(stockData.marketCap) : "$500B",
-    exchange: "NASDAQ",
+    exchange: stockData?.exchange || "NASDAQ",
     description: stockData?.description || "No description available",
     week52High: stockData?.week52High ? `$${stockData.week52High.toFixed(2)}` : "$250.00",
     week52Low: stockData?.week52Low ? `$${stockData.week52Low.toFixed(2)}` : "$150.00",
@@ -37,10 +37,10 @@ const CompanySnapshot = ({ ticker, stockData }: CompanySnapshotProps) => {
     ma200: stockData?.technicals?.ma200 ? `$${stockData.technicals.ma200.toFixed(2)}` : "$165.30",
     beta: stockData?.beta ? stockData.beta.toFixed(2) : "1.0",
     volume: stockData?.volume ? stockData.volume.toLocaleString() : "1,000,000",
-    headquarters: "N/A", // API doesn't provide this data
-    founded: "N/A", // API doesn't provide this data  
-    employees: "N/A", // API doesn't provide this data
-    ceo: "N/A" // API doesn't provide this data
+    headquarters: stockData?.headquarters || "Information not available",
+    founded: stockData?.founded || "Information not available",
+    employees: stockData?.employees || "Information not available",
+    ceo: stockData?.ceo || "Information not available"
   };
 
   return (

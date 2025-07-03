@@ -9,7 +9,60 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      watchlist: {
+        Row: {
+          added_at: string
+          company_name: string | null
+          current_price: number | null
+          dcf_intrinsic_value: number | null
+          dcf_scenario: string
+          dcf_upside_percentage: number | null
+          id: string
+          market_cap: number | null
+          notes: string | null
+          pe_ratio: number | null
+          recommendation: string | null
+          score: number | null
+          ticker: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          added_at?: string
+          company_name?: string | null
+          current_price?: number | null
+          dcf_intrinsic_value?: number | null
+          dcf_scenario: string
+          dcf_upside_percentage?: number | null
+          id?: string
+          market_cap?: number | null
+          notes?: string | null
+          pe_ratio?: number | null
+          recommendation?: string | null
+          score?: number | null
+          ticker: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          added_at?: string
+          company_name?: string | null
+          current_price?: number | null
+          dcf_intrinsic_value?: number | null
+          dcf_scenario?: string
+          dcf_upside_percentage?: number | null
+          id?: string
+          market_cap?: number | null
+          notes?: string | null
+          pe_ratio?: number | null
+          recommendation?: string | null
+          score?: number | null
+          ticker?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
