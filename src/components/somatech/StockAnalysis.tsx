@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { StockData, DCFScenarios, InvestmentThesis } from "./types";
 import { generateStockChartData } from "./utils";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import StockTickerInput from "./StockTickerInput";
 import CompanySnapshot from "./CompanySnapshot";
 import FinancialStatements from "./FinancialStatements";
@@ -18,6 +20,7 @@ interface StockAnalysisProps {
 
 const StockAnalysis = ({ globalTicker, setGlobalTicker }: StockAnalysisProps) => {
   const [stockData, setStockData] = useState<StockData | null>(null);
+  const [loading, setLoading] = useState(false);
   const [dcfScenarios, setDcfScenarios] = useState<DCFScenarios>({
     low: { revenueGrowth: 5, netMargin: 8, fcfGrowth: 3, exitMultiple: 15, discountRate: 12 },
     base: { revenueGrowth: 12, netMargin: 15, fcfGrowth: 8, exitMultiple: 20, discountRate: 10 },
@@ -79,14 +82,42 @@ const StockAnalysis = ({ globalTicker, setGlobalTicker }: StockAnalysisProps) =>
     };
   };
 
-  const analyzeStock = () => {
-    setStockData(generateMockData(globalTicker));
+  const analyzeStock = async () => {
+    if (!globalTicker) {
+      toast.error("Please enter a stock symbol");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('fetch-stock-data', {
+        body: { symbol: globalTicker }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      setStockData(data);
+      toast.success(`Successfully loaded data for ${globalTicker}`);
+    } catch (error) {
+      console.error('Error fetching stock data:', error);
+      toast.error(`Failed to fetch data for ${globalTicker}. Using mock data.`);
+      // Fallback to mock data
+      setStockData(generateMockData(globalTicker));
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Auto-update data when ticker changes
   useEffect(() => {
     if (globalTicker && stockData) {
-      setStockData(generateMockData(globalTicker));
+      analyzeStock();
     }
   }, [globalTicker]);
 
@@ -97,6 +128,7 @@ const StockAnalysis = ({ globalTicker, setGlobalTicker }: StockAnalysisProps) =>
           globalTicker={globalTicker}
           setGlobalTicker={setGlobalTicker}
           onAnalyze={analyzeStock}
+          loading={loading}
         />
       </div>
 
