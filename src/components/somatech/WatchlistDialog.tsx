@@ -53,6 +53,7 @@ const WatchlistDialog = ({ open, onOpenChange, ticker, stockData, dcfScenarios, 
       const { error } = await supabase
         .from('watchlist')
         .insert({
+          user_id: (await supabase.auth.getUser()).data.user?.id,
           ticker: stockData.symbol,
           company_name: stockData.companyName || `${stockData.symbol} Corporation`,
           current_price: stockData.price,
