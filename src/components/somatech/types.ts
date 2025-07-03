@@ -54,6 +54,15 @@ export interface StockData {
   pillars: Record<string, StockPillar>;
   technicals: StockTechnicals;
   ratios: StockRatios;
+  marketCap?: number;
+  eps?: number;
+  financials?: {
+    revenue: string;
+    netIncome: string;
+    totalAssets: string;
+    totalDebt: string;
+    shareholderEquity: string;
+  };
 }
 
 export interface ValuationResult {

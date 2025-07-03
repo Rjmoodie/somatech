@@ -37,15 +37,43 @@ export const generateStockChartData = () => {
 };
 
 export const calculateDCF = (scenario: DCFParams, stockData: StockData | null) => {
-  const currentPrice = stockData?.price || 175;
-  const revenue = 380000; // Mock current revenue in millions
+  if (!stockData) {
+    return { intrinsicValue: 0, cagr: 0, upside: 0 };
+  }
+
+  const currentPrice = stockData.price;
   
+  // Use real financial data from Alpha Vantage API
+  const revenue = stockData.financials?.revenue ? 
+    parseFloat(stockData.financials.revenue) / 1000000 : // Convert to millions
+    stockData.marketCap / (stockData.pe || 20); // Fallback estimate
+  
+  const currentEarnings = stockData.financials?.netIncome ? 
+    parseFloat(stockData.financials.netIncome) / 1000000 : // Convert to millions
+    revenue * 0.15; // Fallback to 15% net margin
+  
+  // Calculate shares outstanding from market cap and price
+  const sharesOutstanding = stockData.marketCap / (currentPrice * 1000000); // In millions
+  
+  // Project financials based on scenario
   const projectedRevenue = revenue * Math.pow(1 + scenario.revenueGrowth / 100, 5);
   const projectedEarnings = projectedRevenue * (scenario.netMargin / 100);
-  const terminalValue = projectedEarnings * scenario.exitMultiple;
+  
+  // Calculate free cash flow growth
+  const currentFCF = currentEarnings * 1.2; // Estimate FCF as 120% of net income
+  const projectedFCF = currentFCF * Math.pow(1 + scenario.fcfGrowth / 100, 5);
+  
+  // Terminal value using both earnings and FCF
+  const terminalValueEarnings = projectedEarnings * scenario.exitMultiple;
+  const terminalValueFCF = projectedFCF * (scenario.exitMultiple * 0.8); // FCF multiple typically lower
+  const terminalValue = (terminalValueEarnings + terminalValueFCF) / 2; // Average both methods
+  
+  // Discount to present value
   const discountFactor = Math.pow(1 + scenario.discountRate / 100, 5);
-  const intrinsicValue = terminalValue / discountFactor;
-  const sharePrice = intrinsicValue / 16000; // Mock shares outstanding in millions
+  const presentValue = terminalValue / discountFactor;
+  
+  // Calculate per-share value
+  const sharePrice = presentValue / sharesOutstanding;
   
   return {
     intrinsicValue: Math.round(sharePrice),
