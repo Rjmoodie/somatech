@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -12,9 +13,13 @@ import {
   Calendar,
   PlayCircle,
   BookOpen,
-  ExternalLink
+  ExternalLink,
+  Megaphone,
+  BarChart3
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from "recharts";
 
 interface DashboardProps {
   globalTicker: string;
@@ -96,22 +101,37 @@ const Dashboard = ({ globalTicker, setGlobalTicker, setActiveModule }: Dashboard
     );
   };
 
-  const youtubeVideos = [
-    {
-      title: "Market Analysis: Q3 2024 Review",
-      thumbnail: "https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg",
-      duration: "12:34"
-    },
-    {
-      title: "Business Valuation Fundamentals",
-      thumbnail: "https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg",
-      duration: "15:22"
-    },
-    {
-      title: "Cash Flow Management Tips",
-      thumbnail: "https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg",
-      duration: "8:45"
-    }
+  const featuredVideo = {
+    title: "SomaTech Financial Analysis Deep Dive",
+    thumbnail: "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
+    duration: "24:15",
+    description: "Learn advanced valuation techniques and cash flow modeling with real-world examples."
+  };
+
+  // Mock historical data for charts
+  const historicalData = {
+    fedRate: [
+      { month: 'Jan', value: 5.0 },
+      { month: 'Feb', value: 5.1 },
+      { month: 'Mar', value: 5.15 },
+      { month: 'Apr', value: 5.2 },
+      { month: 'May', value: 5.25 },
+      { month: 'Jun', value: 5.25 }
+    ],
+    inflation: [
+      { month: 'Jan', value: 3.4 },
+      { month: 'Feb', value: 3.3 },
+      { month: 'Mar', value: 3.2 },
+      { month: 'Apr', value: 3.1 },
+      { month: 'May', value: 3.2 },
+      { month: 'Jun', value: 3.2 }
+    ]
+  };
+
+  const [selectedChart, setSelectedChart] = useState<string | null>(null);
+
+  const announcements = [
+    // Empty array to show "no announcements today"
   ];
 
   const contentResources = [
@@ -149,39 +169,81 @@ const Dashboard = ({ globalTicker, setGlobalTicker, setActiveModule }: Dashboard
         </CardContent>
       </Card>
 
+      {/* Announcements Section */}
+      {announcements.length > 0 ? (
+        <Card className="border-l-4 border-l-primary bg-gradient-to-r from-primary/5 to-background">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium flex items-center">
+              <Megaphone className="h-4 w-4 mr-2" />
+              Announcements
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {announcements.map((announcement, index) => (
+              <div key={index} className="p-3 bg-background/50 rounded-lg">
+                <p className="text-sm">{announcement}</p>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      ) : (
+        <Card className="border-dashed border-2 border-muted">
+          <CardContent className="p-6 text-center">
+            <Megaphone className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+            <p className="text-muted-foreground">No announcements today</p>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Market Overview Section */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Macroeconomic Indicators */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center">
-              <Globe className="h-4 w-4 mr-2" />
-              Key Indicators
+        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <CardHeader className="pb-3 bg-gradient-to-r from-primary/10 to-primary/5">
+            <CardTitle className="text-sm font-medium flex items-center justify-between">
+              <span className="flex items-center">
+                <Globe className="h-4 w-4 mr-2" />
+                Key Indicators
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSelectedChart(selectedChart === 'indicators' ? null : 'indicators')}
+                className="h-6 w-6 p-0"
+              >
+                <BarChart3 className="h-3 w-3" />
+              </Button>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center cursor-pointer hover:bg-muted/50 p-2 rounded transition-colors" onClick={() => setSelectedChart('fedRate')}>
               <span className="text-sm text-muted-foreground">Fed Rate</span>
-              <Badge variant="outline">5.25%</Badge>
+              <div className="flex items-center space-x-2">
+                <Badge variant="outline" className="bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200">5.25%</Badge>
+                <BarChart3 className="h-3 w-3 text-muted-foreground" />
+              </div>
             </div>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center cursor-pointer hover:bg-muted/50 p-2 rounded transition-colors" onClick={() => setSelectedChart('inflation')}>
               <span className="text-sm text-muted-foreground">Inflation</span>
-              <Badge variant="outline">3.2%</Badge>
+              <div className="flex items-center space-x-2">
+                <Badge variant="outline" className="bg-gradient-to-r from-orange-50 to-orange-100 border-orange-200">3.2%</Badge>
+                <BarChart3 className="h-3 w-3 text-muted-foreground" />
+              </div>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm text-muted-foreground">Unemployment</span>
-              <Badge variant="outline">3.8%</Badge>
+              <Badge variant="outline" className="bg-gradient-to-r from-green-50 to-green-100 border-green-200">3.8%</Badge>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm text-muted-foreground">GDP Growth</span>
-              <Badge variant="outline">2.4%</Badge>
+              <Badge variant="outline" className="bg-gradient-to-r from-purple-50 to-purple-100 border-purple-200">2.4%</Badge>
             </div>
           </CardContent>
         </Card>
 
         {/* Market Snapshot */}
-        <Card>
-          <CardHeader className="pb-3">
+        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <CardHeader className="pb-3 bg-gradient-to-r from-green-50 to-green-100/50">
             <CardTitle className="text-sm font-medium flex items-center">
               <Activity className="h-4 w-4 mr-2" />
               Market Snapshot
@@ -190,21 +252,21 @@ const Dashboard = ({ globalTicker, setGlobalTicker, setActiveModule }: Dashboard
           <CardContent className="space-y-3">
             {marketData && (
               <>
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center p-2 bg-gradient-to-r from-background to-muted/20 rounded">
                   <span className="text-sm text-muted-foreground">S&P 500</span>
                   <div className="text-right">
-                    <div className="text-sm font-medium">{marketData.sp500.value}</div>
+                    <div className="text-sm font-medium">{marketData.sp500.value.toLocaleString()}</div>
                     {formatChange(marketData.sp500.change)}
                   </div>
                 </div>
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center p-2 bg-gradient-to-r from-background to-muted/20 rounded">
                   <span className="text-sm text-muted-foreground">NASDAQ</span>
                   <div className="text-right">
-                    <div className="text-sm font-medium">{marketData.nasdaq.value}</div>
+                    <div className="text-sm font-medium">{marketData.nasdaq.value.toLocaleString()}</div>
                     {formatChange(marketData.nasdaq.change)}
                   </div>
                 </div>
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center p-2 bg-gradient-to-r from-background to-muted/20 rounded">
                   <span className="text-sm text-muted-foreground">10Y Treasury</span>
                   <div className="text-right">
                     <div className="text-sm font-medium">{marketData.treasury10y.value}%</div>
@@ -217,53 +279,53 @@ const Dashboard = ({ globalTicker, setGlobalTicker, setActiveModule }: Dashboard
         </Card>
 
         {/* Business Environment */}
-        <Card>
-          <CardHeader className="pb-3">
+        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <CardHeader className="pb-3 bg-gradient-to-r from-blue-50 to-blue-100/50">
             <CardTitle className="text-sm font-medium flex items-center">
               <Building2 className="h-4 w-4 mr-2" />
               Business Pulse
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center p-2 bg-gradient-to-r from-green-50 to-green-100/30 rounded-lg">
               <span className="text-sm text-muted-foreground">SMB Confidence</span>
-              <Badge variant="secondary" className="bg-green-100 text-green-800">High</Badge>
+              <Badge variant="secondary" className="bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md">High</Badge>
             </div>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center p-2 bg-gradient-to-r from-yellow-50 to-yellow-100/30 rounded-lg">
               <span className="text-sm text-muted-foreground">VC Funding</span>
-              <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">Moderate</Badge>
+              <Badge variant="secondary" className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white shadow-md">Moderate</Badge>
             </div>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center p-2 bg-gradient-to-r from-green-50 to-green-100/30 rounded-lg">
               <span className="text-sm text-muted-foreground">Credit Access</span>
-              <Badge variant="secondary" className="bg-green-100 text-green-800">Good</Badge>
+              <Badge variant="secondary" className="bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md">Good</Badge>
             </div>
           </CardContent>
         </Card>
 
         {/* Key Alerts */}
-        <Card>
-          <CardHeader className="pb-3">
+        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <CardHeader className="pb-3 bg-gradient-to-r from-orange-50 to-orange-100/50">
             <CardTitle className="text-sm font-medium flex items-center">
               <AlertCircle className="h-4 w-4 mr-2" />
               Today's Alerts
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="text-sm">
+            <div className="text-sm p-2 bg-gradient-to-r from-blue-50 to-blue-100/30 rounded-lg">
               <div className="flex items-start space-x-2">
-                <div className="w-2 h-2 bg-blue-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                <div className="w-2 h-2 bg-blue-500 rounded-full mt-1.5 flex-shrink-0 shadow-sm"></div>
                 <span className="text-muted-foreground">Fed meeting minutes released</span>
               </div>
             </div>
-            <div className="text-sm">
+            <div className="text-sm p-2 bg-gradient-to-r from-green-50 to-green-100/30 rounded-lg">
               <div className="flex items-start space-x-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                <div className="w-2 h-2 bg-green-500 rounded-full mt-1.5 flex-shrink-0 shadow-sm"></div>
                 <span className="text-muted-foreground">Tech earnings beat expectations</span>
               </div>
             </div>
-            <div className="text-sm">
+            <div className="text-sm p-2 bg-gradient-to-r from-orange-50 to-orange-100/30 rounded-lg">
               <div className="flex items-start space-x-2">
-                <div className="w-2 h-2 bg-orange-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                <div className="w-2 h-2 bg-orange-500 rounded-full mt-1.5 flex-shrink-0 shadow-sm"></div>
                 <span className="text-muted-foreground">Oil prices volatile</span>
               </div>
             </div>
@@ -271,35 +333,76 @@ const Dashboard = ({ globalTicker, setGlobalTicker, setActiveModule }: Dashboard
         </Card>
       </div>
 
-      {/* YouTube Section */}
-      <Card>
-        <CardHeader>
+      {/* Historical Chart Modal */}
+      {selectedChart && (
+        <Card className="shadow-2xl border-2 border-primary/20">
+          <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5">
+            <CardTitle className="flex items-center justify-between">
+              <span>{selectedChart === 'fedRate' ? 'Federal Funds Rate - 6 Month Trend' : 'Inflation Rate - 6 Month Trend'}</span>
+              <Button variant="ghost" size="sm" onClick={() => setSelectedChart(null)}>×</Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={selectedChart === 'fedRate' ? historicalData.fedRate : historicalData.inflation}>
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Line 
+                    type="monotone" 
+                    dataKey="value" 
+                    stroke="hsl(var(--primary))" 
+                    strokeWidth={3}
+                    dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 6 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Featured Video Section */}
+      <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <CardHeader className="bg-gradient-to-r from-red-50 to-red-100/50">
           <CardTitle className="flex items-center">
             <PlayCircle className="h-5 w-5 mr-2" />
-            Featured Videos
+            Featured Video
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {youtubeVideos.map((video, index) => (
-              <div key={index} className="group cursor-pointer">
-                <div className="relative overflow-hidden rounded-lg">
-                  <img 
-                    src={video.thumbnail} 
-                    alt={video.title}
-                    className="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-200"
-                  />
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors">
-                    <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded">
-                      {video.duration}
+        <CardContent className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="group cursor-pointer">
+              <div className="relative overflow-hidden rounded-lg shadow-lg">
+                <img 
+                  src={featuredVideo.thumbnail} 
+                  alt={featuredVideo.title}
+                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors">
+                  <div className="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-1 rounded font-medium">
+                    FEATURED
+                  </div>
+                  <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded font-medium">
+                    {featuredVideo.duration}
+                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm group-hover:bg-white/30 transition-colors">
+                      <PlayCircle className="h-8 w-8 text-white" />
                     </div>
                   </div>
                 </div>
-                <h4 className="mt-2 text-sm font-medium group-hover:text-primary transition-colors">
-                  {video.title}
-                </h4>
               </div>
-            ))}
+            </div>
+            <div className="flex flex-col justify-center space-y-4">
+              <h3 className="text-xl font-bold text-foreground">{featuredVideo.title}</h3>
+              <p className="text-muted-foreground">{featuredVideo.description}</p>
+              <Button className="w-fit bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800">
+                <PlayCircle className="h-4 w-4 mr-2" />
+                Watch Now
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
