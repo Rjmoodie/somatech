@@ -85,29 +85,62 @@ export const calculateDCF = (scenario: DCFParams, stockData: StockData | null) =
 export const generateRetirementChartData = (
   currentAge: string,
   retirementAge: string,
+  lifeExpectancy: string,
   currentSavings: string,
-  monthlyContribution: string,
-  expectedReturn: number[]
+  annualContribution: string,
+  expectedReturn: number[],
+  retirementSpending: string,
+  inflationRate: number[]
 ) => {
-  if (!currentAge || !retirementAge || !currentSavings || !monthlyContribution) return [];
+  if (!currentAge || !retirementAge || !currentSavings || !annualContribution) return [];
   
   const age = parseInt(currentAge);
   const retAge = parseInt(retirementAge);
+  const lifeExp = parseInt(lifeExpectancy) || 90;
   const savings = parseFloat(currentSavings);
-  const contribution = parseFloat(monthlyContribution);
+  const contribution = parseFloat(annualContribution);
   const returnRate = expectedReturn[0] / 100;
+  const annualSpending = parseFloat(retirementSpending) || 0;
+  const inflation = inflationRate ? inflationRate[0] / 100 : 0.025;
   
   const data = [];
   let currentBalance = savings;
   
+  // Accumulation phase (working years)
   for (let year = age; year <= retAge; year++) {
+    const totalContributions = contribution * (year - age + 1);
+    const growth = currentBalance - savings - totalContributions;
+    
     data.push({
       age: year,
       balance: Math.round(currentBalance),
-      contributions: Math.round(contribution * 12 * (year - age + 1)),
-      growth: Math.round(currentBalance - savings - (contribution * 12 * (year - age)))
+      contributions: Math.round(totalContributions),
+      growth: Math.round(Math.max(0, growth)),
+      phase: 'accumulation'
     });
-    currentBalance = currentBalance * (1 + returnRate) + (contribution * 12);
+    
+    if (year < retAge) {
+      currentBalance = currentBalance * (1 + returnRate) + contribution;
+    }
+  }
+  
+  // Decumulation phase (retirement years)
+  let retirementBalance = currentBalance;
+  const inflationAdjustedSpending = annualSpending * Math.pow(1 + inflation, retAge - age);
+  
+  for (let year = retAge + 1; year <= lifeExp; year++) {
+    const yearlySpending = inflationAdjustedSpending * Math.pow(1 + inflation, year - retAge);
+    retirementBalance = Math.max(0, retirementBalance * (1 + returnRate) - yearlySpending);
+    
+    data.push({
+      age: year,
+      balance: Math.round(retirementBalance),
+      contributions: Math.round(contribution * (retAge - age + 1)),
+      growth: Math.round(retirementBalance),
+      phase: 'decumulation'
+    });
+    
+    if (retirementBalance <= 0) break;
   }
   
   return data;
