@@ -1,8 +1,20 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { TrendingUp, Calculator, BarChart3 } from "lucide-react";
-import { modules } from "./constants";
+import { Badge } from "@/components/ui/badge";
+import { 
+  TrendingUp, 
+  TrendingDown, 
+  DollarSign, 
+  Activity, 
+  Users, 
+  Building2,
+  Globe,
+  AlertCircle,
+  Calendar,
+  PlayCircle,
+  BookOpen,
+  ExternalLink
+} from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface DashboardProps {
   globalTicker: string;
@@ -10,74 +22,341 @@ interface DashboardProps {
   setActiveModule: (module: string) => void;
 }
 
+interface MarketData {
+  sp500: { value: number; change: number };
+  nasdaq: { value: number; change: number };
+  dow: { value: number; change: number };
+  treasury10y: { value: number; change: number };
+  oil: { value: number; change: number };
+  gold: { value: number; change: number };
+}
+
+interface NewsItem {
+  title: string;
+  summary: string;
+  url: string;
+  time_published: string;
+  source: string;
+}
+
 const Dashboard = ({ globalTicker, setGlobalTicker, setActiveModule }: DashboardProps) => {
+  const [marketData, setMarketData] = useState<MarketData | null>(null);
+  const [news, setNews] = useState<NewsItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Mock data for demo - in production, fetch from APIs
+  useEffect(() => {
+    const mockMarketData: MarketData = {
+      sp500: { value: 4563.45, change: 1.2 },
+      nasdaq: { value: 14234.56, change: 0.8 },
+      dow: { value: 35234.78, change: -0.3 },
+      treasury10y: { value: 4.25, change: 0.05 },
+      oil: { value: 78.45, change: 2.1 },
+      gold: { value: 1985.34, change: -0.5 }
+    };
+
+    const mockNews: NewsItem[] = [
+      {
+        title: "Federal Reserve Holds Interest Rates Steady",
+        summary: "The Fed maintains current rates while signaling potential future adjustments based on inflation data.",
+        url: "#",
+        time_published: "2025-07-03T08:00:00Z",
+        source: "Financial Times"
+      },
+      {
+        title: "Small Business Confidence Index Reaches Highest Level This Year",
+        summary: "NFIB report shows increased optimism among small business owners regarding economic outlook.",
+        url: "#",
+        time_published: "2025-07-03T07:30:00Z",
+        source: "Reuters"
+      },
+      {
+        title: "Tech Startup Funding Shows Signs of Recovery",
+        summary: "VC investment in early-stage companies increases 15% quarter-over-quarter.",
+        url: "#",
+        time_published: "2025-07-03T06:45:00Z",
+        source: "Bloomberg"
+      }
+    ];
+
+    setTimeout(() => {
+      setMarketData(mockMarketData);
+      setNews(mockNews);
+      setLoading(false);
+    }, 1000);
+  }, []);
+
+  const formatChange = (change: number) => {
+    const isPositive = change >= 0;
+    return (
+      <span className={`flex items-center ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+        {isPositive ? <TrendingUp className="h-3 w-3 mr-1" /> : <TrendingDown className="h-3 w-3 mr-1" />}
+        {isPositive ? '+' : ''}{change.toFixed(2)}%
+      </span>
+    );
+  };
+
+  const youtubeVideos = [
+    {
+      title: "Market Analysis: Q3 2024 Review",
+      thumbnail: "https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg",
+      duration: "12:34"
+    },
+    {
+      title: "Business Valuation Fundamentals",
+      thumbnail: "https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg",
+      duration: "15:22"
+    },
+    {
+      title: "Cash Flow Management Tips",
+      thumbnail: "https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg",
+      duration: "8:45"
+    }
+  ];
+
+  const contentResources = [
+    {
+      title: "The Complete Guide to Business Valuation",
+      type: "Guide",
+      description: "Learn the fundamentals of valuing any business with our comprehensive guide."
+    },
+    {
+      title: "Financial Modeling Templates",
+      type: "Templates",
+      description: "Ready-to-use Excel templates for financial projections and analysis."
+    },
+    {
+      title: "Investment Due Diligence Checklist",
+      type: "Checklist",
+      description: "Essential items to review before making any investment decision."
+    }
+  ];
+
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {modules.slice(1).map((module) => {
-          const Icon = module.icon;
-          return (
-            <Card key={module.id} className="cursor-pointer hover:shadow-md transition-all duration-200" onClick={() => setActiveModule(module.id)}>
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-3">
-                  <Icon className="h-8 w-8 text-primary" />
-                  <div>
-                    <h3 className="font-semibold">{module.name}</h3>
-                    <p className="text-sm text-muted-foreground">Available</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Welcome to SomaTech</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">
+    <div className="space-y-8 animate-fade-in">
+      {/* Welcome Section */}
+      <Card className="border-none bg-gradient-to-r from-primary/5 to-primary/10">
+        <CardContent className="p-8">
+          <div className="text-center space-y-4">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+              Welcome to SomaTech
+            </h1>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               SomaTech provides professional-grade financial analysis tools designed for entrepreneurs, 
               investors, and business professionals.
             </p>
-            <div className="space-y-2">
-              <div className="flex items-center text-sm text-muted-foreground">
-                <TrendingUp className="h-4 w-4 mr-2" />
-                Real-time stock analysis with 8-pillar scoring
-              </div>
-              <div className="flex items-center text-sm text-muted-foreground">
-                <Calculator className="h-4 w-4 mr-2" />
-                Business valuation using multiple methodologies
-              </div>
-              <div className="flex items-center text-sm text-muted-foreground">
-                <BarChart3 className="h-4 w-4 mr-2" />
-                Cash flow simulation and runway analysis
-              </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Market Overview Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Macroeconomic Indicators */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium flex items-center">
+              <Globe className="h-4 w-4 mr-2" />
+              Key Indicators
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-muted-foreground">Fed Rate</span>
+              <Badge variant="outline">5.25%</Badge>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-muted-foreground">Inflation</span>
+              <Badge variant="outline">3.2%</Badge>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-muted-foreground">Unemployment</span>
+              <Badge variant="outline">3.8%</Badge>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-muted-foreground">GDP Growth</span>
+              <Badge variant="outline">2.4%</Badge>
             </div>
           </CardContent>
         </Card>
-        
+
+        {/* Market Snapshot */}
         <Card>
-          <CardHeader>
-            <CardTitle>Quick Stock Lookup</CardTitle>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium flex items-center">
+              <Activity className="h-4 w-4 mr-2" />
+              Market Snapshot
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="flex space-x-2">
-              <Input
-                placeholder="TSLA"
-                value={globalTicker}
-                onChange={(e) => setGlobalTicker(e.target.value.toUpperCase())}
-                className="flex-1"
-              />
-              <Button onClick={() => setActiveModule("stock-analysis")}>
-                Analyze
-              </Button>
+          <CardContent className="space-y-3">
+            {marketData && (
+              <>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">S&P 500</span>
+                  <div className="text-right">
+                    <div className="text-sm font-medium">{marketData.sp500.value}</div>
+                    {formatChange(marketData.sp500.change)}
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">NASDAQ</span>
+                  <div className="text-right">
+                    <div className="text-sm font-medium">{marketData.nasdaq.value}</div>
+                    {formatChange(marketData.nasdaq.change)}
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">10Y Treasury</span>
+                  <div className="text-right">
+                    <div className="text-sm font-medium">{marketData.treasury10y.value}%</div>
+                    {formatChange(marketData.treasury10y.change)}
+                  </div>
+                </div>
+              </>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Business Environment */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium flex items-center">
+              <Building2 className="h-4 w-4 mr-2" />
+              Business Pulse
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-muted-foreground">SMB Confidence</span>
+              <Badge variant="secondary" className="bg-green-100 text-green-800">High</Badge>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-muted-foreground">VC Funding</span>
+              <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">Moderate</Badge>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-muted-foreground">Credit Access</span>
+              <Badge variant="secondary" className="bg-green-100 text-green-800">Good</Badge>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Key Alerts */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium flex items-center">
+              <AlertCircle className="h-4 w-4 mr-2" />
+              Today's Alerts
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="text-sm">
+              <div className="flex items-start space-x-2">
+                <div className="w-2 h-2 bg-blue-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                <span className="text-muted-foreground">Fed meeting minutes released</span>
+              </div>
+            </div>
+            <div className="text-sm">
+              <div className="flex items-start space-x-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                <span className="text-muted-foreground">Tech earnings beat expectations</span>
+              </div>
+            </div>
+            <div className="text-sm">
+              <div className="flex items-start space-x-2">
+                <div className="w-2 h-2 bg-orange-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                <span className="text-muted-foreground">Oil prices volatile</span>
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* YouTube Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <PlayCircle className="h-5 w-5 mr-2" />
+            Featured Videos
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {youtubeVideos.map((video, index) => (
+              <div key={index} className="group cursor-pointer">
+                <div className="relative overflow-hidden rounded-lg">
+                  <img 
+                    src={video.thumbnail} 
+                    alt={video.title}
+                    className="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-200"
+                  />
+                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors">
+                    <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded">
+                      {video.duration}
+                    </div>
+                  </div>
+                </div>
+                <h4 className="mt-2 text-sm font-medium group-hover:text-primary transition-colors">
+                  {video.title}
+                </h4>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Content Resources */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <BookOpen className="h-5 w-5 mr-2" />
+            Learning Resources
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {contentResources.map((resource, index) => (
+              <div key={index} className="p-4 border rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+                <div className="flex items-start justify-between mb-2">
+                  <Badge variant="outline">{resource.type}</Badge>
+                  <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <h4 className="font-medium mb-2">{resource.title}</h4>
+                <p className="text-sm text-muted-foreground">{resource.description}</p>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Latest News */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Calendar className="h-5 w-5 mr-2" />
+            Latest Business News
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {news.map((item, index) => (
+              <div key={index} className="flex items-start space-x-4 p-4 border rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+                <div className="flex-1">
+                  <div className="flex items-center space-x-2 mb-1">
+                    <h4 className="font-medium hover:text-primary transition-colors">{item.title}</h4>
+                    <ExternalLink className="h-3 w-3 text-muted-foreground" />
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-2">{item.summary}</p>
+                  <div className="flex items-center space-x-4 text-xs text-muted-foreground">
+                    <span>{item.source}</span>
+                    <span>•</span>
+                    <span>{new Date(item.time_published).toLocaleDateString()}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
