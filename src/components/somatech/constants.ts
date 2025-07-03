@@ -1,15 +1,16 @@
-import { Calculator, TrendingUp, BarChart3, Users, FileText, Home, DollarSign, Star } from "lucide-react";
+import { Calculator, TrendingUp, BarChart3, Users, FileText, Home, DollarSign, Star, ShoppingCart, LayoutDashboard, Activity } from "lucide-react";
 import { Module } from "./types";
 
 export const modules: Module[] = [
-  { id: "dashboard", name: "Dashboard", icon: Home },
-  { id: "retirement-planning", name: "Retirement Planning", icon: FileText },
+  { id: "dashboard", name: "Dashboard", icon: LayoutDashboard },
   { id: "stock-analysis", name: "Stock Analysis", icon: TrendingUp },
   { id: "watchlist", name: "Watchlist", icon: Star },
+  { id: "marketplace", name: "Business Marketplace", icon: ShoppingCart },
   { id: "business-valuation", name: "Business Valuation", icon: Calculator },
-  { id: "cash-flow", name: "Cash Flow Simulator", icon: BarChart3 },
+  { id: "cash-flow", name: "Cash Flow Simulator", icon: Activity },
+  { id: "retirement-planning", name: "Retirement Planning", icon: FileText },
   { id: "real-estate", name: "Real Estate Calculator", icon: DollarSign },
-  { id: "investor-readiness", name: "Investor Readiness", icon: Users },
+  { id: "performance-tracker", name: "Performance Tracker", icon: BarChart3 },
 ];
 
 export const industryMultipliers: Record<string, number> = {

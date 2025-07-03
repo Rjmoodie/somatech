@@ -9,6 +9,116 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      business_listings: {
+        Row: {
+          asking_price: number
+          business_name: string
+          cash_flow: number | null
+          competitive_advantages: string | null
+          contact_requests_count: number | null
+          created_at: string
+          description: string
+          documents: string[] | null
+          ebitda: number
+          growth_potential: string | null
+          id: string
+          industry: string
+          key_value_drivers: string | null
+          location: string
+          revenue: number
+          status: string
+          updated_at: string
+          user_id: string
+          valuation_summary: Json | null
+          views_count: number | null
+          visibility: string
+        }
+        Insert: {
+          asking_price: number
+          business_name: string
+          cash_flow?: number | null
+          competitive_advantages?: string | null
+          contact_requests_count?: number | null
+          created_at?: string
+          description: string
+          documents?: string[] | null
+          ebitda: number
+          growth_potential?: string | null
+          id?: string
+          industry: string
+          key_value_drivers?: string | null
+          location: string
+          revenue: number
+          status?: string
+          updated_at?: string
+          user_id: string
+          valuation_summary?: Json | null
+          views_count?: number | null
+          visibility?: string
+        }
+        Update: {
+          asking_price?: number
+          business_name?: string
+          cash_flow?: number | null
+          competitive_advantages?: string | null
+          contact_requests_count?: number | null
+          created_at?: string
+          description?: string
+          documents?: string[] | null
+          ebitda?: number
+          growth_potential?: string | null
+          id?: string
+          industry?: string
+          key_value_drivers?: string | null
+          location?: string
+          revenue?: number
+          status?: string
+          updated_at?: string
+          user_id?: string
+          valuation_summary?: Json | null
+          views_count?: number | null
+          visibility?: string
+        }
+        Relationships: []
+      }
+      marketplace_messages: {
+        Row: {
+          created_at: string
+          id: string
+          listing_id: string
+          message: string
+          read_at: string | null
+          recipient_id: string
+          sender_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          listing_id: string
+          message: string
+          read_at?: string | null
+          recipient_id: string
+          sender_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          listing_id?: string
+          message?: string
+          read_at?: string | null
+          recipient_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketplace_messages_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "business_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       watchlist: {
         Row: {
           added_at: string

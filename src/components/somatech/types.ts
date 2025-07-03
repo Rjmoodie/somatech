@@ -226,3 +226,69 @@ export interface Module {
   name: string;
   icon: any;
 }
+
+// Business Marketplace Types
+export interface BusinessListing {
+  id: string;
+  user_id: string;
+  business_name: string;
+  industry: string;
+  location: string;
+  revenue: number;
+  ebitda: number;
+  cash_flow?: number;
+  asking_price: number;
+  valuation_summary?: {
+    low: number;
+    base: number;
+    high: number;
+    cagr?: number;
+    upside?: number;
+  };
+  description: string;
+  key_value_drivers?: string;
+  growth_potential?: string;
+  competitive_advantages?: string;
+  documents?: string[];
+  visibility: 'public' | 'verified_only';
+  status: 'draft' | 'live' | 'under_negotiation' | 'sold';
+  views_count: number;
+  contact_requests_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MarketplaceMessage {
+  id: string;
+  listing_id: string;
+  sender_id: string;
+  recipient_id: string;
+  message: string;
+  read_at?: string;
+  created_at: string;
+}
+
+export interface ListingFormData {
+  business_name: string;
+  industry: string;
+  location: string;
+  revenue: number;
+  ebitda: number;
+  cash_flow?: number;
+  asking_price: number;
+  description: string;
+  key_value_drivers?: string;
+  growth_potential?: string;
+  competitive_advantages?: string;
+  visibility: 'public' | 'verified_only';
+}
+
+export interface MarketplaceFilters {
+  industry?: string;
+  location?: string;
+  priceMin?: number;
+  priceMax?: number;
+  ebitdaMin?: number;
+  ebitdaMax?: number;
+  sortBy: 'newest' | 'price_asc' | 'price_desc' | 'ebitda_desc';
+}

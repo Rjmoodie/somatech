@@ -11,6 +11,7 @@ import RetirementPlanning from "@/components/somatech/RetirementPlanning";
 import RealEstateCalculator from "@/components/somatech/RealEstateCalculator";
 import PerformanceTracker from "@/components/somatech/PerformanceTracker";
 import Dashboard from "@/components/somatech/Dashboard";
+import Marketplace from "@/components/somatech/Marketplace";
 
 const SomaTech = () => {
   const [activeModule, setActiveModule] = useState("dashboard");
@@ -43,6 +44,8 @@ const SomaTech = () => {
         return <StockAnalysis globalTicker={globalTicker} setGlobalTicker={setGlobalTicker} />;
       case "watchlist":
         return <WatchlistModule setActiveModule={setActiveModule} />;
+      case "marketplace":
+        return <Marketplace />;
       case "business-valuation":
         return <BusinessValuation />;
       case "cash-flow":
