@@ -155,13 +155,14 @@ const Dashboard = ({ globalTicker, setGlobalTicker, setActiveModule }: Dashboard
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Welcome Section */}
-      <Card className="border-none bg-gradient-to-r from-primary/5 to-primary/10">
+      <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 border-none bg-gradient-to-r from-primary/10 to-primary/5">
         <CardContent className="p-8">
           <div className="text-center space-y-4">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
               Welcome to SomaTech
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <div className="w-24 h-1 bg-gradient-to-r from-primary to-primary/70 mx-auto rounded-full"></div>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               SomaTech provides professional-grade financial analysis tools designed for entrepreneurs, 
               investors, and business professionals.
             </p>
@@ -171,8 +172,8 @@ const Dashboard = ({ globalTicker, setGlobalTicker, setActiveModule }: Dashboard
 
       {/* Announcements Section */}
       {announcements.length > 0 ? (
-        <Card className="border-l-4 border-l-primary bg-gradient-to-r from-primary/5 to-background">
-          <CardHeader className="pb-3">
+        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 border-l-4 border-l-primary bg-gradient-to-r from-primary/5 to-background">
+          <CardHeader className="pb-3 bg-gradient-to-r from-primary/10 to-primary/5">
             <CardTitle className="text-sm font-medium flex items-center">
               <Megaphone className="h-4 w-4 mr-2" />
               Announcements
@@ -180,20 +181,23 @@ const Dashboard = ({ globalTicker, setGlobalTicker, setActiveModule }: Dashboard
           </CardHeader>
           <CardContent>
             {announcements.map((announcement, index) => (
-              <div key={index} className="p-3 bg-background/50 rounded-lg">
+              <div key={index} className="p-3 bg-gradient-to-r from-background to-muted/20 rounded-lg">
                 <p className="text-sm">{announcement}</p>
               </div>
             ))}
           </CardContent>
         </Card>
       ) : (
-        <Card className="border-dashed border-2 border-muted">
+        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 border-dashed border-2 border-muted bg-gradient-to-r from-muted/5 to-background">
           <CardContent className="p-6 text-center">
             <Megaphone className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
             <p className="text-muted-foreground">No announcements today</p>
           </CardContent>
         </Card>
       )}
+
+      {/* Horizontal Separator */}
+      <div className="border-t border-border/30"></div>
 
       {/* Market Overview Section */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -407,9 +411,12 @@ const Dashboard = ({ globalTicker, setGlobalTicker, setActiveModule }: Dashboard
         </CardContent>
       </Card>
 
+      {/* Horizontal Separator */}
+      <div className="border-t border-border/30"></div>
+
       {/* Content Resources */}
-      <Card>
-        <CardHeader>
+      <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <CardHeader className="bg-gradient-to-r from-green-50 to-green-100/50">
           <CardTitle className="flex items-center">
             <BookOpen className="h-5 w-5 mr-2" />
             Learning Resources
@@ -418,7 +425,7 @@ const Dashboard = ({ globalTicker, setGlobalTicker, setActiveModule }: Dashboard
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {contentResources.map((resource, index) => (
-              <div key={index} className="p-4 border rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+              <div key={index} className="p-4 bg-gradient-to-r from-background to-muted/20 rounded-lg hover:shadow-md transition-shadow cursor-pointer border border-border/30">
                 <div className="flex items-start justify-between mb-2">
                   <Badge variant="outline">{resource.type}</Badge>
                   <ExternalLink className="h-4 w-4 text-muted-foreground" />
@@ -431,9 +438,12 @@ const Dashboard = ({ globalTicker, setGlobalTicker, setActiveModule }: Dashboard
         </CardContent>
       </Card>
 
+      {/* Horizontal Separator */}
+      <div className="border-t border-border/30"></div>
+
       {/* Latest News */}
-      <Card>
-        <CardHeader>
+      <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100/50">
           <CardTitle className="flex items-center">
             <Calendar className="h-5 w-5 mr-2" />
             Latest Business News
@@ -442,7 +452,7 @@ const Dashboard = ({ globalTicker, setGlobalTicker, setActiveModule }: Dashboard
         <CardContent>
           <div className="space-y-4">
             {news.map((item, index) => (
-              <div key={index} className="flex items-start space-x-4 p-4 border rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+              <div key={index} className="flex items-start space-x-4 p-4 bg-gradient-to-r from-background to-muted/20 rounded-lg hover:shadow-md transition-shadow cursor-pointer border border-border/30">
                 <div className="flex-1">
                   <div className="flex items-center space-x-2 mb-1">
                     <h4 className="font-medium hover:text-primary transition-colors">{item.title}</h4>
