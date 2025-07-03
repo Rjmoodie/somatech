@@ -88,6 +88,57 @@ export interface ValuationResult {
   averageValue: number;
 }
 
+export interface BusinessValuationInputs {
+  industry: string;
+  businessType: string;
+  currentRevenue: number;
+  grossMargin: number;
+  ebitdaMargin: number;
+  netMargin: number;
+  revenueGrowth: number;
+  exitTimeframe: number;
+  discountRate: number;
+  terminalGrowthRate: number;
+}
+
+export interface ValuationMethods {
+  revenueMultiple: boolean;
+  ebitdaMultiple: boolean;
+  peMultiple: boolean;
+  dcf: boolean;
+}
+
+export interface ValuationScenarios {
+  conservative: ValuationBreakdown;
+  base: ValuationBreakdown;
+  optimistic: ValuationBreakdown;
+}
+
+export interface ValuationBreakdown {
+  revenueMultiple?: number;
+  ebitdaMultiple?: number;
+  peMultiple?: number;
+  dcfValue?: number;
+  totalValue: number;
+}
+
+export interface BusinessValuationReport {
+  inputs: BusinessValuationInputs;
+  scenarios: ValuationScenarios;
+  projections: Array<{
+    year: number;
+    revenue: number;
+    ebitda: number;
+    netIncome: number;
+    value: number;
+  }>;
+  sensitivityAnalysis: {
+    revenueGrowthImpact: Array<{ growth: number; value: number }>;
+    marginImpact: Array<{ margin: number; value: number }>;
+    multipleImpact: Array<{ multiple: number; value: number }>;
+  };
+}
+
 export interface CashFlowResult {
   netCashFlow: number;
   runway: number;
