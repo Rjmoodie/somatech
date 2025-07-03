@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { PieChart } from "lucide-react";
 import { modules } from "@/components/somatech/constants";
 import StockAnalysis from "@/components/somatech/StockAnalysis";
+import WatchlistModule from "@/components/somatech/WatchlistModule";
 import BusinessValuation from "@/components/somatech/BusinessValuation";
 import CashFlowSimulator from "@/components/somatech/CashFlowSimulator";
 import RetirementPlanning from "@/components/somatech/RetirementPlanning";
@@ -40,6 +41,8 @@ const SomaTech = () => {
         return <Dashboard globalTicker={globalTicker} setGlobalTicker={setGlobalTicker} setActiveModule={setActiveModule} />;
       case "stock-analysis":
         return <StockAnalysis globalTicker={globalTicker} setGlobalTicker={setGlobalTicker} />;
+      case "watchlist":
+        return <WatchlistModule setActiveModule={setActiveModule} />;
       case "business-valuation":
         return <BusinessValuation />;
       case "cash-flow":
@@ -115,9 +118,6 @@ const SomaTech = () => {
               </p>
             </div>
             <div className="flex items-center space-x-4">
-              <Button variant="outline" onClick={() => window.location.href = '/watchlist'}>
-                View Watchlist
-              </Button>
               <Button variant="outline">Free Trial</Button>
               <Button>Upgrade to Pro</Button>
             </div>
