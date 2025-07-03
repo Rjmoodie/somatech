@@ -1,10 +1,48 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { StockData } from "./types";
 
 interface BusinessBenchmarksProps {
   ticker: string;
+  stockData?: StockData | null;
 }
 
-const BusinessBenchmarks = ({ ticker }: BusinessBenchmarksProps) => {
+const BusinessBenchmarks = ({ ticker, stockData }: BusinessBenchmarksProps) => {
+  
+  // Calculate profile match based on real stock data
+  const calculateProfileMatch = (data: StockData | null) => {
+    if (!data) return { type: "Unknown", description: "Unable to determine profile without data." };
+    
+    const { pe, roe, marketCap, financials } = data;
+    
+    // Calculate revenue growth estimate based on financials
+    const revenue = financials?.revenue ? parseFloat(financials.revenue) : 0;
+    const netIncome = financials?.netIncome ? parseFloat(financials.netIncome) : 0;
+    const netMargin = revenue > 0 ? (netIncome / revenue) * 100 : 0;
+    
+    // High-Growth profile: High P/E, High ROE, Strong margins or rapid growth potential
+    if (pe > 30 && roe > 0.15 && (netMargin > 15 || marketCap < 50000000000)) {
+      return {
+        type: "High-Growth",
+        description: `${ticker} shows high-growth characteristics with elevated P/E ratio (${pe.toFixed(1)}), strong ROE (${(roe * 100).toFixed(1)}%), suggesting investors expect rapid expansion.`
+      };
+    }
+    
+    // Declining profile: Low P/E, Poor ROE, declining margins
+    if (pe < 12 && roe < 0.05 && netMargin < 5) {
+      return {
+        type: "Declining",
+        description: `${ticker} exhibits declining business characteristics with low P/E (${pe.toFixed(1)}), weak ROE (${(roe * 100).toFixed(1)}%), indicating potential operational challenges.`
+      };
+    }
+    
+    // Mature & Stable (default for everything in between)
+    return {
+      type: "Mature & Stable",
+      description: `${ticker} demonstrates mature, stable business characteristics with balanced P/E (${pe.toFixed(1)}), solid ROE (${(roe * 100).toFixed(1)}%), typical of established companies.`
+    };
+  };
+  
+  const profileMatch = calculateProfileMatch(stockData);
   const benchmarkData = [
     {
       type: "High-Growth",
@@ -96,12 +134,16 @@ const BusinessBenchmarks = ({ ticker }: BusinessBenchmarksProps) => {
               <div className="font-medium text-sm">{ticker} Profile Match</div>
               <div className="text-xs text-muted-foreground">Based on {ticker}&apos;s current financial metrics</div>
             </div>
-            <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-              {ticker} most similar to: Mature & Stable
+            <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+              profileMatch.type === "High-Growth" ? "bg-green-100 text-green-800" :
+              profileMatch.type === "Declining" ? "bg-red-100 text-red-800" :
+              "bg-blue-100 text-blue-800"
+            }`}>
+              {ticker} most similar to: {profileMatch.type}
             </div>
           </div>
           <div className="mt-2 text-xs text-muted-foreground">
-            {ticker} exhibits characteristics of a mature, cash-generating business with stable margins and moderate growth, similar to companies like MSFT and V.
+            {profileMatch.description}
           </div>
         </div>
       </CardContent>

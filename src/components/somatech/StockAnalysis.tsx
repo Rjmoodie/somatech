@@ -106,9 +106,9 @@ const StockAnalysis = ({ globalTicker, setGlobalTicker }: StockAnalysisProps) =>
       toast.success(`Successfully loaded data for ${globalTicker}`);
     } catch (error) {
       console.error('Error fetching stock data:', error);
-      toast.error(`Failed to fetch data for ${globalTicker}. Using mock data.`);
-      // Fallback to mock data
-      setStockData(generateMockData(globalTicker));
+      toast.error(`Failed to fetch real-time data for ${globalTicker}. Please try another symbol or check if the market is open.`);
+      // Clear any existing data to show the error state
+      setStockData(null);
     } finally {
       setLoading(false);
     }
@@ -147,7 +147,7 @@ const StockAnalysis = ({ globalTicker, setGlobalTicker }: StockAnalysisProps) =>
             <EnhancedPillarScorecard ticker={globalTicker} stockData={stockData} />
           </div>
           <div className="glass-card smooth-transition">
-            <BusinessBenchmarks ticker={globalTicker} />
+            <BusinessBenchmarks ticker={globalTicker} stockData={stockData} />
           </div>
           <div className="glass-card smooth-transition">
             <DCFAnalysis 
