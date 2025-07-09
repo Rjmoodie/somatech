@@ -34,7 +34,6 @@ const CreateCampaignDialog = ({ open, onOpenChange, onCampaignCreated }: CreateC
   });
 
   // Integrated projection state
-  const [timeframe, setTimeframe] = useState("");
   const [averageDonation, setAverageDonation] = useState("");
   const [donationFrequency, setDonationFrequency] = useState([1]);
   const [networkSize, setNetworkSize] = useState("");
@@ -187,9 +186,7 @@ const CreateCampaignDialog = ({ open, onOpenChange, onCampaignCreated }: CreateC
         user_id: user.id,
         image_url,
         url_slug,
-        financial_breakdown: formData.financial_breakdown?.length 
-          ? formData.financial_breakdown.filter(item => item.title?.trim() && item.amount > 0)
-          : null,
+        financial_breakdown: null,
         status: 'active',
         current_amount: 0,
         projection_data: projectionResult
@@ -286,10 +283,10 @@ const CreateCampaignDialog = ({ open, onOpenChange, onCampaignCreated }: CreateC
   };
 
   const calculateProjection = () => {
-    if (!formData.target_amount || !timeframe || !averageDonation || !networkSize) return;
+    if (!formData.target_amount || !formData.deadline || !averageDonation || !networkSize) return;
 
     const target = formData.target_amount;
-    const weeks = parseInt(timeframe);
+    const weeks = calculateWeeksFromDeadline(formData.deadline);
     const avgDonation = parseFloat(averageDonation);
     const frequency = donationFrequency[0];
     const network = parseInt(networkSize);
@@ -329,6 +326,14 @@ const CreateCampaignDialog = ({ open, onOpenChange, onCampaignCreated }: CreateC
       successProbability: Math.round(successProbability * 100) / 100,
       onTrack: projectedAmount >= target
     });
+  };
+
+  const calculateWeeksFromDeadline = (deadline: string) => {
+    const now = new Date();
+    const end = new Date(deadline);
+    const diffTime = end.getTime() - now.getTime();
+    const diffWeeks = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7));
+    return Math.max(1, diffWeeks); // At least 1 week
   };
 
   return (
@@ -424,19 +429,14 @@ const CreateCampaignDialog = ({ open, onOpenChange, onCampaignCreated }: CreateC
                 Campaign Projection
               </h3>
 
-              <div>
-                <Label htmlFor="timeframe" className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  Campaign Duration (weeks)
-                </Label>
-                <Input
-                  id="timeframe"
-                  type="number"
-                  placeholder="12"
-                  value={timeframe}
-                  onChange={(e) => setTimeframe(e.target.value)}
-                />
-              </div>
+              {formData.deadline && (
+                <div className="p-3 bg-muted rounded-lg">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Calendar className="h-4 w-4" />
+                    Duration: {calculateWeeksFromDeadline(formData.deadline)} weeks
+                  </div>
+                </div>
+              )}
 
               <div>
                 <Label htmlFor="avg-donation" className="flex items-center gap-2">
@@ -507,7 +507,7 @@ const CreateCampaignDialog = ({ open, onOpenChange, onCampaignCreated }: CreateC
               <Button 
                 type="button"
                 onClick={calculateProjection}
-                disabled={!formData.target_amount || !timeframe || !averageDonation || !networkSize}
+                disabled={!formData.target_amount || !formData.deadline || !averageDonation || !networkSize}
                 className="w-full gap-2"
                 variant="outline"
               >
@@ -562,7 +562,7 @@ const CreateCampaignDialog = ({ open, onOpenChange, onCampaignCreated }: CreateC
               <CampaignProjectionResults result={projectionResult} />
               <CampaignProjectionVisualization
                 targetAmount={formData.target_amount.toString()}
-                timeframe={timeframe}
+                timeframe={formData.deadline ? calculateWeeksFromDeadline(formData.deadline).toString() : "0"}
                 averageDonation={averageDonation}
                 donationFrequency={donationFrequency}
                 networkSize={networkSize}
@@ -572,53 +572,6 @@ const CreateCampaignDialog = ({ open, onOpenChange, onCampaignCreated }: CreateC
             </div>
           )}
 
-          {/* Financial Breakdown */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Financial Breakdown (Optional)</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {formData.financial_breakdown?.map((item, index) => (
-                <div key={index} className="flex gap-2 items-end">
-                  <div className="flex-1">
-                    <Label>Item</Label>
-                    <Input
-                      value={item.title}
-                      onChange={(e) => updateBreakdownItem(index, 'title', e.target.value)}
-                      placeholder="Tuition"
-                    />
-                  </div>
-                  <div className="w-32">
-                    <Label>Amount</Label>
-                    <Input
-                      type="number"
-                      value={item.amount}
-                      onChange={(e) => updateBreakdownItem(index, 'amount', parseFloat(e.target.value) || 0)}
-                      placeholder="5000"
-                    />
-                  </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => removeBreakdownItem(index)}
-                  >
-                    <Minus className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={addBreakdownItem}
-                className="w-full"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Item
-              </Button>
-            </CardContent>
-          </Card>
 
           {/* Submit Button */}
           <div className="flex justify-end space-x-2">

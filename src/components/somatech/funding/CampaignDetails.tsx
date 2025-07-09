@@ -8,6 +8,7 @@ import { ArrowLeft, Heart, Share2, Calendar, Target, Users, MessageCircle } from
 import { FundingCampaign, Donation } from "../types";
 import { supabase } from "@/integrations/supabase/client";
 import DonationForm from "./DonationForm";
+import CampaignProjectionVisualization from "../campaign-projection/CampaignProjectionVisualization";
 import { toast } from "@/hooks/use-toast";
 
 interface CampaignDetailsProps {
@@ -121,6 +122,15 @@ const CampaignDetails = ({ campaign, onBack, onUpdate }: CampaignDetailsProps) =
     });
   };
 
+  const getWeeksFromCampaign = (campaign: FundingCampaign) => {
+    if (!campaign.deadline) return "12";
+    const now = new Date();
+    const end = new Date(campaign.deadline);
+    const diffTime = end.getTime() - now.getTime();
+    const diffWeeks = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7));
+    return Math.max(1, diffWeeks).toString();
+  };
+
   const progress = calculateProgress(campaign.current_amount, campaign.target_amount);
   const daysLeft = getDaysLeft(campaign.deadline);
   const donorsCount = donations.length;
@@ -195,79 +205,76 @@ const CampaignDetails = ({ campaign, onBack, onUpdate }: CampaignDetailsProps) =
           {campaign.projection_data && (
             <Card>
               <CardHeader>
-                <CardTitle>Campaign Projection</CardTitle>
+                <CardTitle>Campaign Projection & Analysis</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">Target Amount:</span>
-                      <span className="font-medium">{formatCurrency(campaign.projection_data.targetAmount)}</span>
+                <Tabs defaultValue="summary" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="summary">Summary</TabsTrigger>
+                    <TabsTrigger value="visualization">Chart</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="summary" className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-3">
+                        <div className="flex justify-between">
+                          <span className="text-sm text-muted-foreground">Target Amount:</span>
+                          <span className="font-medium">{formatCurrency(campaign.projection_data.targetAmount)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-muted-foreground">Projected Amount:</span>
+                          <span className="font-medium">{formatCurrency(campaign.projection_data.projectedAmount)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-muted-foreground">Expected Donors:</span>
+                          <span className="font-medium">{campaign.projection_data.expectedDonors}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-muted-foreground">Weekly Target:</span>
+                          <span className="font-medium">{formatCurrency(campaign.projection_data.weeklyTarget)}</span>
+                        </div>
+                      </div>
+                      <div className="space-y-3">
+                        <div className="flex justify-between">
+                          <span className="text-sm text-muted-foreground">Success Probability:</span>
+                          <span className={`font-medium ${campaign.projection_data.successProbability >= 80 ? 'text-green-600' : campaign.projection_data.successProbability >= 50 ? 'text-yellow-600' : 'text-red-600'}`}>
+                            {campaign.projection_data.successProbability}%
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-muted-foreground">Weeks to Complete:</span>
+                          <span className="font-medium">{campaign.projection_data.weeksToComplete}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-muted-foreground">Optimistic Scenario:</span>
+                          <span className="font-medium">{formatCurrency(campaign.projection_data.optimisticAmount)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-muted-foreground">Status:</span>
+                          <span className={`font-medium ${campaign.projection_data.onTrack ? 'text-green-600' : 'text-yellow-600'}`}>
+                            {campaign.projection_data.onTrack ? 'On Track' : 'Needs Adjustment'}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">Projected Amount:</span>
-                      <span className="font-medium">{formatCurrency(campaign.projection_data.projectedAmount)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">Expected Donors:</span>
-                      <span className="font-medium">{campaign.projection_data.expectedDonors}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">Weekly Target:</span>
-                      <span className="font-medium">{formatCurrency(campaign.projection_data.weeklyTarget)}</span>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">Success Probability:</span>
-                      <span className={`font-medium ${campaign.projection_data.successProbability >= 80 ? 'text-green-600' : campaign.projection_data.successProbability >= 50 ? 'text-yellow-600' : 'text-red-600'}`}>
-                        {campaign.projection_data.successProbability}%
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">Weeks to Complete:</span>
-                      <span className="font-medium">{campaign.projection_data.weeksToComplete}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">Optimistic Scenario:</span>
-                      <span className="font-medium">{formatCurrency(campaign.projection_data.optimisticAmount)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">Status:</span>
-                      <span className={`font-medium ${campaign.projection_data.onTrack ? 'text-green-600' : 'text-yellow-600'}`}>
-                        {campaign.projection_data.onTrack ? 'On Track' : 'Needs Adjustment'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="visualization">
+                    <CampaignProjectionVisualization
+                      targetAmount={campaign.target_amount.toString()}
+                      timeframe={getWeeksFromCampaign(campaign)}
+                      averageDonation="25"
+                      donationFrequency={[1]}
+                      networkSize="100"
+                      participationRate={[20]}
+                      projectionResult={campaign.projection_data}
+                    />
+                  </TabsContent>
+                </Tabs>
               </CardContent>
             </Card>
           )}
 
-          {/* Financial Breakdown */}
-          {campaign.financial_breakdown && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Financial Breakdown</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {(campaign.financial_breakdown as any[]).map((item, index) => (
-                    <div key={index} className="flex justify-between items-center">
-                      <span>{item.title}</span>
-                      <span className="font-medium">{formatCurrency(item.amount)}</span>
-                    </div>
-                  ))}
-                  <div className="border-t pt-3">
-                    <div className="flex justify-between items-center font-semibold">
-                      <span>Total</span>
-                      <span>{formatCurrency(campaign.target_amount)}</span>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
 
           {/* Donations List */}
           <Card>
