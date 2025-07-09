@@ -13,7 +13,7 @@ import CampaignCard from "./funding/CampaignCard";
 import CampaignDetails from "./funding/CampaignDetails";
 import { toast } from "@/hooks/use-toast";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
-import CampaignProjection from "./CampaignProjection";
+
 
 interface FundingCampaignsProps {
   user: SupabaseUser | null;
@@ -24,7 +24,7 @@ const FundingCampaigns = ({ user, onAuthRequired }: FundingCampaignsProps) => {
   const [campaigns, setCampaigns] = useState<FundingCampaign[]>([]);
   const [myCampaigns, setMyCampaigns] = useState<FundingCampaign[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'explore' | 'my-campaigns' | 'projection'>('explore');
+  const [activeTab, setActiveTab] = useState<'explore' | 'my-campaigns'>('explore');
   const [selectedCampaign, setSelectedCampaign] = useState<FundingCampaign | null>(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [filters, setFilters] = useState<CampaignFilters>({
@@ -213,20 +213,7 @@ const FundingCampaigns = ({ user, onAuthRequired }: FundingCampaignsProps) => {
           <Heart className="h-4 w-4 mr-2" />
           My Campaigns
         </Button>
-        <Button
-          variant={activeTab === 'projection' ? 'default' : 'ghost'}
-          size="sm"
-          onClick={() => setActiveTab('projection')}
-        >
-          <Target className="h-4 w-4 mr-2" />
-          Projection Tool
-        </Button>
       </div>
-
-      {/* Projection Content */}
-      {activeTab === 'projection' && (
-        <CampaignProjection />
-      )}
 
       {/* Filters (only for explore tab) */}
       {activeTab === 'explore' && (
@@ -282,7 +269,7 @@ const FundingCampaigns = ({ user, onAuthRequired }: FundingCampaignsProps) => {
       )}
 
       {/* Campaign Grid */}
-      {activeTab !== 'projection' && (
+      {(
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {loading ? (
           // Loading skeletons
@@ -313,7 +300,7 @@ const FundingCampaigns = ({ user, onAuthRequired }: FundingCampaignsProps) => {
       )}
 
       {/* Empty State */}
-      {!loading && activeTab !== 'projection' && (activeTab === 'explore' ? campaigns : myCampaigns).length === 0 && (
+      {!loading && (activeTab === 'explore' ? campaigns : myCampaigns).length === 0 && (
         <Card className="text-center py-12">
           <CardContent>
             <Heart className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
