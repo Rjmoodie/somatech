@@ -218,14 +218,14 @@ const FundingCampaigns = () => {
                 />
               </div>
               <Select
-                value={filters.category}
-                onValueChange={(value) => setFilters({ ...filters, category: value })}
+                value={filters.category || "all"}
+                onValueChange={(value) => setFilters({ ...filters, category: value === "all" ? undefined : value })}
               >
                 <SelectTrigger className="w-48">
                   <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
+                  <SelectItem value="all">All Categories</SelectItem>
                   {campaignCategories.map((category) => (
                     <SelectItem key={category.value} value={category.value}>
                       {category.label}
