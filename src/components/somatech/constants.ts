@@ -1,4 +1,4 @@
-import { Calculator, TrendingUp, BarChart3, Users, FileText, Home, DollarSign, Star, ShoppingCart, LayoutDashboard, Activity } from "lucide-react";
+import { Calculator, TrendingUp, BarChart3, Users, FileText, Home, DollarSign, Star, ShoppingCart, LayoutDashboard, Activity, Heart } from "lucide-react";
 import { Module } from "./types";
 
 export const modules: Module[] = [
@@ -6,6 +6,7 @@ export const modules: Module[] = [
   { id: "stock-analysis", name: "Stock Analysis", icon: TrendingUp },
   { id: "watchlist", name: "Watchlist", icon: Star },
   { id: "marketplace", name: "Business Marketplace", icon: ShoppingCart },
+  { id: "funding-campaigns", name: "Funding Campaigns", icon: Heart },
   { id: "business-valuation", name: "Business Valuation", icon: Calculator },
   { id: "cash-flow", name: "Cash Flow Simulator", icon: Activity },
   { id: "retirement-planning", name: "Retirement Planning", icon: FileText },
@@ -66,3 +67,15 @@ export const valuationMultiples = {
   media: { revenue: 2.5, ebitda: 8, pe: 18 },
   other: { revenue: 2, ebitda: 7, pe: 15 }
 };
+
+export const campaignCategories = [
+  { value: "car", label: "Car/Vehicle" },
+  { value: "education", label: "Education/Tuition" },
+  { value: "business", label: "Business/Startup" },
+  { value: "medical", label: "Medical/Health" },
+  { value: "emergency", label: "Emergency Fund" },
+  { value: "housing", label: "Housing/Rent" },
+  { value: "other", label: "Other" }
+];
+
+export const donationAmounts = [10, 25, 50, 100, 250, 500];

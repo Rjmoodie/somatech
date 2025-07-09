@@ -296,3 +296,68 @@ export interface MarketplaceFilters {
   ebitdaMax?: number;
   sortBy: 'newest' | 'price_asc' | 'price_desc' | 'ebitda_desc';
 }
+
+// Funding Campaigns Types
+export interface FundingCampaign {
+  id: string;
+  user_id: string;
+  title: string;
+  category: 'car' | 'education' | 'business' | 'medical' | 'emergency' | 'housing' | 'other';
+  description: string;
+  target_amount: number;
+  current_amount: number;
+  deadline?: string;
+  image_url?: string;
+  video_url?: string;
+  financial_breakdown?: Array<{
+    title: string;
+    amount: number;
+  }>;
+  url_slug?: string;
+  visibility: 'public' | 'private';
+  status: 'active' | 'completed' | 'cancelled';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Donation {
+  id: string;
+  campaign_id: string;
+  donor_name?: string;
+  donor_email?: string;
+  amount: number;
+  message?: string;
+  is_anonymous: boolean;
+  stripe_payment_intent_id?: string;
+  created_at: string;
+}
+
+export interface CreateCampaignForm {
+  title: string;
+  category: string;
+  description: string;
+  target_amount: number;
+  deadline?: string;
+  image_url?: string;
+  video_url?: string;
+  financial_breakdown?: Array<{
+    title: string;
+    amount: number;
+  }>;
+  url_slug?: string;
+  visibility: 'public' | 'private';
+}
+
+export interface DonationForm {
+  amount: number;
+  donor_name?: string;
+  donor_email?: string;
+  message?: string;
+  is_anonymous: boolean;
+}
+
+export interface CampaignFilters {
+  category?: string;
+  sortBy: 'newest' | 'most_funded' | 'ending_soon' | 'most_recent';
+  search?: string;
+}

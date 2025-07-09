@@ -12,6 +12,7 @@ import RealEstateCalculator from "@/components/somatech/RealEstateCalculator";
 import PerformanceTracker from "@/components/somatech/PerformanceTracker";
 import Dashboard from "@/components/somatech/Dashboard";
 import Marketplace from "@/components/somatech/Marketplace";
+import FundingCampaigns from "@/components/somatech/FundingCampaigns";
 
 const SomaTech = () => {
   const [activeModule, setActiveModule] = useState("dashboard");
@@ -46,6 +47,8 @@ const SomaTech = () => {
         return <WatchlistModule setActiveModule={setActiveModule} />;
       case "marketplace":
         return <Marketplace />;
+      case "funding-campaigns":
+        return <FundingCampaigns />;
       case "business-valuation":
         return <BusinessValuation />;
       case "cash-flow":
