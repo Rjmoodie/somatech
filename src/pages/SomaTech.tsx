@@ -55,8 +55,6 @@ const SomaTech = () => {
         return <Marketplace />;
       case "funding-campaigns":
         return <FundingCampaigns user={user} onAuthRequired={() => setShowAuthDialog(true)} />;
-      case "campaign-projection":
-        return <CampaignProjection />;
       case "business-valuation":
         return <BusinessValuation />;
       case "cash-flow":

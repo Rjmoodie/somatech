@@ -7,7 +7,6 @@ export const modules: Module[] = [
   { id: "watchlist", name: "Watchlist", icon: Star },
   { id: "marketplace", name: "Business Marketplace", icon: ShoppingCart },
   { id: "funding-campaigns", name: "Funding Campaigns", icon: Heart },
-  { id: "campaign-projection", name: "Campaign Projection", icon: Target },
   { id: "business-valuation", name: "Business Valuation", icon: Calculator },
   { id: "cash-flow", name: "Cash Flow Simulator", icon: Activity },
   { id: "retirement-planning", name: "Retirement Planning", icon: FileText },
