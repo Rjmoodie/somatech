@@ -1,4 +1,4 @@
-import { Calculator, TrendingUp, BarChart3, Users, FileText, Home, DollarSign, Star, ShoppingCart, LayoutDashboard, Activity, Heart } from "lucide-react";
+import { Calculator, TrendingUp, BarChart3, Users, FileText, Home, DollarSign, Star, ShoppingCart, LayoutDashboard, Activity, Heart, Target } from "lucide-react";
 import { Module } from "./types";
 
 export const modules: Module[] = [
@@ -7,6 +7,7 @@ export const modules: Module[] = [
   { id: "watchlist", name: "Watchlist", icon: Star },
   { id: "marketplace", name: "Business Marketplace", icon: ShoppingCart },
   { id: "funding-campaigns", name: "Funding Campaigns", icon: Heart },
+  { id: "campaign-projection", name: "Campaign Projection", icon: Target },
   { id: "business-valuation", name: "Business Valuation", icon: Calculator },
   { id: "cash-flow", name: "Cash Flow Simulator", icon: Activity },
   { id: "retirement-planning", name: "Retirement Planning", icon: FileText },

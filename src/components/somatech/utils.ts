@@ -145,3 +145,43 @@ export const generateRetirementChartData = (
   
   return data;
 };
+
+export const generateCampaignProjectionData = (
+  targetAmount: string,
+  timeframe: string,
+  averageDonation: string,
+  donationFrequency: number[],
+  networkSize: string,
+  participationRate: number[]
+) => {
+  if (!targetAmount || !timeframe || !averageDonation || !networkSize) return [];
+  
+  const target = parseFloat(targetAmount);
+  const weeks = parseInt(timeframe);
+  const avgDonation = parseFloat(averageDonation);
+  const frequency = donationFrequency[0];
+  const network = parseInt(networkSize);
+  const participation = participationRate[0] / 100;
+  
+  const expectedDonors = Math.floor(network * participation);
+  const weeklyDonations = expectedDonors * frequency;
+  const weeklyAmount = weeklyDonations * avgDonation;
+  
+  const data = [];
+  
+  for (let week = 0; week <= weeks; week++) {
+    const realistic = Math.round(weeklyAmount * week);
+    const optimistic = Math.round(weeklyAmount * week * 1.5);
+    const pessimistic = Math.round(weeklyAmount * week * 0.6);
+    
+    data.push({
+      week,
+      realistic,
+      optimistic,
+      pessimistic,
+      target: Math.round(target)
+    });
+  }
+  
+  return data;
+};
