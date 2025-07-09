@@ -310,6 +310,7 @@ const FundingCampaigns = ({ user, onAuthRequired }: FundingCampaignsProps) => {
           ))
         )}
       </div>
+      )}
 
       {/* Empty State */}
       {!loading && activeTab !== 'projection' && (activeTab === 'explore' ? campaigns : myCampaigns).length === 0 && (
