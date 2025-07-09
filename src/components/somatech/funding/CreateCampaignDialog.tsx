@@ -33,65 +33,192 @@ const CreateCampaignDialog = ({ open, onOpenChange, onCampaignCreated }: CreateC
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.title || !formData.category || !formData.description || !formData.target_amount) {
+    // Enhanced validation
+    if (!formData.title?.trim()) {
       toast({
-        title: "Error",
-        description: "Please fill in all required fields",
+        title: "Validation Error",
+        description: "Campaign title is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.category) {
+      toast({
+        title: "Validation Error", 
+        description: "Please select a category",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.description?.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Campaign description is required", 
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.target_amount || formData.target_amount <= 0) {
+      toast({
+        title: "Validation Error",
+        description: "Target amount must be greater than $0",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (formData.target_amount > 10000000) {
+      toast({
+        title: "Validation Error",
+        description: "Target amount cannot exceed $10,000,000",
         variant: "destructive",
       });
       return;
     }
 
     setLoading(true);
+    
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not authenticated");
+      // Check authentication
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError) {
+        throw new Error(`Authentication error: ${authError.message}`);
+      }
+      
+      if (!user) {
+        toast({
+          title: "Authentication Required",
+          description: "You must be logged in to create a campaign. Please sign up or log in first.",
+          variant: "destructive",
+        });
+        return;
+      }
 
       let image_url = null;
       
-      // Upload image if provided
+      // Upload image if provided with enhanced error handling
       if (imageFile) {
-        const fileExt = imageFile.name.split('.').pop();
-        const fileName = `${user.id}/${Date.now()}.${fileExt}`;
-        
-        const { error: uploadError } = await supabase.storage
-          .from('campaign-media')
-          .upload(fileName, imageFile);
-        
-        if (uploadError) throw uploadError;
-        
-        const { data: { publicUrl } } = supabase.storage
-          .from('campaign-media')
-          .getPublicUrl(fileName);
-        
-        image_url = publicUrl;
+        // Validate file size (max 5MB)
+        if (imageFile.size > 5 * 1024 * 1024) {
+          toast({
+            title: "File Too Large",
+            description: "Image must be less than 5MB",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // Validate file type
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        if (!allowedTypes.includes(imageFile.type)) {
+          toast({
+            title: "Invalid File Type",
+            description: "Please upload a JPEG, PNG, or WebP image",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        try {
+          const fileExt = imageFile.name.split('.').pop()?.toLowerCase();
+          const fileName = `campaigns/${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('campaign-media')
+            .upload(fileName, imageFile, {
+              cacheControl: '3600',
+              upsert: false
+            });
+          
+          if (uploadError) {
+            console.error('Upload error:', uploadError);
+            throw new Error(`Image upload failed: ${uploadError.message}`);
+          }
+          
+          const { data: { publicUrl } } = supabase.storage
+            .from('campaign-media')
+            .getPublicUrl(fileName);
+          
+          image_url = publicUrl;
+        } catch (uploadError) {
+          console.error('Image upload error:', uploadError);
+          toast({
+            title: "Upload Failed",
+            description: "Failed to upload image. Please try again or proceed without an image.",
+            variant: "destructive",
+          });
+          return;
+        }
       }
 
-      // Create URL slug from title
+      // Create URL slug from title with better sanitization
       const url_slug = formData.title
         .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '');
+        .trim()
+        .replace(/[^a-z0-9\s-]/g, '') // Remove special characters except spaces and hyphens
+        .replace(/\s+/g, '-') // Replace spaces with hyphens
+        .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+        .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens
+        .substring(0, 100); // Limit length
+
+      // Prepare campaign data
+      const campaignData = {
+        title: formData.title.trim(),
+        category: formData.category,
+        description: formData.description.trim(),
+        target_amount: Number(formData.target_amount),
+        deadline: formData.deadline || null,
+        visibility: formData.visibility || 'public',
+        user_id: user.id,
+        image_url,
+        url_slug,
+        financial_breakdown: formData.financial_breakdown?.length 
+          ? formData.financial_breakdown.filter(item => item.title?.trim() && item.amount > 0)
+          : null,
+        status: 'active',
+        current_amount: 0
+      };
+
+      console.log('Creating campaign with data:', campaignData);
 
       const { data, error } = await supabase
         .from('funding_campaigns')
-        .insert([
-          {
-            ...formData,
-            user_id: user.id,
-            image_url,
-            url_slug,
-            financial_breakdown: formData.financial_breakdown?.length 
-              ? formData.financial_breakdown 
-              : null
-          }
-        ])
+        .insert([campaignData])
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database error:', error);
+        
+        // Handle specific database errors
+        if (error.code === '23505') {
+          throw new Error('A campaign with this title already exists. Please choose a different title.');
+        } else if (error.code === '23503') {
+          throw new Error('Database constraint violation. Please check your data and try again.');
+        } else if (error.message.includes('row-level security')) {
+          throw new Error('Permission denied. Please make sure you are logged in with the correct account.');
+        } else {
+          throw new Error(`Database error: ${error.message}`);
+        }
+      }
+
+      if (!data) {
+        throw new Error('Campaign was created but no data was returned. Please refresh the page.');
+      }
+
+      // Success
+      toast({
+        title: "Success!",
+        description: "Your campaign has been created successfully",
+      });
 
       onCampaignCreated(data as FundingCampaign);
+      
+      // Reset form
       setFormData({
         title: "",
         category: "",
@@ -101,12 +228,18 @@ const CreateCampaignDialog = ({ open, onOpenChange, onCampaignCreated }: CreateC
         financial_breakdown: []
       });
       setImageFile(null);
+      onOpenChange(false);
       
     } catch (error) {
       console.error('Error creating campaign:', error);
+      
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'An unexpected error occurred. Please try again.';
+      
       toast({
-        title: "Error",
-        description: "Failed to create campaign. Please try again.",
+        title: "Failed to Create Campaign",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

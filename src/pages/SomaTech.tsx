@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PieChart } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { PieChart, User, LogOut } from "lucide-react";
 import { modules } from "@/components/somatech/constants";
 import StockAnalysis from "@/components/somatech/StockAnalysis";
 import WatchlistModule from "@/components/somatech/WatchlistModule";
@@ -14,11 +15,15 @@ import Dashboard from "@/components/somatech/Dashboard";
 import Marketplace from "@/components/somatech/Marketplace";
 import FundingCampaigns from "@/components/somatech/FundingCampaigns";
 import CampaignProjection from "@/components/somatech/CampaignProjection";
+import AuthDialog, { useAuth } from "@/components/somatech/AuthDialog";
 
 const SomaTech = () => {
   const [activeModule, setActiveModule] = useState("dashboard");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [globalTicker, setGlobalTicker] = useState("AAPL");
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
+  
+  const { user, loading: authLoading, signOut } = useAuth();
 
   const renderPlaceholder = (title: string) => (
     <Card>
@@ -49,7 +54,7 @@ const SomaTech = () => {
       case "marketplace":
         return <Marketplace />;
       case "funding-campaigns":
-        return <FundingCampaigns />;
+        return <FundingCampaigns user={user} onAuthRequired={() => setShowAuthDialog(true)} />;
       case "campaign-projection":
         return <CampaignProjection />;
       case "business-valuation":
@@ -127,8 +132,49 @@ const SomaTech = () => {
               </p>
             </div>
             <div className="flex items-center space-x-4">
-              <Button variant="outline">Free Trial</Button>
-              <Button>Upgrade to Pro</Button>
+              {authLoading ? (
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 bg-muted rounded-full animate-pulse"></div>
+                  <span className="text-sm text-muted-foreground">Loading...</span>
+                </div>
+              ) : user ? (
+                <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                      <User className="h-4 w-4 text-primary-foreground" />
+                    </div>
+                    <div className="text-sm">
+                      <div className="font-medium">{user.email}</div>
+                      <Badge variant="secondary" className="text-xs">
+                        Pro User
+                      </Badge>
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={signOut}
+                    className="flex items-center gap-2"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Sign Out
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-3">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setShowAuthDialog(true)}
+                  >
+                    Sign In
+                  </Button>
+                  <Button 
+                    onClick={() => setShowAuthDialog(true)}
+                  >
+                    Get Started
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </header>
@@ -137,6 +183,13 @@ const SomaTech = () => {
           {renderContent()}
         </main>
       </div>
+
+      {/* Auth Dialog */}
+      <AuthDialog
+        open={showAuthDialog}
+        onOpenChange={setShowAuthDialog}
+        onAuthSuccess={() => setShowAuthDialog(false)}
+      />
     </div>
   );
 };

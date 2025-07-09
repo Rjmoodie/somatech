@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Search, Filter, Heart, Calendar, Target, TrendingUp } from "lucide-react";
+import { Plus, Search, Filter, Heart, Calendar, Target, TrendingUp, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { FundingCampaign, CampaignFilters } from "./types";
 import { campaignCategories } from "./constants";
@@ -12,8 +12,14 @@ import CreateCampaignDialog from "./funding/CreateCampaignDialog";
 import CampaignCard from "./funding/CampaignCard";
 import CampaignDetails from "./funding/CampaignDetails";
 import { toast } from "@/hooks/use-toast";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
 
-const FundingCampaigns = () => {
+interface FundingCampaignsProps {
+  user: SupabaseUser | null;
+  onAuthRequired: () => void;
+}
+
+const FundingCampaigns = ({ user, onAuthRequired }: FundingCampaignsProps) => {
   const [campaigns, setCampaigns] = useState<FundingCampaign[]>([]);
   const [myCampaigns, setMyCampaigns] = useState<FundingCampaign[]>([]);
   const [loading, setLoading] = useState(true);
@@ -104,6 +110,10 @@ const FundingCampaigns = () => {
   }, [activeTab]);
 
   const handleCreateCampaign = () => {
+    if (!user) {
+      onAuthRequired();
+      return;
+    }
     setShowCreateDialog(true);
   };
 
@@ -191,7 +201,13 @@ const FundingCampaigns = () => {
         <Button
           variant={activeTab === 'my-campaigns' ? 'default' : 'ghost'}
           size="sm"
-          onClick={() => setActiveTab('my-campaigns')}
+          onClick={() => {
+            if (!user) {
+              onAuthRequired();
+              return;
+            }
+            setActiveTab('my-campaigns');
+          }}
         >
           <Heart className="h-4 w-4 mr-2" />
           My Campaigns
