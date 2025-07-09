@@ -6,9 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Minus, Upload, X, Calculator } from "lucide-react";
-import CampaignProjectionInputForm from "../campaign-projection/CampaignProjectionInputForm";
+import { Slider } from "@/components/ui/slider";
+import { Plus, Minus, X, Calculator, Target, Users, DollarSign, Calendar, Zap } from "lucide-react";
 import CampaignProjectionResults from "../campaign-projection/CampaignProjectionResults";
 import CampaignProjectionVisualization from "../campaign-projection/CampaignProjectionVisualization";
 import { supabase } from "@/integrations/supabase/client";
@@ -34,8 +33,7 @@ const CreateCampaignDialog = ({ open, onOpenChange, onCampaignCreated }: CreateC
     financial_breakdown: []
   });
 
-  // Projection tool state
-  const [targetAmount, setTargetAmount] = useState("");
+  // Integrated projection state
   const [timeframe, setTimeframe] = useState("");
   const [averageDonation, setAverageDonation] = useState("");
   const [donationFrequency, setDonationFrequency] = useState([1]);
@@ -288,9 +286,9 @@ const CreateCampaignDialog = ({ open, onOpenChange, onCampaignCreated }: CreateC
   };
 
   const calculateProjection = () => {
-    if (!targetAmount || !timeframe || !averageDonation || !networkSize) return;
+    if (!formData.target_amount || !timeframe || !averageDonation || !networkSize) return;
 
-    const target = parseFloat(targetAmount);
+    const target = formData.target_amount;
     const weeks = parseInt(timeframe);
     const avgDonation = parseFloat(averageDonation);
     const frequency = donationFrequency[0];
@@ -331,97 +329,205 @@ const CreateCampaignDialog = ({ open, onOpenChange, onCampaignCreated }: CreateC
       successProbability: Math.round(successProbability * 100) / 100,
       onTrack: projectedAmount >= target
     });
-
-    // Auto-populate form if projection looks good
-    if (projectedAmount >= target && !formData.target_amount) {
-      setFormData(prev => ({ ...prev, target_amount: target }));
-    }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create Funding Campaign</DialogTitle>
         </DialogHeader>
         
-        <Tabs defaultValue="campaign" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="campaign">Campaign Details</TabsTrigger>
-            <TabsTrigger value="projection" className="gap-2">
-              <Calculator className="h-4 w-4" />
-              Projection Tool
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="campaign">
-            <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Basic Information */}
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="title">Campaign Title *</Label>
-              <Input
-                id="title"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder="Help Me Buy My First Car"
-                required
-              />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Campaign Details</h3>
+              
+              <div>
+                <Label htmlFor="title">Campaign Title *</Label>
+                <Input
+                  id="title"
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  placeholder="Help Me Buy My First Car"
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="category">Category *</Label>
+                <Select
+                  value={formData.category}
+                  onValueChange={(value) => setFormData({ ...formData, category: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {campaignCategories.map((category) => (
+                      <SelectItem key={category.value} value={category.value}>
+                        {category.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="target_amount" className="flex items-center gap-2">
+                  <Target className="h-4 w-4" />
+                  Target Amount ($) *
+                </Label>
+                <Input
+                  id="target_amount"
+                  type="number"
+                  value={formData.target_amount}
+                  onChange={(e) => setFormData({ ...formData, target_amount: parseFloat(e.target.value) || 0 })}
+                  placeholder="10000"
+                  min="1"
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="deadline">Deadline (Optional)</Label>
+                <Input
+                  id="deadline"
+                  type="date"
+                  value={formData.deadline}
+                  onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <Label>Visibility</Label>
+                <Select
+                  value={formData.visibility}
+                  onValueChange={(value) => setFormData({ ...formData, visibility: value as 'public' | 'private' })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="public">Public - Anyone can discover</SelectItem>
+                    <SelectItem value="private">Private - Only accessible via link</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
-            <div>
-              <Label htmlFor="category">Category *</Label>
-              <Select
-                value={formData.category}
-                onValueChange={(value) => setFormData({ ...formData, category: value })}
+            {/* Projection Settings */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <Calculator className="h-5 w-5" />
+                Campaign Projection
+              </h3>
+
+              <div>
+                <Label htmlFor="timeframe" className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  Campaign Duration (weeks)
+                </Label>
+                <Input
+                  id="timeframe"
+                  type="number"
+                  placeholder="12"
+                  value={timeframe}
+                  onChange={(e) => setTimeframe(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="avg-donation" className="flex items-center gap-2">
+                  <DollarSign className="h-4 w-4" />
+                  Average Donation ($)
+                </Label>
+                <Input
+                  id="avg-donation"
+                  type="number"
+                  placeholder="25"
+                  value={averageDonation}
+                  onChange={(e) => setAverageDonation(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="network-size" className="flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  Network Size (potential donors)
+                </Label>
+                <Input
+                  id="network-size"
+                  type="number"
+                  placeholder="100"
+                  value={networkSize}
+                  onChange={(e) => setNetworkSize(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-3">
+                <Label className="flex items-center gap-2">
+                  <Zap className="h-4 w-4" />
+                  Donation Frequency (per week): {donationFrequency[0]}x
+                </Label>
+                <Slider
+                  value={donationFrequency}
+                  onValueChange={setDonationFrequency}
+                  max={5}
+                  min={0.1}
+                  step={0.1}
+                  className="w-full"
+                />
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>0.1x</span>
+                  <span>5x</span>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <Label className="flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  Participation Rate: {participationRate[0]}%
+                </Label>
+                <Slider
+                  value={participationRate}
+                  onValueChange={setParticipationRate}
+                  max={100}
+                  min={1}
+                  step={1}
+                  className="w-full"
+                />
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>1%</span>
+                  <span>100%</span>
+                </div>
+              </div>
+
+              <Button 
+                type="button"
+                onClick={calculateProjection}
+                disabled={!formData.target_amount || !timeframe || !averageDonation || !networkSize}
+                className="w-full gap-2"
+                variant="outline"
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {campaignCategories.map((category) => (
-                    <SelectItem key={category.value} value={category.value}>
-                      {category.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                <Calculator className="h-4 w-4" />
+                Calculate Projection
+              </Button>
             </div>
+          </div>
 
-            <div>
-              <Label htmlFor="description">Description *</Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Tell your story, your needs, your plan..."
-                rows={4}
-                required
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="target_amount">Target Amount ($) *</Label>
-              <Input
-                id="target_amount"
-                type="number"
-                value={formData.target_amount}
-                onChange={(e) => setFormData({ ...formData, target_amount: parseFloat(e.target.value) || 0 })}
-                placeholder="10000"
-                min="1"
-                required
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="deadline">Deadline (Optional)</Label>
-              <Input
-                id="deadline"
-                type="date"
-                value={formData.deadline}
-                onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
-              />
-            </div>
+          {/* Description */}
+          <div>
+            <Label htmlFor="description">Description *</Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="Tell your story, your needs, your plan..."
+              rows={4}
+              required
+            />
           </div>
 
           {/* Image Upload */}
@@ -449,6 +555,22 @@ const CreateCampaignDialog = ({ open, onOpenChange, onCampaignCreated }: CreateC
               )}
             </div>
           </div>
+
+          {/* Projection Results */}
+          {projectionResult && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <CampaignProjectionResults result={projectionResult} />
+              <CampaignProjectionVisualization
+                targetAmount={formData.target_amount.toString()}
+                timeframe={timeframe}
+                averageDonation={averageDonation}
+                donationFrequency={donationFrequency}
+                networkSize={networkSize}
+                participationRate={participationRate}
+                projectionResult={projectionResult}
+              />
+            </div>
+          )}
 
           {/* Financial Breakdown */}
           <Card>
@@ -498,23 +620,6 @@ const CreateCampaignDialog = ({ open, onOpenChange, onCampaignCreated }: CreateC
             </CardContent>
           </Card>
 
-          {/* Visibility */}
-          <div>
-            <Label>Visibility</Label>
-            <Select
-              value={formData.visibility}
-              onValueChange={(value) => setFormData({ ...formData, visibility: value as 'public' | 'private' })}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="public">Public - Anyone can discover</SelectItem>
-                <SelectItem value="private">Private - Only accessible via link</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
           {/* Submit Button */}
           <div className="flex justify-end space-x-2">
             <Button
@@ -528,43 +633,7 @@ const CreateCampaignDialog = ({ open, onOpenChange, onCampaignCreated }: CreateC
               {loading ? "Creating..." : "Create Campaign"}
             </Button>
           </div>
-            </form>
-          </TabsContent>
-
-          <TabsContent value="projection" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <CampaignProjectionInputForm
-                targetAmount={targetAmount}
-                setTargetAmount={setTargetAmount}
-                timeframe={timeframe}
-                setTimeframe={setTimeframe}
-                averageDonation={averageDonation}
-                setAverageDonation={setAverageDonation}
-                donationFrequency={donationFrequency}
-                setDonationFrequency={setDonationFrequency}
-                networkSize={networkSize}
-                setNetworkSize={setNetworkSize}
-                participationRate={participationRate}
-                setParticipationRate={setParticipationRate}
-                onCalculate={calculateProjection}
-              />
-
-              {projectionResult && <CampaignProjectionResults result={projectionResult} />}
-            </div>
-
-            {projectionResult && (
-              <CampaignProjectionVisualization
-                targetAmount={targetAmount}
-                timeframe={timeframe}
-                averageDonation={averageDonation}
-                donationFrequency={donationFrequency}
-                networkSize={networkSize}
-                participationRate={participationRate}
-                projectionResult={projectionResult}
-              />
-            )}
-          </TabsContent>
-        </Tabs>
+        </form>
       </DialogContent>
     </Dialog>
   );
