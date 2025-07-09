@@ -193,7 +193,8 @@ const CreateCampaignDialog = ({ open, onOpenChange, onCampaignCreated }: CreateC
           ? formData.financial_breakdown.filter(item => item.title?.trim() && item.amount > 0)
           : null,
         status: 'active',
-        current_amount: 0
+        current_amount: 0,
+        projection_data: projectionResult
       };
 
       console.log('Creating campaign with data:', campaignData);

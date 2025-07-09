@@ -146,6 +146,7 @@ export type Database = {
           financial_breakdown: Json | null
           id: string
           image_url: string | null
+          projection_data: Json | null
           status: string
           target_amount: number
           title: string
@@ -164,6 +165,7 @@ export type Database = {
           financial_breakdown?: Json | null
           id?: string
           image_url?: string | null
+          projection_data?: Json | null
           status?: string
           target_amount: number
           title: string
@@ -182,6 +184,7 @@ export type Database = {
           financial_breakdown?: Json | null
           id?: string
           image_url?: string | null
+          projection_data?: Json | null
           status?: string
           target_amount?: number
           title?: string

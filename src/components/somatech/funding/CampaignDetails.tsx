@@ -191,6 +191,59 @@ const CampaignDetails = ({ campaign, onBack, onUpdate }: CampaignDetailsProps) =
             </CardContent>
           </Card>
 
+          {/* Projection Results */}
+          {campaign.projection_data && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Campaign Projection</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-muted-foreground">Target Amount:</span>
+                      <span className="font-medium">{formatCurrency(campaign.projection_data.targetAmount)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-muted-foreground">Projected Amount:</span>
+                      <span className="font-medium">{formatCurrency(campaign.projection_data.projectedAmount)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-muted-foreground">Expected Donors:</span>
+                      <span className="font-medium">{campaign.projection_data.expectedDonors}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-muted-foreground">Weekly Target:</span>
+                      <span className="font-medium">{formatCurrency(campaign.projection_data.weeklyTarget)}</span>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-muted-foreground">Success Probability:</span>
+                      <span className={`font-medium ${campaign.projection_data.successProbability >= 80 ? 'text-green-600' : campaign.projection_data.successProbability >= 50 ? 'text-yellow-600' : 'text-red-600'}`}>
+                        {campaign.projection_data.successProbability}%
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-muted-foreground">Weeks to Complete:</span>
+                      <span className="font-medium">{campaign.projection_data.weeksToComplete}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-muted-foreground">Optimistic Scenario:</span>
+                      <span className="font-medium">{formatCurrency(campaign.projection_data.optimisticAmount)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-muted-foreground">Status:</span>
+                      <span className={`font-medium ${campaign.projection_data.onTrack ? 'text-green-600' : 'text-yellow-600'}`}>
+                        {campaign.projection_data.onTrack ? 'On Track' : 'Needs Adjustment'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Financial Breakdown */}
           {campaign.financial_breakdown && (
             <Card>

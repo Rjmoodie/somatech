@@ -298,6 +298,20 @@ export interface MarketplaceFilters {
 }
 
 // Funding Campaigns Types
+export interface CampaignProjectionResult {
+  targetAmount: number;
+  projectedAmount: number;
+  expectedDonors: number;
+  totalDonations: number;
+  weeklyTarget: number;
+  weeklyProjected: number;
+  optimisticAmount: number;
+  pessimisticAmount: number;
+  weeksToComplete: number;
+  successProbability: number;
+  onTrack: boolean;
+}
+
 export interface FundingCampaign {
   id: string;
   user_id: string;
@@ -312,7 +326,8 @@ export interface FundingCampaign {
   financial_breakdown?: Array<{
     title: string;
     amount: number;
-  }>;
+  }> | any;
+  projection_data?: CampaignProjectionResult | any;
   url_slug?: string;
   visibility: 'public' | 'private';
   status: 'active' | 'completed' | 'cancelled';
