@@ -20,6 +20,7 @@ const AuthDialog = ({ open, onOpenChange, onAuthSuccess }: AuthDialogProps) => {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
   const [activeTab, setActiveTab] = useState("signin");
 
   const handleAuth = async (type: 'signin' | 'signup') => {
@@ -27,6 +28,15 @@ const AuthDialog = ({ open, onOpenChange, onAuthSuccess }: AuthDialogProps) => {
       toast({
         title: "Validation Error",
         description: "Please enter both email and password",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (type === 'signup' && !username.trim()) {
+      toast({
+        title: "Validation Error", 
+        description: "Please enter a username",
         variant: "destructive",
       });
       return;
@@ -46,7 +56,16 @@ const AuthDialog = ({ open, onOpenChange, onAuthSuccess }: AuthDialogProps) => {
     try {
       const { data, error } = type === 'signin' 
         ? await supabase.auth.signInWithPassword({ email, password })
-        : await supabase.auth.signUp({ email, password });
+        : await supabase.auth.signUp({ 
+            email, 
+            password,
+            options: {
+              emailRedirectTo: `${window.location.origin}/`,
+              data: {
+                username: username.trim()
+              }
+            }
+          });
 
       if (error) {
         if (error.message.includes('Invalid login credentials')) {
@@ -74,6 +93,7 @@ const AuthDialog = ({ open, onOpenChange, onAuthSuccess }: AuthDialogProps) => {
         // Reset form
         setEmail("");
         setPassword("");
+        setUsername("");
         onOpenChange(false);
         onAuthSuccess?.();
       }
@@ -159,6 +179,20 @@ const AuthDialog = ({ open, onOpenChange, onAuthSuccess }: AuthDialogProps) => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
+                  <Label htmlFor="signup-username" className="flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    Username
+                  </Label>
+                  <Input
+                    id="signup-username"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Choose a username"
+                    required
+                  />
+                </div>
+                <div>
                   <Label htmlFor="signup-email" className="flex items-center gap-2">
                     <Mail className="h-4 w-4" />
                     Email
@@ -204,12 +238,37 @@ const AuthDialog = ({ open, onOpenChange, onAuthSuccess }: AuthDialogProps) => {
 
 export const useAuth = () => {
   const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [profile, setProfile] = useState<{ username: string; email: string } | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const fetchProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('username, email')
+        .eq('id', userId)
+        .single();
+      
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching profile:', error);
+        return;
+      }
+      
+      setProfile(data);
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  };
 
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchProfile(session.user.id);
+      } else {
+        setProfile(null);
+      }
       setLoading(false);
     });
 
@@ -217,6 +276,11 @@ export const useAuth = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setUser(session?.user ?? null);
+        if (session?.user) {
+          fetchProfile(session.user.id);
+        } else {
+          setProfile(null);
+        }
         setLoading(false);
       }
     );
@@ -240,7 +304,7 @@ export const useAuth = () => {
     }
   };
 
-  return { user, loading, signOut };
+  return { user, profile, loading, signOut };
 };
 
 export default AuthDialog;

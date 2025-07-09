@@ -23,7 +23,7 @@ const SomaTech = () => {
   const [globalTicker, setGlobalTicker] = useState("AAPL");
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   
-  const { user, loading: authLoading, signOut } = useAuth();
+  const { user, profile, loading: authLoading, signOut } = useAuth();
 
   const renderPlaceholder = (title: string) => (
     <Card>
@@ -141,12 +141,12 @@ const SomaTech = () => {
                     <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
                       <User className="h-4 w-4 text-primary-foreground" />
                     </div>
-                    <div className="text-sm">
-                      <div className="font-medium">{user.email}</div>
-                      <Badge variant="secondary" className="text-xs">
-                        Pro User
-                      </Badge>
-                    </div>
+                     <div className="text-sm">
+                       <div className="font-medium">{profile?.username || user.email}</div>
+                       <Badge variant="secondary" className="text-xs">
+                         Pro User
+                       </Badge>
+                     </div>
                   </div>
                   <Button
                     variant="ghost"
