@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      brrrr_deals: {
+        Row: {
+          created_at: string
+          deal_name: string
+          id: string
+          inputs: Json
+          notes: string | null
+          results: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          deal_name: string
+          id?: string
+          inputs: Json
+          notes?: string | null
+          results: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          deal_name?: string
+          id?: string
+          inputs?: Json
+          notes?: string | null
+          results?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       business_listings: {
         Row: {
           asking_price: number

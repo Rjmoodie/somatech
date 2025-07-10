@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,7 +6,12 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Calculator, Home, RefreshCw, TrendingUp, DollarSign } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calculator, Home, RefreshCw, TrendingUp, DollarSign, Save, FolderOpen, Download, Trash2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 import { RealEstateResult } from "./types";
 
 interface BRRRRInputs {
@@ -71,6 +76,16 @@ interface BRRRRResults {
   rentToValueRatio: number;
 }
 
+interface SavedDeal {
+  id: string;
+  deal_name: string;
+  inputs: BRRRRInputs;
+  results: BRRRRResults;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 const RealEstateCalculator = () => {
   // Traditional Calculator State
   const [propertyPrice, setPropertyPrice] = useState("");
@@ -104,6 +119,14 @@ const RealEstateCalculator = () => {
   });
   
   const [brrrrResults, setBrrrrResults] = useState<BRRRRResults | null>(null);
+  
+  // Save/Load State
+  const [savedDeals, setSavedDeals] = useState<SavedDeal[]>([]);
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [showLoadDialog, setShowLoadDialog] = useState(false);
+  const [dealName, setDealName] = useState("");
+  const [dealNotes, setDealNotes] = useState("");
+  const [currentDealId, setCurrentDealId] = useState<string | null>(null);
 
   const calculateRealEstate = () => {
     if (!propertyPrice || !downPayment || !monthlyRent || !operatingExpenses) return;
@@ -125,6 +148,280 @@ const RealEstateCalculator = () => {
       cashOnCashReturn: Math.round(cashOnCashReturn * 100) / 100,
       capRate: Math.round(capRate * 100) / 100,
       profitable: netCashFlow > 0
+    });
+  };
+
+  useEffect(() => {
+    loadSavedDeals();
+  }, []);
+
+  const loadSavedDeals = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('brrrr_deals')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setSavedDeals((data as any[])?.map(item => ({
+        ...item,
+        inputs: item.inputs as BRRRRInputs,
+        results: item.results as BRRRRResults
+      })) || []);
+    } catch (error) {
+      console.error('Error loading saved deals:', error);
+    }
+  };
+
+  const saveDeal = async () => {
+    if (!brrrrResults || !dealName.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Please calculate the deal and enter a deal name before saving.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Authentication Required",
+          description: "Please sign in to save deals.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (currentDealId) {
+        const { error } = await supabase
+          .from('brrrr_deals')
+          .update({
+            deal_name: dealName,
+            inputs: brrrrInputs as any,
+            results: brrrrResults as any,
+            notes: dealNotes,
+          })
+          .eq('id', currentDealId);
+
+        if (error) throw error;
+        
+        toast({
+          title: "Deal Updated",
+          description: `"${dealName}" has been updated successfully.`,
+        });
+      } else {
+        const { error } = await supabase
+          .from('brrrr_deals')
+          .insert([{
+            user_id: user.id,
+            deal_name: dealName,
+            inputs: brrrrInputs as any,
+            results: brrrrResults as any,
+            notes: dealNotes,
+          }]);
+        
+        toast({
+          title: "Deal Saved",
+          description: `"${dealName}" has been saved successfully.`,
+        });
+      }
+
+      setShowSaveDialog(false);
+      setDealName("");
+      setDealNotes("");
+      loadSavedDeals();
+    } catch (error) {
+      console.error('Error saving deal:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save deal. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const loadDeal = (deal: SavedDeal) => {
+    setBrrrrInputs(deal.inputs);
+    setBrrrrResults(deal.results);
+    setCurrentDealId(deal.id);
+    setDealName(deal.deal_name);
+    setDealNotes(deal.notes || "");
+    setShowLoadDialog(false);
+    
+    toast({
+      title: "Deal Loaded",
+      description: `"${deal.deal_name}" has been loaded successfully.`,
+    });
+  };
+
+  const deleteDeal = async (dealId: string, dealName: string) => {
+    try {
+      const { error } = await supabase
+        .from('brrrr_deals')
+        .delete()
+        .eq('id', dealId);
+
+      if (error) throw error;
+      
+      toast({
+        title: "Deal Deleted",
+        description: `"${dealName}" has been deleted.`,
+      });
+      
+      loadSavedDeals();
+    } catch (error) {
+      console.error('Error deleting deal:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete deal. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const exportToPrint = () => {
+    if (!brrrrResults) {
+      toast({
+        title: "No Data",
+        description: "Please calculate a deal before exporting.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>BRRRR Deal Report - ${dealName || 'Untitled Deal'}</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+            .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px; }
+            .section { margin-bottom: 30px; }
+            .section h2 { color: #333; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
+            .metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 20px; }
+            .metric { padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+            .metric-value { font-size: 1.2em; font-weight: bold; color: #2563eb; }
+            .positive { color: #16a34a; }
+            .negative { color: #dc2626; }
+            .phase { margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px; }
+            .phase h3 { margin-top: 0; color: #666; }
+            @media print { body { margin: 0; } }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>BRRRR Deal Analysis Report</h1>
+            <h2>${dealName || 'Untitled Deal'}</h2>
+            <p>Generated on ${new Date().toLocaleDateString()}</p>
+          </div>
+
+          <div class="section">
+            <h2>Executive Summary</h2>
+            <div class="metrics">
+              <div class="metric">
+                <div>Total Investment</div>
+                <div class="metric-value">${formatCurrency(brrrrResults.totalInvestment)}</div>
+              </div>
+              <div class="metric">
+                <div>Equity Created</div>
+                <div class="metric-value">${formatCurrency(brrrrResults.equityCreated)}</div>
+              </div>
+              <div class="metric">
+                <div>Cash Out Amount</div>
+                <div class="metric-value">${formatCurrency(brrrrResults.cashOutAmount)}</div>
+              </div>
+              <div class="metric">
+                <div>Capital Recycled</div>
+                <div class="metric-value">${formatPercentage(brrrrResults.capitalRecycled)}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <h2>Phase Analysis</h2>
+            
+            <div class="phase">
+              <h3>Buy Phase</h3>
+              <p><strong>Purchase Price:</strong> ${formatCurrency(brrrrInputs.purchasePrice)}</p>
+              <p><strong>Down Payment:</strong> ${formatCurrency((brrrrInputs.purchasePrice * brrrrInputs.downPaymentPercent) / 100)} (${brrrrInputs.downPaymentPercent}%)</p>
+              <p><strong>Total Acquisition Cost:</strong> ${formatCurrency(brrrrResults.totalAcquisitionCost)}</p>
+              <p><strong>Initial Cash Needed:</strong> ${formatCurrency(brrrrResults.initialCashNeeded)}</p>
+            </div>
+
+            <div class="phase">
+              <h3>Rehab Phase</h3>
+              <p><strong>Renovation Budget:</strong> ${formatCurrency(brrrrInputs.renovationBudget)}</p>
+              <p><strong>Contingency:</strong> ${formatCurrency((brrrrInputs.renovationBudget * brrrrInputs.contingencyPercent) / 100)} (${brrrrInputs.contingencyPercent}%)</p>
+              <p><strong>Total Rehab Cost:</strong> ${formatCurrency(brrrrResults.totalRehabCost)}</p>
+              <p><strong>Holding Costs:</strong> ${formatCurrency(brrrrResults.totalHoldingCost)}</p>
+            </div>
+
+            <div class="phase">
+              <h3>Rent Phase</h3>
+              <p><strong>Monthly Rent:</strong> ${formatCurrency(brrrrInputs.monthlyRent)}</p>
+              <p><strong>Effective Monthly Rent:</strong> ${formatCurrency(brrrrResults.effectiveMonthlyRent)}</p>
+              <p><strong>Operating Expenses:</strong> ${formatCurrency(brrrrResults.monthlyOperatingExpenses)}</p>
+              <p><strong>Pre-Refi Cash Flow:</strong> <span class="${brrrrResults.preRefinanceCashFlow >= 0 ? 'positive' : 'negative'}">${formatCurrency(brrrrResults.preRefinanceCashFlow)}</span></p>
+            </div>
+
+            <div class="phase">
+              <h3>Refinance Phase</h3>
+              <p><strong>After Repair Value (ARV):</strong> ${formatCurrency(brrrrInputs.arv)}</p>
+              <p><strong>Refinance LTV:</strong> ${brrrrInputs.refinanceLTV}%</p>
+              <p><strong>Max Refinance Loan:</strong> ${formatCurrency(brrrrResults.maxRefinanceLoan)}</p>
+              <p><strong>Post-Refi Cash Flow:</strong> <span class="${brrrrResults.postRefinanceCashFlow >= 0 ? 'positive' : 'negative'}">${formatCurrency(brrrrResults.postRefinanceCashFlow)}</span></p>
+              <p><strong>Remaining Equity:</strong> ${formatCurrency(brrrrResults.remainingEquity)}</p>
+            </div>
+          </div>
+
+          ${dealNotes ? `
+          <div class="section">
+            <h2>Notes</h2>
+            <p>${dealNotes.replace(/\n/g, '<br>')}</p>
+          </div>
+          ` : ''}
+
+          <div class="section">
+            <h2>Investment Metrics</h2>
+            <div class="metrics">
+              <div class="metric">
+                <div>Post-Refinance ROI</div>
+                <div class="metric-value">${formatPercentage(brrrrResults.postRefinanceROI)}</div>
+              </div>
+              <div class="metric">
+                <div>Rent-to-Value Ratio</div>
+                <div class="metric-value">${formatPercentage(brrrrResults.rentToValueRatio)}</div>
+              </div>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.write(html);
+    printWindow.document.close();
+    printWindow.print();
+  };
+
+  const resetCalculator = () => {
+    setBrrrrResults(null);
+    setCurrentDealId(null);
+    setDealName("");
+    setDealNotes("");
+    
+    toast({
+      title: "Calculator Reset",
+      description: "Ready for a new deal analysis.",
     });
   };
 
@@ -562,14 +859,147 @@ const RealEstateCalculator = () => {
                 </CardContent>
               </Card>
 
-              <Button onClick={calculateBRRRR} className="w-full" size="lg">
-                Calculate BRRRR Deal
-              </Button>
+              <div className="flex gap-2">
+                <Button onClick={calculateBRRRR} className="flex-1" size="lg">
+                  Calculate BRRRR Deal
+                </Button>
+                {brrrrResults && (
+                  <>
+                    <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="lg">
+                          <Save className="h-4 w-4" />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Save BRRRR Deal</DialogTitle>
+                          <DialogDescription>
+                            Save this deal analysis for future reference
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Label>Deal Name</Label>
+                            <Input
+                              placeholder="e.g., 123 Main St Property"
+                              value={dealName}
+                              onChange={(e) => setDealName(e.target.value)}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Notes (Optional)</Label>
+                            <Textarea
+                              placeholder="Add any notes about this deal..."
+                              value={dealNotes}
+                              onChange={(e) => setDealNotes(e.target.value)}
+                              rows={3}
+                            />
+                          </div>
+                          <div className="flex gap-2">
+                            <Button onClick={saveDeal} className="flex-1">
+                              {currentDealId ? 'Update Deal' : 'Save Deal'}
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              onClick={() => setShowSaveDialog(false)}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+
+                    <Dialog open={showLoadDialog} onOpenChange={setShowLoadDialog}>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="lg">
+                          <FolderOpen className="h-4 w-4" />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-2xl">
+                        <DialogHeader>
+                          <DialogTitle>Load Saved Deal</DialogTitle>
+                          <DialogDescription>
+                            Choose a previously saved deal to load
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="max-h-96 overflow-y-auto">
+                          {savedDeals.length === 0 ? (
+                            <div className="text-center py-8 text-muted-foreground">
+                              No saved deals found. Save your first deal to see it here.
+                            </div>
+                          ) : (
+                            <div className="space-y-2">
+                              {savedDeals.map((deal) => (
+                                <Card key={deal.id} className="p-4">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex-1">
+                                      <h4 className="font-semibold">{deal.deal_name}</h4>
+                                      <p className="text-sm text-muted-foreground">
+                                        Created: {new Date(deal.created_at).toLocaleDateString()}
+                                      </p>
+                                      <div className="flex gap-4 text-xs text-muted-foreground mt-1">
+                                        <span>Purchase: {formatCurrency(deal.inputs.purchasePrice)}</span>
+                                        <span>ARV: {formatCurrency(deal.inputs.arv)}</span>
+                                        <span>Cash Flow: {formatCurrency(deal.results.postRefinanceCashFlow)}</span>
+                                      </div>
+                                    </div>
+                                    <div className="flex gap-2">
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => loadDeal(deal)}
+                                      >
+                                        Load
+                                      </Button>
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => deleteDeal(deal.id, deal.deal_name)}
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </Card>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+
+                    <Button variant="outline" size="lg" onClick={exportToPrint}>
+                      <Download className="h-4 w-4" />
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
 
             {/* BRRRR Results */}
             {brrrrResults && (
               <div className="space-y-6">
+                {/* Current Deal Indicator */}
+                {currentDealId && (
+                  <Card className="mb-4">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-semibold">Currently Editing: {dealName}</h4>
+                          <p className="text-sm text-muted-foreground">
+                            This deal is loaded from your saved deals
+                          </p>
+                        </div>
+                        <Button variant="outline" size="sm" onClick={resetCalculator}>
+                          New Deal
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
                 {/* Summary Dashboard */}
                 <Card>
                   <CardHeader>
