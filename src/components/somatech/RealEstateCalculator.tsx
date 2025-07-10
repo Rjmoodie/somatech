@@ -9,7 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calculator, Home, RefreshCw, TrendingUp, DollarSign, Save, FolderOpen, Download, Trash2 } from "lucide-react";
+import { Calculator, Home, RefreshCw, TrendingUp, DollarSign, Save, FolderOpen, Download, Trash2, Edit3, FileText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { RealEstateResult } from "./types";
@@ -127,6 +127,11 @@ const RealEstateCalculator = () => {
   const [dealName, setDealName] = useState("");
   const [dealNotes, setDealNotes] = useState("");
   const [currentDealId, setCurrentDealId] = useState<string | null>(null);
+  const [showExportDialog, setShowExportDialog] = useState(false);
+  const [showEditNotesDialog, setShowEditNotesDialog] = useState(false);
+  const [editingDeal, setEditingDeal] = useState<SavedDeal | null>(null);
+  const [editNotes, setEditNotes] = useState("");
+  const [currentNotes, setCurrentNotes] = useState("");
 
   const calculateRealEstate = () => {
     if (!propertyPrice || !downPayment || !monthlyRent || !operatingExpenses) return;
@@ -280,6 +285,42 @@ const RealEstateCalculator = () => {
       toast({
         title: "Error",
         description: "Failed to delete deal. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const editDealNotes = (deal: SavedDeal) => {
+    setEditingDeal(deal);
+    setEditNotes(deal.notes || "");
+    setShowEditNotesDialog(true);
+  };
+
+  const updateDealNotes = async () => {
+    if (!editingDeal) return;
+
+    try {
+      const { error } = await supabase
+        .from('brrrr_deals')
+        .update({ notes: editNotes })
+        .eq('id', editingDeal.id);
+
+      if (error) throw error;
+      
+      toast({
+        title: "Notes Updated",
+        description: `Notes for "${editingDeal.deal_name}" have been updated.`,
+      });
+      
+      setShowEditNotesDialog(false);
+      setEditingDeal(null);
+      setEditNotes("");
+      loadSavedDeals();
+    } catch (error) {
+      console.error('Error updating notes:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update notes. Please try again.",
         variant: "destructive",
       });
     }
@@ -511,6 +552,71 @@ const RealEstateCalculator = () => {
 
   const formatPercentage = (value: number) => {
     return `${value.toFixed(2)}%`;
+  };
+
+  const generatePDFReport = () => {
+    if (!brrrrResults) return;
+
+    const reportContent = `
+      BRRRR Deal Analysis Report
+      
+      Deal Summary:
+      - Purchase Price: ${formatCurrency(brrrrInputs.purchasePrice)}
+      - After Repair Value: ${formatCurrency(brrrrInputs.arv)}
+      - Monthly Rent: ${formatCurrency(brrrrInputs.monthlyRent)}
+      
+      Key Metrics:
+      - Capital Recycled: ${formatPercentage(brrrrResults.capitalRecycled)}
+      - Post-Refinance Cash Flow: ${formatCurrency(brrrrResults.postRefinanceCashFlow)}/month
+      - Post-Refinance ROI: ${formatPercentage(brrrrResults.postRefinanceROI)}
+      
+      Generated on: ${new Date().toLocaleDateString()}
+    `;
+
+    const blob = new Blob([reportContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'brrrr-deal-report.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    setShowExportDialog(false);
+    toast({
+      title: "Report Exported",
+      description: "Your BRRRR deal report has been downloaded.",
+    });
+  };
+
+  const generateCSVReport = () => {
+    if (!brrrrResults) return;
+
+    const csvContent = [
+      ['Metric', 'Value'],
+      ['Purchase Price', brrrrInputs.purchasePrice],
+      ['Down Payment %', brrrrInputs.downPaymentPercent],
+      ['Renovation Budget', brrrrInputs.renovationBudget],
+      ['ARV', brrrrInputs.arv],
+      ['Monthly Rent', brrrrInputs.monthlyRent],
+      ['Capital Recycled %', brrrrResults.capitalRecycled.toFixed(2)],
+      ['Post-Refi Cash Flow', brrrrResults.postRefinanceCashFlow.toFixed(2)],
+      ['Post-Refi ROI %', brrrrResults.postRefinanceROI.toFixed(2)],
+      ['Remaining Equity', brrrrResults.remainingEquity.toFixed(2)]
+    ].map(row => row.join(',')).join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'brrrr-deal-data.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    setShowExportDialog(false);
+    toast({
+      title: "Data Exported",
+      description: "Your BRRRR deal data has been downloaded as CSV.",
+    });
   };
 
   return (
@@ -895,10 +1001,15 @@ const RealEstateCalculator = () => {
                             <Label>Notes (Optional)</Label>
                             <Textarea
                               placeholder="Add any notes about this deal..."
-                              value={dealNotes}
+                              value={dealNotes || currentNotes}
                               onChange={(e) => setDealNotes(e.target.value)}
-                              rows={3}
+                              rows={4}
                             />
+                            {currentNotes && !dealNotes && (
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Using notes from current analysis. Edit above to change.
+                              </p>
+                            )}
                           </div>
                           <div className="flex gap-2">
                             <Button onClick={saveDeal} className="flex-1">
@@ -974,13 +1085,42 @@ const RealEstateCalculator = () => {
                       </DialogContent>
                     </Dialog>
 
-                    <Button variant="outline" size="lg" onClick={exportToPrint}>
+                    <Button 
+                      variant="outline" 
+                      size="lg"
+                      onClick={() => setShowExportDialog(true)}
+                    >
                       <Download className="h-4 w-4" />
                     </Button>
+
                   </>
                 )}
               </div>
             </div>
+
+            {/* Current Analysis Notes */}
+            {brrrrResults && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Analysis Notes
+                  </CardTitle>
+                  <CardDescription>
+                    Add notes about this deal analysis
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Textarea
+                    value={currentNotes}
+                    onChange={(e) => setCurrentNotes(e.target.value)}
+                    placeholder="Add your thoughts about this deal, potential concerns, next steps, etc..."
+                    rows={4}
+                    className="resize-none"
+                  />
+                </CardContent>
+              </Card>
+            )}
 
             {/* BRRRR Results */}
             {brrrrResults && (
@@ -1283,6 +1423,13 @@ const RealEstateCalculator = () => {
                           <Button
                             variant="outline"
                             size="sm"
+                            onClick={() => editDealNotes(deal)}
+                          >
+                            <Edit3 className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
                             onClick={() => deleteDeal(deal.id, deal.deal_name)}
                             className="text-destructive hover:text-destructive"
                           >
@@ -1299,6 +1446,74 @@ const RealEstateCalculator = () => {
         </TabsContent>
 
       </Tabs>
+
+      {/* Edit Notes Dialog */}
+      <Dialog open={showEditNotesDialog} onOpenChange={setShowEditNotesDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Deal Notes</DialogTitle>
+            <DialogDescription>
+              Update notes for "{editingDeal?.deal_name}"
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="edit-notes">Notes</Label>
+              <Textarea
+                id="edit-notes"
+                value={editNotes}
+                onChange={(e) => setEditNotes(e.target.value)}
+                placeholder="Add your thoughts, observations, or next steps for this deal..."
+                rows={6}
+                className="resize-none"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={updateDealNotes} className="flex-1">
+                Save Notes
+              </Button>
+              <Button variant="outline" onClick={() => setShowEditNotesDialog(false)}>
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Export Dialog */}
+      <Dialog open={showExportDialog} onOpenChange={setShowExportDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Export Deal Report</DialogTitle>
+            <DialogDescription>
+              Choose how you'd like to export your BRRRR analysis
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <Button 
+                variant="outline" 
+                className="h-20 flex flex-col gap-2"
+                onClick={() => generatePDFReport()}
+              >
+                <Download className="h-6 w-6" />
+                <span>PDF Report</span>
+              </Button>
+              <Button 
+                variant="outline" 
+                className="h-20 flex flex-col gap-2"
+                onClick={() => generateCSVReport()}
+              >
+                <Download className="h-6 w-6" />
+                <span>CSV Data</span>
+              </Button>
+            </div>
+            <Button variant="outline" onClick={() => setShowExportDialog(false)} className="w-full">
+              Cancel
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
