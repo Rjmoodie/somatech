@@ -291,6 +291,39 @@ export type Database = {
         }
         Relationships: []
       }
+      retirement_plans: {
+        Row: {
+          created_at: string
+          id: string
+          inputs: Json
+          notes: string | null
+          plan_name: string
+          results: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          inputs: Json
+          notes?: string | null
+          plan_name: string
+          results: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          inputs?: Json
+          notes?: string | null
+          plan_name?: string
+          results?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       watchlist: {
         Row: {
           added_at: string
