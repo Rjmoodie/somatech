@@ -276,54 +276,72 @@ const CampaignDetails = ({ campaign, onBack, onUpdate }: CampaignDetailsProps) =
           )}
 
 
-          {/* Donations List */}
+          {/* Donations Feed */}
           <Card>
             <CardHeader>
-              <CardTitle>Recent Donations</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <MessageCircle className="h-5 w-5" />
+                Recent Donations ({donations.length})
+              </CardTitle>
             </CardHeader>
             <CardContent>
               {loading ? (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {Array.from({ length: 3 }).map((_, i) => (
                     <div key={i} className="animate-pulse">
-                      <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
-                      <div className="h-3 bg-muted rounded w-1/2"></div>
-                    </div>
-                  ))}
-                </div>
-              ) : donations.length === 0 ? (
-                <p className="text-muted-foreground">No donations yet. Be the first to support this campaign!</p>
-              ) : (
-                <div className="space-y-4">
-                  {donations.slice(0, 10).map((donation) => (
-                    <div key={donation.id} className="border-b pb-3 last:border-b-0">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-medium">
-                            {donation.is_anonymous 
-                              ? 'Anonymous' 
-                              : donation.donor_name || 'Anonymous'
-                            }
-                          </p>
-                          {donation.message && (
-                            <p className="text-sm text-muted-foreground mt-1">
-                              "{donation.message}"
-                            </p>
-                          )}
-                        </div>
-                        <div className="text-right">
-                          <p className="font-semibold">{formatCurrency(donation.amount)}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {new Date(donation.created_at).toLocaleDateString()}
-                          </p>
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-muted rounded-full"></div>
+                        <div className="flex-1">
+                          <div className="h-4 bg-muted rounded w-1/3 mb-2"></div>
+                          <div className="h-3 bg-muted rounded w-2/3"></div>
                         </div>
                       </div>
                     </div>
                   ))}
+                </div>
+              ) : donations.length === 0 ? (
+                <div className="text-center py-8">
+                  <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                  <p className="text-muted-foreground">No donations yet. Be the first to support this campaign!</p>
+                </div>
+              ) : (
+                <div className="space-y-4 max-h-96 overflow-y-auto">
+                  {donations.map((donation, index) => (
+                    <div key={donation.id} className="flex items-start gap-3 p-3 rounded-lg bg-card border">
+                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                        <Heart className="h-4 w-4 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <p className="font-medium text-sm">
+                            {donation.is_anonymous 
+                              ? 'Anonymous Supporter' 
+                              : donation.donor_name || 'Anonymous Supporter'
+                            }
+                          </p>
+                          <span className="font-semibold text-primary">
+                            {formatCurrency(donation.amount)}
+                          </span>
+                        </div>
+                        {donation.message && (
+                          <div className="bg-muted/50 rounded-lg p-2 mb-2">
+                            <p className="text-sm text-foreground italic">
+                              "{donation.message}"
+                            </p>
+                          </div>
+                        )}
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(donation.created_at).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
                   {donations.length > 10 && (
-                    <p className="text-sm text-muted-foreground text-center">
-                      And {donations.length - 10} more donations...
-                    </p>
+                    <div className="text-center py-2">
+                      <p className="text-sm text-muted-foreground">
+                        Showing recent 10 donations • {donations.length} total
+                      </p>
+                    </div>
                   )}
                 </div>
               )}
