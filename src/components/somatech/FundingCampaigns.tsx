@@ -293,6 +293,9 @@ const FundingCampaigns = ({ user, onAuthRequired }: FundingCampaignsProps) => {
               campaign={campaign}
               onClick={() => setSelectedCampaign(campaign)}
               showManageButton={activeTab === 'my-campaigns'}
+              onDelete={() => {
+                setMyCampaigns(myCampaigns.filter(c => c.id !== campaign.id));
+              }}
             />
           ))
         )}

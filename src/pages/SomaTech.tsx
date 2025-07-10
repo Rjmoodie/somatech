@@ -11,7 +11,7 @@ import BusinessValuation from "@/components/somatech/BusinessValuation";
 import CashFlowSimulator from "@/components/somatech/CashFlowSimulator";
 import RetirementPlanning from "@/components/somatech/RetirementPlanning";
 import RealEstateCalculator from "@/components/somatech/RealEstateCalculator";
-import PerformanceTracker from "@/components/somatech/PerformanceTracker";
+
 import Dashboard from "@/components/somatech/Dashboard";
 import Marketplace from "@/components/somatech/Marketplace";
 import FundingCampaigns from "@/components/somatech/FundingCampaigns";
@@ -89,8 +89,6 @@ const SomaTech = () => {
         return <RetirementPlanning />;
       case "real-estate":
         return <RealEstateCalculator />;
-      case "performance-tracker":
-        return <PerformanceTracker />;
       default:
         return renderPlaceholder(modules.find(m => m.id === activeModule)?.name || "Tool");
     }

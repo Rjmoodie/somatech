@@ -1,4 +1,4 @@
-import { Calculator, TrendingUp, BarChart3, Users, FileText, Home, DollarSign, Star, ShoppingCart, LayoutDashboard, Activity, Heart, Target } from "lucide-react";
+import { Calculator, TrendingUp, Users, FileText, Home, DollarSign, Star, ShoppingCart, LayoutDashboard, Activity, Heart, Target } from "lucide-react";
 import { Module } from "./types";
 
 export const modules: Module[] = [
@@ -11,7 +11,6 @@ export const modules: Module[] = [
   { id: "cash-flow", name: "Cash Flow Simulator", icon: Activity },
   { id: "retirement-planning", name: "Retirement Planning", icon: FileText },
   { id: "real-estate", name: "Real Estate Calculator", icon: DollarSign },
-  { id: "performance-tracker", name: "Performance Tracker", icon: BarChart3 },
 ];
 
 export const industryMultipliers: Record<string, number> = {

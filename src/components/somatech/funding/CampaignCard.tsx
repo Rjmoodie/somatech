@@ -2,16 +2,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Calendar, Target, Heart, Settings } from "lucide-react";
+import { Calendar, Target, Heart, Settings, Trash2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 import { FundingCampaign } from "../types";
 
 interface CampaignCardProps {
   campaign: FundingCampaign;
   onClick: () => void;
   showManageButton?: boolean;
+  onDelete?: () => void;
 }
 
-const CampaignCard = ({ campaign, onClick, showManageButton = false }: CampaignCardProps) => {
+const CampaignCard = ({ campaign, onClick, showManageButton = false, onDelete }: CampaignCardProps) => {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -30,6 +33,42 @@ const CampaignCard = ({ campaign, onClick, showManageButton = false }: CampaignC
     const diff = end.getTime() - now.getTime();
     const days = Math.ceil(diff / (1000 * 3600 * 24));
     return days > 0 ? days : 0;
+  };
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (campaign.current_amount > 0) {
+      toast({
+        title: "Cannot Delete Campaign",
+        description: "You cannot delete a campaign that has received donations.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('funding_campaigns')
+        .delete()
+        .eq('id', campaign.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Campaign Deleted",
+        description: "Your campaign has been successfully deleted.",
+      });
+      
+      onDelete?.();
+    } catch (error) {
+      console.error('Error deleting campaign:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete campaign. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const getCategoryBadgeColor = (category: string) => {
@@ -61,18 +100,6 @@ const CampaignCard = ({ campaign, onClick, showManageButton = false }: CampaignC
               {campaign.category.charAt(0).toUpperCase() + campaign.category.slice(1)}
             </Badge>
           </div>
-          {showManageButton && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                // TODO: Open manage dialog
-              }}
-            >
-              <Settings className="h-4 w-4" />
-            </Button>
-          )}
         </div>
       </CardHeader>
       
@@ -133,6 +160,34 @@ const CampaignCard = ({ campaign, onClick, showManageButton = false }: CampaignC
           >
             {campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1)}
           </Badge>
+        )}
+
+        {showManageButton && (
+          <div className="mt-4 space-y-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="w-full gap-2"
+              onClick={(e) => {
+                e.stopPropagation();
+                onClick();
+              }}
+            >
+              <Settings className="h-4 w-4" />
+              Manage Campaign
+            </Button>
+            {campaign.current_amount === 0 && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full gap-2 text-destructive hover:text-destructive"
+                onClick={handleDelete}
+              >
+                <Trash2 className="h-4 w-4" />
+                Delete Campaign
+              </Button>
+            )}
+          </div>
         )}
       </CardContent>
     </Card>
