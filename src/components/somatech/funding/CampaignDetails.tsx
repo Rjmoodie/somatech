@@ -45,31 +45,30 @@ const CampaignDetails = ({ campaign, onBack, onUpdate }: CampaignDetailsProps) =
 
   const handleDonation = async (donationData: any) => {
     try {
-      const { data, error } = await supabase
-        .from('donations')
-        .insert([{
-          ...donationData,
-          campaign_id: campaign.id
-        }])
-        .select()
-        .single();
+      // Process payment through Stripe
+      const { data, error } = await supabase.functions.invoke('process-donation', {
+        body: {
+          campaign_id: campaign.id,
+          amount: donationData.amount,
+          donor_name: donationData.donor_name,
+          donor_email: donationData.donor_email,
+          message: donationData.message,
+          is_anonymous: donationData.is_anonymous
+        }
+      });
 
       if (error) throw error;
 
-      // Update the campaign with new amount
-      const updatedCampaign = {
-        ...campaign,
-        current_amount: campaign.current_amount + donationData.amount
-      };
-      
-      onUpdate(updatedCampaign);
-      setDonations([data, ...donations]);
-      setShowDonationForm(false);
-      
-      toast({
-        title: "Thank you!",
-        description: "Your donation has been processed successfully.",
-      });
+      if (data.checkout_url) {
+        // Redirect to Stripe checkout
+        window.open(data.checkout_url, '_blank');
+        setShowDonationForm(false);
+        
+        toast({
+          title: "Redirecting to payment",
+          description: "Please complete your donation in the new tab.",
+        });
+      }
     } catch (error) {
       console.error('Error processing donation:', error);
       toast({

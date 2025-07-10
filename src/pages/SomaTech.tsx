@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,15 +16,34 @@ import Dashboard from "@/components/somatech/Dashboard";
 import Marketplace from "@/components/somatech/Marketplace";
 import FundingCampaigns from "@/components/somatech/FundingCampaigns";
 import CampaignProjection from "@/components/somatech/CampaignProjection";
+import DonationSuccess from "@/components/somatech/funding/DonationSuccess";
 import AuthDialog, { useAuth } from "@/components/somatech/AuthDialog";
+import { toast } from "@/hooks/use-toast";
 
 const SomaTech = () => {
   const [activeModule, setActiveModule] = useState("dashboard");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [globalTicker, setGlobalTicker] = useState("AAPL");
   const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
   
   const { user, profile, loading: authLoading, signOut } = useAuth();
+
+  useEffect(() => {
+    const donation = searchParams.get('donation');
+    const sessionId = searchParams.get('session_id');
+    
+    if (donation === 'success' && sessionId) {
+      setActiveModule("funding-campaigns");
+    } else if (donation === 'cancelled') {
+      toast({
+        title: "Donation cancelled",
+        description: "Your donation was cancelled. You can try again anytime.",
+        variant: "default",
+      });
+      setSearchParams({});
+    }
+  }, [searchParams, setSearchParams]);
 
   const renderPlaceholder = (title: string) => (
     <Card>
@@ -54,6 +74,12 @@ const SomaTech = () => {
       case "marketplace":
         return <Marketplace />;
       case "funding-campaigns":
+        const sessionId = searchParams.get('session_id');
+        const donation = searchParams.get('donation');
+        
+        if (donation === 'success' && sessionId) {
+          return <DonationSuccess />;
+        }
         return <FundingCampaigns user={user} onAuthRequired={() => setShowAuthDialog(true)} />;
       case "business-valuation":
         return <BusinessValuation />;
