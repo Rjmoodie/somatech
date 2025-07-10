@@ -94,21 +94,21 @@ const CampaignProjectionResults = ({ result }: CampaignProjectionResultsProps) =
         <div className="space-y-3">
           <h4 className="font-semibold">Scenarios</h4>
           <div className="grid grid-cols-2 gap-4">
-            <div className="p-3 bg-green-50 rounded-lg">
-              <div className="flex items-center gap-2 text-sm text-green-700">
+            <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg">
+              <div className="flex items-center gap-2 text-sm text-primary">
                 <TrendingUp className="h-4 w-4" />
                 Optimistic
               </div>
-              <div className="text-lg font-semibold text-green-800">
+              <div className="text-lg font-semibold text-primary">
                 {formatCurrency(result.optimisticAmount)}
               </div>
             </div>
-            <div className="p-3 bg-red-50 rounded-lg">
-              <div className="flex items-center gap-2 text-sm text-red-700">
+            <div className="p-3 bg-destructive/5 border border-destructive/20 rounded-lg">
+              <div className="flex items-center gap-2 text-sm text-destructive">
                 <TrendingDown className="h-4 w-4" />
                 Pessimistic
               </div>
-              <div className="text-lg font-semibold text-red-800">
+              <div className="text-lg font-semibold text-destructive">
                 {formatCurrency(result.pessimisticAmount)}
               </div>
             </div>
