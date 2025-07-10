@@ -516,7 +516,7 @@ const RealEstateCalculator = () => {
   return (
     <div className="space-y-6">
       <Tabs defaultValue="traditional" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="traditional" className="gap-2">
             <Calculator className="h-4 w-4" />
             Traditional Analysis
@@ -524,6 +524,10 @@ const RealEstateCalculator = () => {
           <TabsTrigger value="brrrr" className="gap-2">
             <RefreshCw className="h-4 w-4" />
             BRRRR Calculator
+          </TabsTrigger>
+          <TabsTrigger value="saved-deals" className="gap-2">
+            <FolderOpen className="h-4 w-4" />
+            Saved Deals
           </TabsTrigger>
         </TabsList>
 
@@ -1178,6 +1182,122 @@ const RealEstateCalculator = () => {
             )}
           </div>
         </TabsContent>
+
+        <TabsContent value="saved-deals" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FolderOpen className="h-5 w-5" />
+                Saved BRRRR Deals
+              </CardTitle>
+              <CardDescription>
+                View, load, and manage your saved real estate investment analyses
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {savedDeals.length === 0 ? (
+                <div className="text-center py-8">
+                  <FolderOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No Saved Deals</h3>
+                  <p className="text-muted-foreground mb-4">
+                    You haven't saved any BRRRR deals yet. Create a deal analysis and save it to see it here.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {savedDeals.map((deal) => (
+                    <Card key={deal.id} className="hover:shadow-lg transition-shadow">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-lg">{deal.deal_name}</CardTitle>
+                        <CardDescription>
+                          Created {new Date(deal.created_at).toLocaleDateString()}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        {/* Deal Summary Metrics */}
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Purchase Price:</span>
+                            <span className="font-medium">{formatCurrency(deal.inputs.purchasePrice)}</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">ARV:</span>
+                            <span className="font-medium">{formatCurrency(deal.inputs.arv)}</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Monthly Rent:</span>
+                            <span className="font-medium">{formatCurrency(deal.inputs.monthlyRent)}</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Capital Recycled:</span>
+                            <span className={`font-medium ${deal.results.capitalRecycled >= 80 ? 'text-green-600' : deal.results.capitalRecycled >= 50 ? 'text-yellow-600' : 'text-red-600'}`}>
+                              {formatPercentage(deal.results.capitalRecycled)}
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Post-Refi Cash Flow:</span>
+                            <span className={`font-medium ${deal.results.postRefinanceCashFlow >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              {formatCurrency(deal.results.postRefinanceCashFlow)}/mo
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Deal Quality Badge */}
+                        <div className="flex justify-center">
+                          <Badge 
+                            variant={
+                              deal.results.capitalRecycled >= 80 && deal.results.postRefinanceCashFlow > 200 
+                                ? "default" 
+                                : deal.results.capitalRecycled >= 50 && deal.results.postRefinanceCashFlow > 0 
+                                ? "secondary" 
+                                : "destructive"
+                            }
+                          >
+                            {deal.results.capitalRecycled >= 80 && deal.results.postRefinanceCashFlow > 200 
+                              ? "Excellent Deal" 
+                              : deal.results.capitalRecycled >= 50 && deal.results.postRefinanceCashFlow > 0 
+                              ? "Good Deal" 
+                              : "Fair Deal"
+                            }
+                          </Badge>
+                        </div>
+
+                        {/* Notes */}
+                        {deal.notes && (
+                          <div className="pt-2 border-t">
+                            <p className="text-xs text-muted-foreground">Notes:</p>
+                            <p className="text-sm mt-1 line-clamp-2">{deal.notes}</p>
+                          </div>
+                        )}
+
+                        {/* Action Buttons */}
+                        <div className="flex gap-2 pt-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => loadDeal(deal)}
+                          >
+                            Load Deal
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => deleteDeal(deal.id, deal.deal_name)}
+                            className="text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
       </Tabs>
     </div>
   );
