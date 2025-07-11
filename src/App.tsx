@@ -15,8 +15,8 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/somatech" element={<SomaTech />} />
+          <Route path="/" element={<SomaTech />} />
+          <Route path="/index" element={<Index />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
