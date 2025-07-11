@@ -135,7 +135,12 @@ export const ProfileDropdown = ({ username, userEmail }: ProfileDropdownProps) =
             <span>Quick Profile Edit</span>
           </DropdownMenuItem>
           
-          <DropdownMenuItem onClick={() => navigate('/somatech?module=account-settings')}>
+          <DropdownMenuItem onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Navigating to account settings...');
+            navigate('/somatech?module=account-settings');
+          }}>
             <Settings className="mr-2 h-4 w-4" />
             <span>Account Settings</span>
           </DropdownMenuItem>
