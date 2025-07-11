@@ -1,0 +1,97 @@
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Home, ArrowLeft, Search, HelpCircle } from 'lucide-react';
+
+const NotFound = () => {
+  const navigate = useNavigate();
+
+  const handleGoBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
+      <Card className="w-full max-w-2xl mx-auto text-center">
+        <CardHeader className="pb-4">
+          <div className="mx-auto w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mb-6">
+            <span className="text-white font-bold text-4xl">404</span>
+          </div>
+          <CardTitle className="text-3xl md:text-4xl font-display font-bold text-gray-900 dark:text-white mb-2">
+            Page Not Found
+          </CardTitle>
+          <p className="text-lg text-muted-foreground max-w-md mx-auto">
+            The page you're looking for doesn't exist or has been moved.
+          </p>
+        </CardHeader>
+        
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Button 
+              onClick={handleGoBack}
+              variant="outline" 
+              className="w-full gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Go Back
+            </Button>
+            
+            <Button 
+              asChild 
+              className="w-full gap-2"
+            >
+              <Link to="/">
+                <Home className="h-4 w-4" />
+                Home
+              </Link>
+            </Button>
+          </div>
+          
+          <div className="pt-4 border-t border-border">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
+              Popular Pages
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+              <Link 
+                to="/somatech?module=dashboard" 
+                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+              >
+                Dashboard
+              </Link>
+              <Link 
+                to="/somatech?module=stock-analysis" 
+                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+              >
+                Stock Analysis
+              </Link>
+              <Link 
+                to="/somatech?module=business-valuation" 
+                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+              >
+                Business Valuation
+              </Link>
+              <Link 
+                to="/somatech?module=real-estate" 
+                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+              >
+                Real Estate Calculator
+              </Link>
+            </div>
+          </div>
+          
+          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+            <HelpCircle className="h-4 w-4" />
+            <span>Need help? Contact support</span>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default NotFound;

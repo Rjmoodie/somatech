@@ -10,6 +10,7 @@ import BottomNavigation from "@/components/somatech/BottomNavigation";
 import OnboardingWelcome from "@/components/somatech/OnboardingWelcome";
 import OfflineIndicator from "@/components/somatech/OfflineIndicator";
 import ErrorBoundary from "@/components/somatech/ErrorBoundary";
+import ResponsiveNavigation from "@/components/somatech/ResponsiveNavigation";
 import { modules } from "@/components/somatech/constants";
 import StockAnalysis from "@/components/somatech/StockAnalysis";
 import WatchlistModule from "@/components/somatech/WatchlistModule";
@@ -64,8 +65,14 @@ const SomaTech = () => {
   }, [user, authLoading]);
 
   useEffect(() => {
+    const moduleParam = searchParams.get('module');
     const donation = searchParams.get('donation');
     const sessionId = searchParams.get('session_id');
+    
+    // Set active module from URL parameter
+    if (moduleParam && modules.find(m => m.id === moduleParam)) {
+      setActiveModule(moduleParam);
+    }
     
     if (donation === 'success' && sessionId) {
       setActiveModule("funding-campaigns");
@@ -99,9 +106,8 @@ const SomaTech = () => {
 
   const handleModuleChange = (module: string) => {
     setActiveModule(module);
-    // Update URL without page reload
-    const newUrl = `/somatech?module=${module}`;
-    window.history.pushState({}, '', newUrl);
+    // Update URL with proper navigation
+    setSearchParams({ module });
   };
 
   const handleOnboardingComplete = () => {
@@ -164,10 +170,10 @@ const SomaTech = () => {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex overflow-hidden">
         <OfflineIndicator />
       {/* Sidebar - Hidden on mobile, shown on desktop */}
-      <div className={`${sidebarCollapsed ? 'w-16' : 'w-72'} transition-all duration-500 ease-apple flex-col hidden lg:flex`}>
+      <div className={`${sidebarCollapsed ? 'w-16' : 'w-72'} transition-all duration-500 ease-apple flex-col hidden lg:flex flex-shrink-0`}>
         <div className="glass-card m-4 mb-2 p-6 rounded-2xl border-0">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
@@ -220,10 +226,11 @@ const SomaTech = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 max-w-full">
         {/* Header */}
-        <header className="glass-card m-2 md:m-4 mb-2 px-4 md:px-8 py-4 md:py-6 rounded-2xl border-0">
+        <header className="glass-card m-2 md:m-4 mb-2 px-4 md:px-8 py-4 md:py-6 rounded-2xl border-0 flex-shrink-0">
           <div className="flex items-center justify-between">
+            <ResponsiveNavigation activeModule={activeModule} onModuleChange={handleModuleChange} />
             <div className="animate-slide-in-left">
               <h2 className="text-xl md:text-3xl font-display font-bold text-gray-900 dark:text-white mb-1">
                 {modules.find(m => m.id === activeModule)?.name || "Dashboard"}
@@ -283,8 +290,8 @@ const SomaTech = () => {
         </header>
 
         {/* Main Content Area */}
-        <main className="flex-1 px-2 md:px-4 pb-20 lg:pb-4 overflow-auto">
-          <div className="premium-card p-4 md:p-8 rounded-2xl animate-fade-in min-h-[calc(100vh-200px)]">
+        <main className="flex-1 px-2 md:px-4 pb-20 lg:pb-4 overflow-auto max-w-full">
+          <div className="premium-card p-4 md:p-8 rounded-2xl animate-fade-in min-h-[calc(100vh-200px)] max-w-full overflow-hidden">
             {renderContent()}
           </div>
         </main>
