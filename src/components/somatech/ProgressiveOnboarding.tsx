@@ -234,9 +234,10 @@ const ProgressiveOnboarding: React.FC<ProgressiveOnboardingProps> = ({
             <Button 
               size="sm" 
               onClick={() => setCurrentStep(Math.min(currentStep + 1, steps.length - 1))}
+              disabled={currentStep >= steps.length - 1 || completedSteps.size === steps.length}
               className="flex-1"
             >
-              Next Step
+              {currentStep >= steps.length - 1 ? 'Complete' : 'Next Step'}
             </Button>
           </div>
         </CardContent>
