@@ -21,6 +21,7 @@ import UserFeedbackSystem from "@/components/somatech/UserFeedbackSystem";
 import NetworkStatus from "@/components/somatech/NetworkStatus";
 import ProgressiveOnboarding from "@/components/somatech/ProgressiveOnboarding";
 import { ProfileDropdown } from "@/components/somatech/ProfileDropdown";
+import NotificationBell from "@/components/somatech/NotificationBell";
 import Footer from "@/components/somatech/Footer";
 
 // Lazy load modules for better performance
@@ -40,6 +41,9 @@ const PrivacyPolicy = lazy(() => import("@/components/somatech/PrivacyPolicy"));
 const AccountSettings = lazy(() => import("@/components/somatech/AccountSettings"));
 const UserDashboard = lazy(() => import("@/components/somatech/UserDashboard"));
 const OnboardingModal = lazy(() => import("@/components/somatech/OnboardingModal"));
+const NotificationCenter = lazy(() => import("@/components/somatech/NotificationCenter"));
+const FeedbackHub = lazy(() => import("@/components/somatech/FeedbackHub"));
+const PWAManager = lazy(() => import("@/components/somatech/PWAManager"));
 
 // Enterprise Components
 const PricingDialog = lazy(() => import("@/components/somatech/enterprise/PricingDialog"));
@@ -292,6 +296,18 @@ const SomaTech = () => {
               <UserDashboard />
             </ModuleWrapper>
           );
+        case "notifications":
+          return (
+            <ModuleWrapper>
+              <NotificationCenter />
+            </ModuleWrapper>
+          );
+        case "feedback":
+          return (
+            <ModuleWrapper>
+              <FeedbackHub />
+            </ModuleWrapper>
+          );
         default:
           return (
             <ModuleWrapper>
@@ -385,6 +401,7 @@ const SomaTech = () => {
                   </div>
                 ) : user ? (
                   <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4">
+                    <NotificationBell />
                     <ProfileDropdown 
                       username={profile?.username || user.email?.split('@')[0] || 'User'}
                       userEmail={user.email || ''}

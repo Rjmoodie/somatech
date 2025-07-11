@@ -208,6 +208,95 @@ export type Database = {
           },
         ]
       }
+      email_campaigns: {
+        Row: {
+          bounced_count: number | null
+          clicked_count: number | null
+          created_at: string
+          delivered_count: number | null
+          id: string
+          metadata: Json | null
+          name: string
+          opened_count: number | null
+          scheduled_at: string | null
+          segment: string | null
+          sent_at: string | null
+          status: string
+          subject: string
+          template_id: string
+          total_recipients: number | null
+          updated_at: string
+        }
+        Insert: {
+          bounced_count?: number | null
+          clicked_count?: number | null
+          created_at?: string
+          delivered_count?: number | null
+          id?: string
+          metadata?: Json | null
+          name: string
+          opened_count?: number | null
+          scheduled_at?: string | null
+          segment?: string | null
+          sent_at?: string | null
+          status?: string
+          subject: string
+          template_id: string
+          total_recipients?: number | null
+          updated_at?: string
+        }
+        Update: {
+          bounced_count?: number | null
+          clicked_count?: number | null
+          created_at?: string
+          delivered_count?: number | null
+          id?: string
+          metadata?: Json | null
+          name?: string
+          opened_count?: number | null
+          scheduled_at?: string | null
+          segment?: string | null
+          sent_at?: string | null
+          status?: string
+          subject?: string
+          template_id?: string
+          total_recipients?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      feature_votes: {
+        Row: {
+          created_at: string
+          feedback_id: string
+          id: string
+          user_id: string
+          vote_type: string
+        }
+        Insert: {
+          created_at?: string
+          feedback_id: string
+          id?: string
+          user_id: string
+          vote_type: string
+        }
+        Update: {
+          created_at?: string
+          feedback_id?: string
+          id?: string
+          user_id?: string
+          vote_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feature_votes_feedback_id_fkey"
+            columns: ["feedback_id"]
+            isOneToOne: false
+            referencedRelation: "user_feedback"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       funding_campaigns: {
         Row: {
           category: string
@@ -350,33 +439,54 @@ export type Database = {
       }
       notifications: {
         Row: {
+          action_label: string | null
           action_url: string | null
+          category: string | null
           created_at: string
+          expires_at: string | null
           id: string
           message: string
+          metadata: Json | null
+          priority: number | null
           read: boolean | null
+          read_at: string | null
           title: string
           type: string | null
+          updated_at: string | null
           user_id: string | null
         }
         Insert: {
+          action_label?: string | null
           action_url?: string | null
+          category?: string | null
           created_at?: string
+          expires_at?: string | null
           id?: string
           message: string
+          metadata?: Json | null
+          priority?: number | null
           read?: boolean | null
+          read_at?: string | null
           title: string
           type?: string | null
+          updated_at?: string | null
           user_id?: string | null
         }
         Update: {
+          action_label?: string | null
           action_url?: string | null
+          category?: string | null
           created_at?: string
+          expires_at?: string | null
           id?: string
           message?: string
+          metadata?: Json | null
+          priority?: number | null
           read?: boolean | null
+          read_at?: string | null
           title?: string
           type?: string | null
+          updated_at?: string | null
           user_id?: string | null
         }
         Relationships: []
@@ -388,6 +498,7 @@ export type Database = {
           bio: string | null
           created_at: string
           email: string | null
+          email_notifications_enabled: boolean | null
           email_verification_sent_at: string | null
           email_verification_token: string | null
           email_verified: boolean | null
@@ -396,10 +507,13 @@ export type Database = {
           last_login_at: string | null
           location: string | null
           login_count: number | null
+          marketing_emails_enabled: boolean | null
           onboarding_completed: boolean | null
           onboarding_progress: Json | null
           onboarding_step: number | null
+          price_alerts_enabled: boolean | null
           profile_completion_score: number | null
+          push_notifications_enabled: boolean | null
           theme_preference: string | null
           tutorial_completed: boolean | null
           two_factor_enabled: boolean | null
@@ -407,6 +521,7 @@ export type Database = {
           updated_at: string
           username: string | null
           website: string | null
+          weekly_summary_enabled: boolean | null
         }
         Insert: {
           avatar_url?: string | null
@@ -414,6 +529,7 @@ export type Database = {
           bio?: string | null
           created_at?: string
           email?: string | null
+          email_notifications_enabled?: boolean | null
           email_verification_sent_at?: string | null
           email_verification_token?: string | null
           email_verified?: boolean | null
@@ -422,10 +538,13 @@ export type Database = {
           last_login_at?: string | null
           location?: string | null
           login_count?: number | null
+          marketing_emails_enabled?: boolean | null
           onboarding_completed?: boolean | null
           onboarding_progress?: Json | null
           onboarding_step?: number | null
+          price_alerts_enabled?: boolean | null
           profile_completion_score?: number | null
+          push_notifications_enabled?: boolean | null
           theme_preference?: string | null
           tutorial_completed?: boolean | null
           two_factor_enabled?: boolean | null
@@ -433,6 +552,7 @@ export type Database = {
           updated_at?: string
           username?: string | null
           website?: string | null
+          weekly_summary_enabled?: boolean | null
         }
         Update: {
           avatar_url?: string | null
@@ -440,6 +560,7 @@ export type Database = {
           bio?: string | null
           created_at?: string
           email?: string | null
+          email_notifications_enabled?: boolean | null
           email_verification_sent_at?: string | null
           email_verification_token?: string | null
           email_verified?: boolean | null
@@ -448,10 +569,13 @@ export type Database = {
           last_login_at?: string | null
           location?: string | null
           login_count?: number | null
+          marketing_emails_enabled?: boolean | null
           onboarding_completed?: boolean | null
           onboarding_progress?: Json | null
           onboarding_step?: number | null
+          price_alerts_enabled?: boolean | null
           profile_completion_score?: number | null
+          push_notifications_enabled?: boolean | null
           theme_preference?: string | null
           tutorial_completed?: boolean | null
           two_factor_enabled?: boolean | null
@@ -459,6 +583,7 @@ export type Database = {
           updated_at?: string
           username?: string | null
           website?: string | null
+          weekly_summary_enabled?: boolean | null
         }
         Relationships: []
       }
@@ -591,6 +716,54 @@ export type Database = {
         }
         Relationships: []
       }
+      user_feedback: {
+        Row: {
+          admin_response: string | null
+          category: string | null
+          created_at: string
+          description: string
+          id: string
+          metadata: Json | null
+          priority: number | null
+          status: string
+          title: string
+          type: string
+          updated_at: string
+          user_id: string | null
+          votes_count: number | null
+        }
+        Insert: {
+          admin_response?: string | null
+          category?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          metadata?: Json | null
+          priority?: number | null
+          status?: string
+          title: string
+          type: string
+          updated_at?: string
+          user_id?: string | null
+          votes_count?: number | null
+        }
+        Update: {
+          admin_response?: string | null
+          category?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          metadata?: Json | null
+          priority?: number | null
+          status?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string | null
+          votes_count?: number | null
+        }
+        Relationships: []
+      }
       watchlist: {
         Row: {
           added_at: string
@@ -655,6 +828,20 @@ export type Database = {
           profile_record: Database["public"]["Tables"]["profiles"]["Row"]
         }
         Returns: number
+      }
+      create_notification: {
+        Args: {
+          p_user_id: string
+          p_title: string
+          p_message: string
+          p_type?: string
+          p_category?: string
+          p_action_url?: string
+          p_action_label?: string
+          p_metadata?: Json
+          p_priority?: number
+        }
+        Returns: string
       }
       track_login_activity: {
         Args: {
