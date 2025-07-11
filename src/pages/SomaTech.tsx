@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { PieChart, User, LogOut } from "lucide-react";
 import DarkModeToggle from "@/components/somatech/DarkModeToggle";
 import FloatingActionMenu from "@/components/somatech/FloatingActionMenu";
+import BottomNavigation from "@/components/somatech/BottomNavigation";
 import { modules } from "@/components/somatech/constants";
 import StockAnalysis from "@/components/somatech/StockAnalysis";
 import WatchlistModule from "@/components/somatech/WatchlistModule";
@@ -146,8 +147,8 @@ const SomaTech = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex">
-      {/* Sidebar */}
-      <div className={`${sidebarCollapsed ? 'w-16' : 'w-72'} transition-all duration-500 ease-apple flex flex-col`}>
+      {/* Sidebar - Hidden on mobile, shown on desktop */}
+      <div className={`${sidebarCollapsed ? 'w-16' : 'w-72'} transition-all duration-500 ease-apple flex-col hidden lg:flex`}>
         <div className="glass-card m-4 mb-2 p-6 rounded-2xl border-0">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
@@ -202,31 +203,31 @@ const SomaTech = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <header className="glass-card m-4 mb-2 px-8 py-6 rounded-2xl border-0">
+        <header className="glass-card m-2 md:m-4 mb-2 px-4 md:px-8 py-4 md:py-6 rounded-2xl border-0">
           <div className="flex items-center justify-between">
             <div className="animate-slide-in-left">
-              <h2 className="text-3xl font-display font-bold text-gray-900 dark:text-white mb-1">
+              <h2 className="text-xl md:text-3xl font-display font-bold text-gray-900 dark:text-white mb-1">
                 {modules.find(m => m.id === activeModule)?.name || "Dashboard"}
               </h2>
-              <p className="text-gray-600 dark:text-gray-400 font-medium">
+              <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 font-medium hidden sm:block">
                 Professional business intelligence platform
               </p>
             </div>
             
-            <div className="flex items-center space-x-4 animate-slide-in-right">
+            <div className="flex items-center space-x-2 md:space-x-4 animate-slide-in-right">
               <DarkModeToggle />
               {authLoading ? (
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-gray-200 rounded-full animate-skeleton"></div>
-                  <div className="w-24 h-4 bg-gray-200 rounded animate-skeleton"></div>
+                <div className="flex items-center space-x-2 md:space-x-3">
+                  <div className="w-6 h-6 md:w-8 md:h-8 bg-gray-200 rounded-full animate-skeleton"></div>
+                  <div className="w-16 md:w-24 h-3 md:h-4 bg-gray-200 rounded animate-skeleton hidden sm:block"></div>
                 </div>
               ) : user ? (
-                <div className="flex items-center space-x-4">
-                  <div className="premium-card px-6 py-3 rounded-xl flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                      <User className="h-4 w-4 text-white" />
+                <div className="flex items-center space-x-2 md:space-x-4">
+                  <div className="premium-card px-3 md:px-6 py-2 md:py-3 rounded-xl flex items-center space-x-2 md:space-x-3">
+                    <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                      <User className="h-3 w-3 md:h-4 md:w-4 text-white" />
                     </div>
-                    <div className="text-sm">
+                    <div className="text-xs md:text-sm hidden sm:block">
                       <div className="font-semibold text-gray-900 dark:text-white">
                         {profile?.username || user.email?.split('@')[0]}
                       </div>
@@ -237,22 +238,22 @@ const SomaTech = () => {
                   </div>
                   <button
                     onClick={signOut}
-                    className="premium-card p-3 rounded-xl hover-lift text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                    className="premium-card p-2 md:p-3 rounded-xl hover-lift text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                   >
-                    <LogOut className="h-4 w-4" />
+                    <LogOut className="h-3 w-3 md:h-4 md:w-4" />
                   </button>
                 </div>
               ) : (
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2 md:space-x-3">
                   <button 
                     onClick={() => setShowAuthDialog(true)}
-                    className="px-6 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-300"
+                    className="px-3 md:px-6 py-2 md:py-3 text-xs md:text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-300 hidden sm:block"
                   >
                     Sign In
                   </button>
                   <button 
                     onClick={() => setShowAuthDialog(true)}
-                    className="btn-apple"
+                    className="btn-apple text-xs md:text-sm px-3 md:px-6 py-2 md:py-3"
                   >
                     Get Started
                   </button>
@@ -263,15 +264,20 @@ const SomaTech = () => {
         </header>
 
         {/* Main Content Area */}
-        <main className="flex-1 px-4 pb-4 overflow-auto">
-          <div className="premium-card p-8 rounded-2xl animate-fade-in min-h-[calc(100vh-200px)]">
+        <main className="flex-1 px-2 md:px-4 pb-20 lg:pb-4 overflow-auto">
+          <div className="premium-card p-4 md:p-8 rounded-2xl animate-fade-in min-h-[calc(100vh-200px)]">
             {renderContent()}
           </div>
         </main>
       </div>
 
-      {/* Floating Action Menu */}
-      <FloatingActionMenu onModuleSelect={handleModuleChange} />
+      {/* Mobile Bottom Navigation */}
+      <BottomNavigation activeModule={activeModule} onModuleChange={handleModuleChange} />
+
+      {/* Floating Action Menu - Hidden on mobile */}
+      <div className="hidden lg:block">
+        <FloatingActionMenu onModuleSelect={handleModuleChange} />
+      </div>
 
       {/* Dialogs */}
       <AuthDialog
