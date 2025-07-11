@@ -38,40 +38,69 @@ const Dashboard = ({ globalTicker, setGlobalTicker, setActiveModule }: Dashboard
 
   return (
     <div className="space-y-8 animate-fade-in">
+      {/* Hero Welcome Section */}
+      <div className="text-center py-8 animate-slide-up">
+        <h1 className="text-4xl md:text-5xl font-display font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 dark:from-white dark:via-blue-200 dark:to-purple-200 bg-clip-text text-transparent mb-4">
+          Financial Intelligence Dashboard
+        </h1>
+        <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto font-medium">
+          Your comprehensive view into market performance and business analytics
+        </p>
+      </div>
+      
       <WelcomeSection />
       
       <AnnouncementsSection announcements={announcements} />
 
-      <div className="border-t border-border/30"></div>
+      <div className="border-t border-gray-200/50 dark:border-gray-700/50"></div>
 
-      {/* Market Overview Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <MacroIndicators 
-          onChartSelect={setSelectedChart} 
-          selectedChart={selectedChart} 
-        />
-        <MarketSnapshot marketData={marketData} />
-        <BusinessPulse />
-        <TodaysAlerts />
+      {/* Enhanced Market Overview Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-scale-in">
+        <div className="glass-card p-6 rounded-2xl hover-lift">
+          <MacroIndicators 
+            onChartSelect={setSelectedChart} 
+            selectedChart={selectedChart} 
+          />
+        </div>
+        <div className="glass-card p-6 rounded-2xl hover-lift">
+          <MarketSnapshot marketData={marketData} />
+        </div>
+        <div className="glass-card p-6 rounded-2xl hover-lift">
+          <BusinessPulse />
+        </div>
+        <div className="glass-card p-6 rounded-2xl hover-lift">
+          <TodaysAlerts />
+        </div>
       </div>
 
       {/* Historical Chart Display */}
       {selectedChart && (
-        <HistoricalChart 
-          selectedChart={selectedChart} 
-          onClose={() => setSelectedChart("")} 
-        />
+        <div className="animate-fade-in">
+          <HistoricalChart 
+            selectedChart={selectedChart} 
+            onClose={() => setSelectedChart("")} 
+          />
+        </div>
       )}
 
-      <FeaturedVideo />
+      {/* Featured Content */}
+      <div className="glass-card p-8 rounded-2xl animate-slide-up">
+        <FeaturedVideo />
+      </div>
 
-      <div className="border-t border-border/30"></div>
+      <div className="border-t border-gray-200/50 dark:border-gray-700/50"></div>
 
-      <LearningResources />
+      {/* Learning Resources */}
+      <div className="glass-card p-8 rounded-2xl animate-fade-in">
+        <LearningResources />
+      </div>
 
-      <div className="border-t border-border/30"></div>
+      <div className="border-t border-gray-200/50 dark:border-gray-700/50"></div>
 
-      <LatestNews news={news} />
+      {/* Latest News */}
+      <div className="glass-card p-8 rounded-2xl animate-slide-up">
+        <LatestNews news={news} />
+      </div>
     </div>
   );
 };

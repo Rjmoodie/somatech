@@ -143,114 +143,125 @@ const SomaTech = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex">
       {/* Sidebar */}
-      <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-card border-r transition-all duration-300 flex flex-col`}>
-        <div className="p-4">
+      <div className={`${sidebarCollapsed ? 'w-16' : 'w-72'} transition-all duration-500 ease-apple flex flex-col`}>
+        <div className="glass-card m-4 mb-2 p-6 rounded-2xl border-0">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">ST</span>
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-lg">ST</span>
             </div>
             {!sidebarCollapsed && (
-              <h1 className="text-xl font-bold">SomaTech</h1>
+              <div className="animate-fade-in">
+                <h1 className="text-xl font-display font-bold text-gray-900 dark:text-white">SomaTech</h1>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Financial Intelligence</p>
+              </div>
             )}
           </div>
         </div>
         
-        <nav className="flex-1 px-2">
-          {modules.map((module) => {
+        <nav className="flex-1 px-4 space-y-1">
+          {modules.map((module, index) => {
             const Icon = module.icon;
             return (
               <button
                 key={module.id}
-                onClick={() => setActiveModule(module.id)}
-                className={`w-full flex items-center space-x-3 px-3 py-2 mb-1 rounded-lg text-left transition-colors ${
+                onClick={() => handleModuleChange(module.id)}
+                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-300 ease-apple group ${
                   activeModule === module.id 
-                    ? 'bg-primary text-primary-foreground' 
-                    : 'hover:bg-muted'
-                }`}
+                    ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25 transform scale-[1.02]' 
+                    : 'hover:bg-white/50 dark:hover:bg-gray-800/50 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:shadow-md'
+                } animate-slide-in-left`}
+                style={{ animationDelay: `${index * 50}ms` }}
               >
-                <Icon className="h-5 w-5" />
-                {!sidebarCollapsed && <span>{module.name}</span>}
+                <Icon className={`h-5 w-5 transition-transform duration-300 ${
+                  activeModule === module.id ? 'scale-110' : 'group-hover:scale-105'
+                }`} />
+                {!sidebarCollapsed && (
+                  <span className="font-medium text-sm">{module.name}</span>
+                )}
               </button>
             );
           })}
         </nav>
         
         <div className="p-4">
-          <Button
-            variant="ghost"
-            size="sm"
+          <button
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            className="w-full"
+            className="w-full premium-card p-3 rounded-xl text-center hover-lift"
           >
-            {sidebarCollapsed ? '→' : '←'}
-          </Button>
+            <span className="text-gray-600 dark:text-gray-400 font-medium text-sm">
+              {sidebarCollapsed ? '→' : '←'}
+            </span>
+          </button>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        <header className="bg-card border-b px-6 py-4">
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Header */}
+        <header className="glass-card m-4 mb-2 px-8 py-6 rounded-2xl border-0">
           <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-bold">
+            <div className="animate-slide-in-left">
+              <h2 className="text-3xl font-display font-bold text-gray-900 dark:text-white mb-1">
                 {modules.find(m => m.id === activeModule)?.name || "Dashboard"}
               </h2>
-              <p className="text-muted-foreground">
-                Professional business intelligence tools
+              <p className="text-gray-600 dark:text-gray-400 font-medium">
+                Professional business intelligence platform
               </p>
             </div>
-            <div className="flex items-center space-x-4">
+            
+            <div className="flex items-center space-x-4 animate-slide-in-right">
               {authLoading ? (
-                <div className="flex items-center space-x-2">
-                  <div className="w-4 h-4 bg-muted rounded-full animate-pulse"></div>
-                  <span className="text-sm text-muted-foreground">Loading...</span>
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-gray-200 rounded-full animate-skeleton"></div>
+                  <div className="w-24 h-4 bg-gray-200 rounded animate-skeleton"></div>
                 </div>
               ) : user ? (
-                <div className="flex items-center space-x-3">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                      <User className="h-4 w-4 text-primary-foreground" />
+                <div className="flex items-center space-x-4">
+                  <div className="premium-card px-6 py-3 rounded-xl flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                      <User className="h-4 w-4 text-white" />
                     </div>
-                     <div className="text-sm">
-                       <div className="font-medium">{profile?.username || user.email}</div>
-                       <Badge variant="secondary" className="text-xs">
-                         Pro User
-                       </Badge>
-                     </div>
+                    <div className="text-sm">
+                      <div className="font-semibold text-gray-900 dark:text-white">
+                        {profile?.username || user.email?.split('@')[0]}
+                      </div>
+                      <div className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                        Pro Member
+                      </div>
+                    </div>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
+                  <button
                     onClick={signOut}
-                    className="flex items-center gap-2"
+                    className="premium-card p-3 rounded-xl hover-lift text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                   >
                     <LogOut className="h-4 w-4" />
-                    Sign Out
-                  </Button>
+                  </button>
                 </div>
               ) : (
                 <div className="flex items-center space-x-3">
-                  <Button 
-                    variant="outline" 
+                  <button 
                     onClick={() => setShowAuthDialog(true)}
+                    className="px-6 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-300"
                   >
                     Sign In
-                  </Button>
-                  <Button 
+                  </button>
+                  <button 
                     onClick={() => setShowAuthDialog(true)}
+                    className="btn-apple"
                   >
                     Get Started
-                  </Button>
+                  </button>
                 </div>
               )}
             </div>
           </div>
         </header>
 
-        <main className="flex-1 p-6 overflow-auto bg-gradient-to-br from-background to-muted/20">
-          <div className="animate-fade-in">
+        {/* Main Content Area */}
+        <main className="flex-1 px-4 pb-4 overflow-auto">
+          <div className="premium-card p-8 rounded-2xl animate-fade-in min-h-[calc(100vh-200px)]">
             {renderContent()}
           </div>
         </main>
