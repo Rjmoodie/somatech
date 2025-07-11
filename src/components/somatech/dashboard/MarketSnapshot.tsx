@@ -37,30 +37,38 @@ const MarketSnapshot = ({ marketData }: MarketSnapshotProps) => {
   ];
 
   return (
-    <Card className="h-full">
-      <CardHeader>
-        <CardTitle className="flex items-center space-x-2">
-          <BarChart3 className="h-5 w-5 text-blue-600" />
+    <Card className="premium-card h-full">
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center gap-3 text-xl">
+          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+            <BarChart3 className="h-5 w-5 text-primary" />
+          </div>
           <span>Market Snapshot</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-4">
         {indices.map((index, i) => (
-          <div key={i} className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{index.name}</p>
-              <p className="text-lg font-bold text-gray-900 dark:text-white">
+          <div key={i} className="flex items-center justify-between p-3 surface-card hover:bg-muted/30 transition-colors rounded-xl">
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-muted-foreground">{index.name}</p>
+              <p className="text-xl font-bold text-foreground">
                 {index.value.toLocaleString()}
               </p>
             </div>
-            <div className="flex items-center space-x-1">
-              {index.change > 0 ? (
-                <TrendingUp className="h-4 w-4 text-green-500" />
-              ) : (
-                <TrendingDown className="h-4 w-4 text-red-500" />
-              )}
-              <span className={`text-sm font-medium ${
-                index.change > 0 ? "text-green-600" : "text-red-600"
+            <div className="flex items-center gap-2">
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                index.change > 0 
+                  ? "bg-success/10" 
+                  : "bg-destructive/10"
+              }`}>
+                {index.change > 0 ? (
+                  <TrendingUp className="h-4 w-4 text-success" />
+                ) : (
+                  <TrendingDown className="h-4 w-4 text-destructive" />
+                )}
+              </div>
+              <span className={`text-sm font-semibold ${
+                index.change > 0 ? "text-success" : "text-destructive"
               }`}>
                 {index.change > 0 ? "+" : ""}{index.change}%
               </span>

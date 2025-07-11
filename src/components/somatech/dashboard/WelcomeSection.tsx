@@ -9,20 +9,20 @@ interface WelcomeSectionProps {
 
 const WelcomeSection = ({ setActiveModule }: WelcomeSectionProps) => {
   return (
-    <Card className="premium-card border-0 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 w-full">
-      <CardContent className="p-4 sm:p-6 lg:p-8">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-          <div className="space-y-4 min-w-0 flex-1">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+    <Card className="premium-card border-0 bg-gradient-to-br from-primary/5 to-accent/5 backdrop-blur-sm w-full">
+      <CardContent className="p-6 sm:p-8 lg:p-10">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+          <div className="space-y-6 min-w-0 flex-1">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                <TrendingUp className="h-6 w-6 sm:h-7 sm:w-7 text-white" />
               </div>
               <div className="min-w-0">
-                <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 dark:text-white">Welcome to SomaTech</h3>
-                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Your financial intelligence command center</p>
+                <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground tracking-tight">Welcome to SomaTech</h3>
+                <p className="text-base sm:text-lg text-muted-foreground">Your financial intelligence command center</p>
               </div>
             </div>
-            <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 max-w-full lg:max-w-lg">
+            <p className="text-base sm:text-lg text-muted-foreground max-w-full lg:max-w-2xl leading-relaxed">
               Access powerful tools for stock analysis, business valuation, portfolio management, and market insights all in one platform.
             </p>
             {setActiveModule ? (
@@ -35,15 +35,15 @@ const WelcomeSection = ({ setActiveModule }: WelcomeSectionProps) => {
                 />
               </div>
             ) : (
-              <Button className="btn-apple group w-full sm:w-auto">
+              <Button className="btn-apple group w-full sm:w-auto text-base">
                 <span>Explore Tools</span>
-                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Button>
             )}
           </div>
           <div className="hidden lg:flex items-center justify-center flex-shrink-0">
-            <div className="w-24 h-24 xl:w-32 xl:h-32 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-2xl flex items-center justify-center">
-              <BarChart3 className="h-12 w-12 xl:h-16 xl:w-16 text-blue-600 dark:text-blue-400" />
+            <div className="w-28 h-28 xl:w-36 xl:h-36 bg-gradient-to-br from-primary/10 to-accent/10 rounded-3xl flex items-center justify-center backdrop-blur-sm border border-border/20">
+              <BarChart3 className="h-14 w-14 xl:h-18 xl:w-18 text-primary" />
             </div>
           </div>
         </div>

@@ -171,76 +171,86 @@ const UserDashboard = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-6xl mx-auto space-y-6">
+    <div className="container mx-auto px-6 py-8">
+      <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Dashboard</h1>
+          <p className="text-muted-foreground text-lg">
             Track your progress and activity on SomaTech
           </p>
         </div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Card className="elegant-card">
             <CardContent className="p-6">
-              <div className="flex items-center space-x-2">
-                <BarChart3 className="h-5 w-5 text-blue-600" />
-                <div>
-                  <p className="text-2xl font-bold">{stats.total_analyses}</p>
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-2xl font-bold text-foreground">{stats.total_analyses}</p>
                   <p className="text-sm text-muted-foreground">Analyses</p>
                 </div>
+                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                  <BarChart3 className="h-6 w-6 text-primary" />
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="elegant-card">
             <CardContent className="p-6">
-              <div className="flex items-center space-x-2">
-                <TrendingUp className="h-5 w-5 text-green-600" />
-                <div>
-                  <p className="text-2xl font-bold">{stats.watchlist_items}</p>
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-2xl font-bold text-foreground">{stats.watchlist_items}</p>
                   <p className="text-sm text-muted-foreground">Watchlist Items</p>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-2">
-                <FileText className="h-5 w-5 text-purple-600" />
-                <div>
-                  <p className="text-2xl font-bold">{stats.saved_plans}</p>
-                  <p className="text-sm text-muted-foreground">Saved Plans</p>
+                <div className="w-12 h-12 bg-success/10 rounded-xl flex items-center justify-center">
+                  <TrendingUp className="h-6 w-6 text-success" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="elegant-card">
             <CardContent className="p-6">
-              <div className="flex items-center space-x-2">
-                <Activity className="h-5 w-5 text-orange-600" />
-                <div>
-                  <p className="text-2xl font-bold">{stats.login_count}</p>
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-2xl font-bold text-foreground">{stats.saved_plans}</p>
+                  <p className="text-sm text-muted-foreground">Saved Plans</p>
+                </div>
+                <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center">
+                  <FileText className="h-6 w-6 text-accent" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="elegant-card">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-2xl font-bold text-foreground">{stats.login_count}</p>
                   <p className="text-sm text-muted-foreground">Total Logins</p>
+                </div>
+                <div className="w-12 h-12 bg-warning/10 rounded-xl flex items-center justify-center">
+                  <Activity className="h-6 w-6 text-warning" />
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Profile Completion */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Award className="h-5 w-5" />
+          <Card className="premium-card">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-3 text-xl">
+                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                  <Award className="h-5 w-5 text-primary" />
+                </div>
                 Profile Completion
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-base">
                 Complete your profile to unlock all features
               </CardDescription>
             </CardHeader>
@@ -273,10 +283,12 @@ const UserDashboard = () => {
           </Card>
 
           {/* Account Info */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
+          <Card className="premium-card">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-3 text-xl">
+                <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center">
+                  <Calendar className="h-5 w-5 text-accent" />
+                </div>
                 Account Information
               </CardTitle>
             </CardHeader>
@@ -302,13 +314,15 @@ const UserDashboard = () => {
         </div>
 
         {/* Recent Activity */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5" />
+        <Card className="premium-card">
+          <CardHeader className="pb-6">
+            <CardTitle className="flex items-center gap-3 text-xl">
+              <div className="w-10 h-10 bg-success/10 rounded-xl flex items-center justify-center">
+                <Clock className="h-5 w-5 text-success" />
+              </div>
               Recent Activity
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-base">
               Your latest actions on SomaTech
             </CardDescription>
           </CardHeader>
@@ -318,13 +332,15 @@ const UserDashboard = () => {
                 {recentActivity.map((activity, index) => {
                   const IconComponent = activity.icon;
                   return (
-                    <div key={index} className="flex items-center gap-3 p-3 border rounded-lg">
-                      <IconComponent className="h-5 w-5 text-muted-foreground" />
-                      <div className="flex-grow">
-                        <div className="font-medium text-sm">{activity.title}</div>
+                    <div key={index} className="flex items-center gap-4 p-4 surface-card hover:bg-muted/30 transition-colors">
+                      <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <IconComponent className="h-5 w-5 text-primary" />
+                      </div>
+                      <div className="flex-grow min-w-0">
+                        <div className="font-medium text-sm text-foreground">{activity.title}</div>
                         <div className="text-xs text-muted-foreground">{activity.subtitle}</div>
                       </div>
-                      <div className="text-xs text-muted-foreground">
+                      <div className="text-xs text-muted-foreground flex-shrink-0">
                         {formatDate(activity.timestamp)}
                       </div>
                     </div>
