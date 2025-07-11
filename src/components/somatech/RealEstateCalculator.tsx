@@ -11,6 +11,7 @@ import { RealEstateResult } from "./types";
 import { BRRRRInputs, BRRRRResults, SavedDeal, calculateBRRRR } from "./real-estate/brrrrCalculations";
 import { useBRRRROperations } from "./real-estate/useBRRRROperations";
 import { formatCurrency, formatPercentage } from "./real-estate/realEstateUtils";
+import PropertyMap from "./real-estate/PropertyMap";
 
 const RealEstateCalculator = () => {
   // Traditional Calculator State
@@ -157,6 +158,8 @@ const RealEstateCalculator = () => {
         </TabsList>
 
         <TabsContent value="traditional" className="space-y-6">
+          <PropertyMap />
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
@@ -253,6 +256,8 @@ const RealEstateCalculator = () => {
         </TabsContent>
 
         <TabsContent value="brrrr" className="space-y-6">
+          <PropertyMap />
+          
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* BRRRR Input Forms */}
             <div className="space-y-6">
