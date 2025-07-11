@@ -18,6 +18,11 @@ interface RetirementResult {
   requiredReturnToMeetGoal: number;
   yearsWillLast: number;
   onTrack: boolean;
+  breakdown?: {
+    futureValueCurrentSavings: number;
+    futureValueContributions: number;
+    actualMonthlyContribution: number;
+  };
 }
 
 interface RetirementResultsProps {
@@ -41,8 +46,18 @@ const RetirementResults = ({ result }: RetirementResultsProps) => {
                   <TooltipTrigger>
                     <InfoIcon className="h-4 w-4 text-muted-foreground" />
                   </TooltipTrigger>
-                  <TooltipContent className="max-w-xs">
-                    <p>This includes your current savings grown at the expected return rate plus all future contributions with compound interest over time.</p>
+                  <TooltipContent className="max-w-sm">
+                    <div className="space-y-2 text-sm">
+                      <p><strong>Calculation Breakdown:</strong></p>
+                      {result.breakdown && (
+                        <>
+                          <p>• Current savings grown: ${result.breakdown.futureValueCurrentSavings.toLocaleString()}</p>
+                          <p>• Future contributions: ${result.breakdown.futureValueContributions.toLocaleString()}</p>
+                          <p>• Monthly contribution: ${result.breakdown.actualMonthlyContribution.toLocaleString()}</p>
+                        </>
+                      )}
+                      <p className="text-xs text-muted-foreground mt-2">This is in future dollars, not today's purchasing power.</p>
+                    </div>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>

@@ -104,6 +104,9 @@ const RetirementInputForm = ({
             value={monthlyContribution}
             onChange={(e) => setMonthlyContribution(e.target.value)}
           />
+          <p className="text-xs text-muted-foreground">
+            Total amount you contribute to retirement savings each year
+          </p>
         </div>
         
         <div className="space-y-2">

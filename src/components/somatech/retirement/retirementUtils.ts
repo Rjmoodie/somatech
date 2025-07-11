@@ -22,28 +22,62 @@ export const calculateRetirement = (inputs: RetirementInputs): RetirementResults
     retirementAge,
     lifeExpectancy,
     currentSavings,
-    monthlyContribution,
+    monthlyContribution, // This is actually annual contribution from the form
     expectedReturn,
     retirementSpending,
     inflationRate,
     otherIncome
   } = inputs;
 
+  // Input validation
+  if (currentAge >= retirementAge) {
+    throw new Error("Retirement age must be greater than current age");
+  }
+  if (retirementAge >= lifeExpectancy) {
+    throw new Error("Life expectancy must be greater than retirement age");
+  }
+  if (expectedReturn < 0 || expectedReturn > 20) {
+    throw new Error("Expected return should be between 0% and 20%");
+  }
+
   const yearsToRetirement = retirementAge - currentAge;
   const yearsInRetirement = lifeExpectancy - retirementAge;
+  
+  // Convert annual contribution to monthly (fixing the mismatch)
+  const actualMonthlyContribution = monthlyContribution / 12;
   const monthsToRetirement = yearsToRetirement * 12;
   const monthlyReturn = expectedReturn / 100 / 12;
+  const annualReturn = expectedReturn / 100;
 
-  // Future value at retirement - corrected calculation
-  const futureValueCurrentSavings = currentSavings * Math.pow(1 + expectedReturn / 100, yearsToRetirement);
+  // Future value of current savings (compound annually)
+  const futureValueCurrentSavings = currentSavings * Math.pow(1 + annualReturn, yearsToRetirement);
+  
+  // Future value of monthly contributions (compound monthly)
   const futureValueContributions = monthlyReturn > 0 ? 
-    monthlyContribution * (Math.pow(1 + monthlyReturn, monthsToRetirement) - 1) / monthlyReturn :
-    monthlyContribution * monthsToRetirement;
+    actualMonthlyContribution * ((Math.pow(1 + monthlyReturn, monthsToRetirement) - 1) / monthlyReturn) :
+    actualMonthlyContribution * monthsToRetirement;
+  
   const totalSavingsAtRetirement = futureValueCurrentSavings + futureValueContributions;
+
+  // Debug logging for transparency
+  console.log('🧮 Retirement Calculation Breakdown:', {
+    inputs: {
+      currentSavings: currentSavings.toLocaleString(),
+      annualContribution: monthlyContribution.toLocaleString(),
+      monthlyContribution: actualMonthlyContribution.toLocaleString(),
+      expectedReturn: expectedReturn + '%',
+      yearsToRetirement
+    },
+    calculations: {
+      futureValueCurrentSavings: Math.round(futureValueCurrentSavings).toLocaleString(),
+      futureValueContributions: Math.round(futureValueContributions).toLocaleString(),
+      totalSavingsAtRetirement: Math.round(totalSavingsAtRetirement).toLocaleString()
+    }
+  });
 
   // Adjust spending for inflation
   const inflationAdjustedSpending = retirementSpending * Math.pow(1 + inflationRate / 100, yearsToRetirement);
-  const netAnnualNeed = inflationAdjustedSpending - otherIncome;
+  const netAnnualNeed = Math.max(0, inflationAdjustedSpending - otherIncome);
   
   // Calculate how long funds will last
   let remainingFunds = totalSavingsAtRetirement;
@@ -51,7 +85,7 @@ export const calculateRetirement = (inputs: RetirementInputs): RetirementResults
   for (let year = 0; year < yearsInRetirement; year++) {
     const yearlySpendingNeed = netAnnualNeed * Math.pow(1 + inflationRate / 100, year);
     if (remainingFunds >= yearlySpendingNeed) {
-      remainingFunds = remainingFunds * (1 + expectedReturn / 100) - yearlySpendingNeed;
+      remainingFunds = remainingFunds * (1 + annualReturn) - yearlySpendingNeed;
       yearsLasted++;
     } else {
       break;
@@ -62,21 +96,27 @@ export const calculateRetirement = (inputs: RetirementInputs): RetirementResults
   const totalNeeded = netAnnualNeed * yearsInRetirement * 1.05; // 5% buffer
   const surplusOrShortfall = totalSavingsAtRetirement - totalNeeded;
   
-  // Required return rate to meet goal
+  // Required return rate to meet goal (simplified calculation)
   const requiredReturn = surplusOrShortfall < 0 ? 
-    Math.pow((totalNeeded - currentSavings) / (monthlyContribution * 12 * yearsToRetirement), 1/yearsToRetirement) - 1 : 
-    expectedReturn / 100;
+    Math.max(0, ((totalNeeded / currentSavings) ** (1/yearsToRetirement) - 1) * 100) : 
+    expectedReturn;
 
   return {
     totalSavingsAtRetirement: Math.round(totalSavingsAtRetirement),
     yearsToRetirement,
     yearsInRetirement,
     inflationAdjustedSpending: Math.round(inflationAdjustedSpending),
-    annualIncomeGap: Math.round(Math.max(0, netAnnualNeed)),
+    annualIncomeGap: Math.round(netAnnualNeed),
     surplusOrShortfall: Math.round(surplusOrShortfall),
-    requiredReturnToMeetGoal: Math.round(requiredReturn * 100 * 100) / 100,
+    requiredReturnToMeetGoal: Math.round(requiredReturn * 100) / 100,
     yearsWillLast: yearsLasted,
-    onTrack: surplusOrShortfall >= 0
+    onTrack: surplusOrShortfall >= 0,
+    // Add breakdown for display
+    breakdown: {
+      futureValueCurrentSavings: Math.round(futureValueCurrentSavings),
+      futureValueContributions: Math.round(futureValueContributions),
+      actualMonthlyContribution: Math.round(actualMonthlyContribution)
+    }
   };
 };
 

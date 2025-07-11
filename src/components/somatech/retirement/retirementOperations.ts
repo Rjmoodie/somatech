@@ -24,6 +24,11 @@ export interface RetirementResults {
   requiredReturnToMeetGoal: number;
   yearsWillLast: number;
   onTrack: boolean;
+  breakdown?: {
+    futureValueCurrentSavings: number;
+    futureValueContributions: number;
+    actualMonthlyContribution: number;
+  };
 }
 
 export interface SavedPlan {
