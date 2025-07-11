@@ -257,6 +257,7 @@ const RealEstateCalculator = () => {
             {/* BRRRR Input Forms */}
             <div className="space-y-6">
               {/* Buy Phase */}
+              {/* Buy Phase */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -301,6 +302,189 @@ const RealEstateCalculator = () => {
                         onChange={(e) => updateBrrrrInput('acquisitionFees', Number(e.target.value))}
                       />
                     </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Monthly Holding Costs ($)</Label>
+                    <Input
+                      type="number"
+                      value={brrrrInputs.holdingCosts}
+                      onChange={(e) => updateBrrrrInput('holdingCosts', Number(e.target.value))}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Rehab Phase */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <RefreshCw className="h-5 w-5 text-orange-500" />
+                    Rehab Phase
+                  </CardTitle>
+                  <CardDescription>Renovation details</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Renovation Budget ($)</Label>
+                      <Input
+                        type="number"
+                        value={brrrrInputs.renovationBudget}
+                        onChange={(e) => updateBrrrrInput('renovationBudget', Number(e.target.value))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Contingency (%)</Label>
+                      <Input
+                        type="number"
+                        value={brrrrInputs.contingencyPercent}
+                        onChange={(e) => updateBrrrrInput('contingencyPercent', Number(e.target.value))}
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Rehab Duration (months)</Label>
+                      <Input
+                        type="number"
+                        value={brrrrInputs.rehabDuration}
+                        onChange={(e) => updateBrrrrInput('rehabDuration', Number(e.target.value))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Financing Rate (%)</Label>
+                      <Input
+                        type="number"
+                        step="0.1"
+                        value={brrrrInputs.rehabFinancingRate}
+                        onChange={(e) => updateBrrrrInput('rehabFinancingRate', Number(e.target.value))}
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Rent Phase */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <DollarSign className="h-5 w-5 text-green-500" />
+                    Rent Phase
+                  </CardTitle>
+                  <CardDescription>Rental income and expenses</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Monthly Rent ($)</Label>
+                      <Input
+                        type="number"
+                        value={brrrrInputs.monthlyRent}
+                        onChange={(e) => updateBrrrrInput('monthlyRent', Number(e.target.value))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Vacancy Rate (%)</Label>
+                      <Input
+                        type="number"
+                        value={brrrrInputs.vacancyRate}
+                        onChange={(e) => updateBrrrrInput('vacancyRate', Number(e.target.value))}
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Property Management ($)</Label>
+                      <Input
+                        type="number"
+                        value={brrrrInputs.propertyManagement}
+                        onChange={(e) => updateBrrrrInput('propertyManagement', Number(e.target.value))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Insurance ($)</Label>
+                      <Input
+                        type="number"
+                        value={brrrrInputs.insurance}
+                        onChange={(e) => updateBrrrrInput('insurance', Number(e.target.value))}
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Property Tax ($)</Label>
+                      <Input
+                        type="number"
+                        value={brrrrInputs.propertyTax}
+                        onChange={(e) => updateBrrrrInput('propertyTax', Number(e.target.value))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Maintenance ($)</Label>
+                      <Input
+                        type="number"
+                        value={brrrrInputs.maintenance}
+                        onChange={(e) => updateBrrrrInput('maintenance', Number(e.target.value))}
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Refinance Phase */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5 text-purple-500" />
+                    Refinance Phase
+                  </CardTitle>
+                  <CardDescription>Refinancing details</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>After Repair Value ($)</Label>
+                      <Input
+                        type="number"
+                        value={brrrrInputs.arv}
+                        onChange={(e) => updateBrrrrInput('arv', Number(e.target.value))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Refinance LTV (%)</Label>
+                      <Input
+                        type="number"
+                        value={brrrrInputs.refinanceLTV}
+                        onChange={(e) => updateBrrrrInput('refinanceLTV', Number(e.target.value))}
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>New Loan Rate (%)</Label>
+                      <Input
+                        type="number"
+                        step="0.1"
+                        value={brrrrInputs.newLoanRate}
+                        onChange={(e) => updateBrrrrInput('newLoanRate', Number(e.target.value))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>New Loan Term (years)</Label>
+                      <Input
+                        type="number"
+                        value={brrrrInputs.newLoanTerm}
+                        onChange={(e) => updateBrrrrInput('newLoanTerm', Number(e.target.value))}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Refinance Costs ($)</Label>
+                    <Input
+                      type="number"
+                      value={brrrrInputs.refinanceCosts}
+                      onChange={(e) => updateBrrrrInput('refinanceCosts', Number(e.target.value))}
+                    />
                   </div>
                 </CardContent>
               </Card>
