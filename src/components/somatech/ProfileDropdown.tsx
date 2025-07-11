@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { User, Settings, LogOut, Mail, Calendar } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,6 +26,7 @@ interface ProfileDropdownProps {
 export const ProfileDropdown = ({ username, userEmail }: ProfileDropdownProps) => {
   const { user, profile, signOut } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [showProfileDialog, setShowProfileDialog] = useState(false);
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -86,29 +88,43 @@ export const ProfileDropdown = ({ username, userEmail }: ProfileDropdownProps) =
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="premium-card px-2 sm:px-3 md:px-6 py-2 md:py-3 rounded-xl flex items-center space-x-1 sm:space-x-2 md:space-x-3 max-w-[200px] hover-lift transition-all duration-200">
-            <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-              <User className="h-3 w-3 md:h-4 md:w-4 text-white" />
+          <button className="group relative overflow-hidden bg-gradient-to-r from-primary/10 via-background to-accent/10 hover:from-primary/20 hover:to-accent/20 border border-border/50 hover:border-primary/30 px-3 md:px-4 py-2.5 md:py-3 rounded-xl flex items-center space-x-2 md:space-x-3 max-w-[220px] transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02]">
+            <div className="relative">
+              <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-primary via-primary/90 to-accent rounded-full flex items-center justify-center flex-shrink-0 shadow-lg ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all duration-300">
+                <User className="h-4 w-4 md:h-5 md:w-5 text-primary-foreground" />
+              </div>
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-background animate-pulse"></div>
             </div>
-            <div className="text-xs md:text-sm hidden sm:block min-w-0">
-              <div className="font-semibold text-gray-900 dark:text-white truncate">
+            <div className="text-sm md:text-base hidden sm:block min-w-0 flex-1">
+              <div className="font-semibold text-foreground truncate group-hover:text-primary transition-colors duration-300">
                 {username}
               </div>
-              <div className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+              <div className="text-xs text-muted-foreground font-medium flex items-center gap-1">
+                <span className="inline-block w-2 h-2 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full"></span>
                 Pro Member
               </div>
             </div>
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out"></div>
           </button>
         </DropdownMenuTrigger>
         
-        <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuLabel className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-              <User className="h-4 w-4 text-white" />
+        <DropdownMenuContent align="end" className="w-72 p-2 bg-gradient-to-br from-background via-background to-muted/20 border border-border/50 shadow-xl">
+          <DropdownMenuLabel className="flex items-center space-x-3 p-3 rounded-lg bg-gradient-to-r from-primary/5 to-accent/5 border border-border/30">
+            <div className="relative">
+              <div className="w-12 h-12 bg-gradient-to-br from-primary via-primary/90 to-accent rounded-full flex items-center justify-center shadow-lg ring-2 ring-primary/20">
+                <User className="h-6 w-6 text-primary-foreground" />
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background flex items-center justify-center">
+                <div className="w-2 h-2 bg-white rounded-full"></div>
+              </div>
             </div>
-            <div className="min-w-0">
-              <div className="font-semibold truncate">{username}</div>
-              <div className="text-xs text-muted-foreground truncate">{userEmail}</div>
+            <div className="min-w-0 flex-1">
+              <div className="font-semibold text-lg truncate text-foreground">{username}</div>
+              <div className="text-sm text-muted-foreground truncate">{userEmail}</div>
+              <div className="flex items-center gap-1 mt-1">
+                <span className="inline-block w-2 h-2 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full"></span>
+                <span className="text-xs font-medium text-amber-600 dark:text-amber-400">Pro Member</span>
+              </div>
             </div>
           </DropdownMenuLabel>
           
@@ -119,7 +135,7 @@ export const ProfileDropdown = ({ username, userEmail }: ProfileDropdownProps) =
             <span>Quick Profile Edit</span>
           </DropdownMenuItem>
           
-          <DropdownMenuItem onClick={() => window.location.href = '/somatech?module=account-settings'}>
+          <DropdownMenuItem onClick={() => navigate('/somatech?module=account-settings')}>
             <Settings className="mr-2 h-4 w-4" />
             <span>Account Settings</span>
           </DropdownMenuItem>
@@ -138,15 +154,22 @@ export const ProfileDropdown = ({ username, userEmail }: ProfileDropdownProps) =
 
       {/* Profile Settings Dialog */}
       <Dialog open={showProfileDialog} onOpenChange={setShowProfileDialog}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Profile Settings</DialogTitle>
+        <DialogContent className="sm:max-w-[500px] bg-gradient-to-br from-background via-background to-muted/10">
+          <DialogHeader className="text-center pb-2">
+            <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Quick Profile Edit
+            </DialogTitle>
           </DialogHeader>
           
-          <div className="space-y-4 pt-4">
-            <div className="flex items-center justify-center mb-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                <User className="h-8 w-8 text-white" />
+          <div className="space-y-6 pt-2">
+            <div className="flex items-center justify-center mb-4">
+              <div className="relative">
+                <div className="w-20 h-20 bg-gradient-to-br from-primary via-primary/90 to-accent rounded-full flex items-center justify-center shadow-xl ring-4 ring-primary/20">
+                  <User className="h-10 w-10 text-primary-foreground" />
+                </div>
+                <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-green-500 rounded-full border-3 border-background flex items-center justify-center shadow-lg">
+                  <div className="w-3 h-3 bg-white rounded-full"></div>
+                </div>
               </div>
             </div>
             
