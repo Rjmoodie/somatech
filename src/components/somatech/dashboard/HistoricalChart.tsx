@@ -41,7 +41,7 @@ const HistoricalChart = ({ selectedChart, onClose }: HistoricalChartProps) => {
         </CardTitle>
       </CardHeader>
       <CardContent className="p-6">
-        <div className="h-64">
+        <ChartContainer config={{ value: { label: "Value", color: "hsl(var(--primary))" } }} className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
               <XAxis dataKey="month" />
@@ -56,7 +56,7 @@ const HistoricalChart = ({ selectedChart, onClose }: HistoricalChartProps) => {
               />
             </LineChart>
           </ResponsiveContainer>
-        </div>
+        </ChartContainer>
       </CardContent>
     </Card>
   );
