@@ -1,10 +1,9 @@
 import { toast } from "@/hooks/use-toast";
-import { RetirementResults } from "./retirementOperations";
+import { RetirementInputs, RetirementResults } from "./retirementOperations";
 
 /**
- * Utility functions for retirement planning
+ * Format currency values for display
  */
-
 export const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -12,6 +11,70 @@ export const formatCurrency = (amount: number): string => {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount);
+};
+
+/**
+ * Calculate retirement projections based on inputs
+ */
+export const calculateRetirement = (inputs: RetirementInputs): RetirementResults => {
+  const {
+    currentAge,
+    retirementAge,
+    lifeExpectancy,
+    currentSavings,
+    monthlyContribution,
+    expectedReturn,
+    retirementSpending,
+    inflationRate,
+    otherIncome
+  } = inputs;
+
+  const yearsToRetirement = retirementAge - currentAge;
+  const yearsInRetirement = lifeExpectancy - retirementAge;
+  const monthsToRetirement = yearsToRetirement * 12;
+  const monthlyReturn = expectedReturn / 100 / 12;
+
+  // Future value at retirement
+  const totalSavingsAtRetirement = currentSavings * Math.pow(1 + expectedReturn / 100, yearsToRetirement) +
+    monthlyContribution * (Math.pow(1 + monthlyReturn, monthsToRetirement) - 1) / monthlyReturn;
+
+  // Adjust spending for inflation
+  const inflationAdjustedSpending = retirementSpending * Math.pow(1 + inflationRate / 100, yearsToRetirement);
+  const netAnnualNeed = inflationAdjustedSpending - otherIncome;
+  
+  // Calculate how long funds will last
+  let remainingFunds = totalSavingsAtRetirement;
+  let yearsLasted = 0;
+  for (let year = 0; year < yearsInRetirement; year++) {
+    const yearlySpendingNeed = netAnnualNeed * Math.pow(1 + inflationRate / 100, year);
+    if (remainingFunds >= yearlySpendingNeed) {
+      remainingFunds = remainingFunds * (1 + expectedReturn / 100) - yearlySpendingNeed;
+      yearsLasted++;
+    } else {
+      break;
+    }
+  }
+
+  // Calculate total needed at retirement for full coverage
+  const totalNeeded = netAnnualNeed * yearsInRetirement * 1.05; // 5% buffer
+  const surplusOrShortfall = totalSavingsAtRetirement - totalNeeded;
+  
+  // Required return rate to meet goal
+  const requiredReturn = surplusOrShortfall < 0 ? 
+    Math.pow((totalNeeded - currentSavings) / (monthlyContribution * 12 * yearsToRetirement), 1/yearsToRetirement) - 1 : 
+    expectedReturn / 100;
+
+  return {
+    totalSavingsAtRetirement: Math.round(totalSavingsAtRetirement),
+    yearsToRetirement,
+    yearsInRetirement,
+    inflationAdjustedSpending: Math.round(inflationAdjustedSpending),
+    annualIncomeGap: Math.round(Math.max(0, netAnnualNeed)),
+    surplusOrShortfall: Math.round(surplusOrShortfall),
+    requiredReturnToMeetGoal: Math.round(requiredReturn * 100 * 100) / 100,
+    yearsWillLast: yearsLasted,
+    onTrack: surplusOrShortfall >= 0
+  };
 };
 
 export const generatePDFReport = (
