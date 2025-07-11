@@ -21,6 +21,7 @@ import UserFeedbackSystem from "@/components/somatech/UserFeedbackSystem";
 import NetworkStatus from "@/components/somatech/NetworkStatus";
 import ProgressiveOnboarding from "@/components/somatech/ProgressiveOnboarding";
 import { ProfileDropdown } from "@/components/somatech/ProfileDropdown";
+import Footer from "@/components/somatech/Footer";
 
 // Lazy load modules for better performance
 const Dashboard = lazy(() => import("@/components/somatech/Dashboard"));
@@ -35,6 +36,7 @@ const FundingCampaigns = lazy(() => import("@/components/somatech/FundingCampaig
 const CampaignProjection = lazy(() => import("@/components/somatech/CampaignProjection"));
 const DonationSuccess = lazy(() => import("@/components/somatech/funding/DonationSuccess"));
 const AuthDialog = lazy(() => import("@/components/somatech/AuthDialog"));
+const PrivacyPolicy = lazy(() => import("@/components/somatech/PrivacyPolicy"));
 
 // Enterprise Components
 const PricingDialog = lazy(() => import("@/components/somatech/enterprise/PricingDialog"));
@@ -84,7 +86,7 @@ const SomaTech = () => {
     const sessionId = searchParams.get('session_id');
     
     // Set active module from URL parameter
-    if (moduleParam && modules.find(m => m.id === moduleParam)) {
+    if (moduleParam && (modules.find(m => m.id === moduleParam) || moduleParam === 'privacy-policy')) {
       setActiveModule(moduleParam);
     }
     
@@ -269,6 +271,12 @@ const SomaTech = () => {
               <MultiTenantArchitecture onUpgrade={() => setShowPricingDialog(true)} />
             </ModuleWrapper>
           );
+        case "privacy-policy":
+          return (
+            <ModuleWrapper>
+              <PrivacyPolicy />
+            </ModuleWrapper>
+          );
         default:
           return (
             <ModuleWrapper>
@@ -345,7 +353,7 @@ const SomaTech = () => {
                 <ResponsiveNavigation activeModule={activeModule} onModuleChange={handleModuleChange} />
                 <div className="animate-slide-in-left min-w-0 flex-1">
                   <h2 className="text-lg sm:text-xl md:text-3xl font-display font-bold text-gray-900 dark:text-white mb-1 truncate">
-                    {modules.find(m => m.id === activeModule)?.name || "Dashboard"}
+                    {activeModule === 'privacy-policy' ? 'Privacy Policy' : (modules.find(m => m.id === activeModule)?.name || "Dashboard")}
                   </h2>
                   <p className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-400 font-medium hidden sm:block truncate">
                     Professional business intelligence platform
@@ -392,6 +400,7 @@ const SomaTech = () => {
             <div className="premium-card p-3 sm:p-4 md:p-8 rounded-2xl animate-fade-in min-h-[calc(100vh-200px)] w-full overflow-x-auto">
               <div className="w-full min-w-0">
                 {renderContent()}
+                <Footer onPrivacyClick={() => handleModuleChange('privacy-policy')} />
               </div>
             </div>
           </main>
