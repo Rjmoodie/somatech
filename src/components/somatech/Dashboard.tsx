@@ -39,12 +39,12 @@ const Dashboard = ({ globalTicker, setGlobalTicker, setActiveModule }: Dashboard
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Hero Welcome Section */}
-      <div className="text-center py-8 animate-slide-up">
-        <h1 className="text-4xl md:text-5xl font-display font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 dark:from-white dark:via-blue-200 dark:to-purple-200 bg-clip-text text-transparent mb-4">
+      <div className="text-center py-12 animate-slide-up">
+        <h1 className="text-hero bg-gradient-to-r from-gray-900 via-blue-600 to-purple-700 dark:from-white dark:via-blue-300 dark:to-purple-300 bg-clip-text text-transparent mb-6">
           Financial Intelligence Dashboard
         </h1>
-        <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto font-medium">
-          Your comprehensive view into market performance and business analytics
+        <p className="text-subtitle max-w-3xl mx-auto">
+          Your comprehensive platform for market insights, business analytics, and financial intelligence
         </p>
       </div>
       
@@ -52,23 +52,23 @@ const Dashboard = ({ globalTicker, setGlobalTicker, setActiveModule }: Dashboard
       
       <AnnouncementsSection announcements={announcements} />
 
-      <div className="border-t border-gray-200/50 dark:border-gray-700/50"></div>
+      <div className="border-t border-border/50"></div>
 
       {/* Enhanced Market Overview Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-scale-in">
-        <div className="glass-card p-6 rounded-2xl hover-lift">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 animate-scale-in">
+        <div className="card-elegant interactive-element">
           <MacroIndicators 
             onChartSelect={setSelectedChart} 
             selectedChart={selectedChart} 
           />
         </div>
-        <div className="glass-card p-6 rounded-2xl hover-lift">
+        <div className="card-elegant interactive-element">
           <MarketSnapshot marketData={marketData} />
         </div>
-        <div className="glass-card p-6 rounded-2xl hover-lift">
+        <div className="card-elegant interactive-element">
           <BusinessPulse />
         </div>
-        <div className="glass-card p-6 rounded-2xl hover-lift">
+        <div className="card-elegant interactive-element">
           <TodaysAlerts />
         </div>
       </div>
@@ -84,21 +84,21 @@ const Dashboard = ({ globalTicker, setGlobalTicker, setActiveModule }: Dashboard
       )}
 
       {/* Featured Content */}
-      <div className="glass-card p-8 rounded-2xl animate-slide-up">
+      <div className="premium-card animate-slide-up">
         <FeaturedVideo />
       </div>
 
-      <div className="border-t border-gray-200/50 dark:border-gray-700/50"></div>
+      <div className="border-t border-border/50"></div>
 
       {/* Learning Resources */}
-      <div className="glass-card p-8 rounded-2xl animate-fade-in">
+      <div className="premium-card animate-fade-in">
         <LearningResources />
       </div>
 
-      <div className="border-t border-gray-200/50 dark:border-gray-700/50"></div>
+      <div className="border-t border-border/50"></div>
 
       {/* Latest News */}
-      <div className="glass-card p-8 rounded-2xl animate-slide-up">
+      <div className="premium-card animate-slide-up">
         <LatestNews news={news} />
       </div>
     </div>

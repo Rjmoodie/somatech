@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PieChart, User, LogOut } from "lucide-react";
+import DarkModeToggle from "@/components/somatech/DarkModeToggle";
+import FloatingActionMenu from "@/components/somatech/FloatingActionMenu";
 import { modules } from "@/components/somatech/constants";
 import StockAnalysis from "@/components/somatech/StockAnalysis";
 import WatchlistModule from "@/components/somatech/WatchlistModule";
@@ -212,6 +214,7 @@ const SomaTech = () => {
             </div>
             
             <div className="flex items-center space-x-4 animate-slide-in-right">
+              <DarkModeToggle />
               {authLoading ? (
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 bg-gray-200 rounded-full animate-skeleton"></div>
@@ -266,6 +269,9 @@ const SomaTech = () => {
           </div>
         </main>
       </div>
+
+      {/* Floating Action Menu */}
+      <FloatingActionMenu onModuleSelect={handleModuleChange} />
 
       {/* Dialogs */}
       <AuthDialog

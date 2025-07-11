@@ -20,7 +20,8 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        display: ['SF Pro Display', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        display: ['Space Grotesk', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        mono: ['JetBrains Mono', 'SF Mono', 'Monaco', 'Cascadia Code', 'Roboto Mono', 'Courier New', 'monospace'],
       },
       fontSize: {
         'xs': ['0.75rem', { lineHeight: '1rem' }],
@@ -93,6 +94,15 @@ export default {
         '100': '25rem',
         '112': '28rem',
         '128': '32rem',
+        '144': '36rem',
+        '160': '40rem',
+      },
+      boxShadow: {
+        'glow': '0 0 20px rgba(59, 130, 246, 0.15)',
+        'glow-lg': '0 0 40px rgba(59, 130, 246, 0.2)',
+        'elegant': '0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.1)',
+        'premium': '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08)',
+        'float': '0 12px 40px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.1)',
       },
       animation: {
         // Fade animations
