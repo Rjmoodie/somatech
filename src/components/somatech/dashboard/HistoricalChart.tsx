@@ -26,11 +26,38 @@ const HistoricalChart = ({ selectedChart, onClose }: HistoricalChartProps) => {
       { month: 'Apr', value: 3.1 },
       { month: 'May', value: 3.2 },
       { month: 'Jun', value: 3.2 }
+    ],
+    unemployment: [
+      { month: 'Jan', value: 4.0 },
+      { month: 'Feb', value: 3.9 },
+      { month: 'Mar', value: 3.8 },
+      { month: 'Apr', value: 3.9 },
+      { month: 'May', value: 3.8 },
+      { month: 'Jun', value: 3.8 }
+    ],
+    gdpGrowth: [
+      { month: 'Jan', value: 2.1 },
+      { month: 'Feb', value: 2.3 },
+      { month: 'Mar', value: 2.4 },
+      { month: 'Apr', value: 2.2 },
+      { month: 'May', value: 2.4 },
+      { month: 'Jun', value: 2.4 }
     ]
   };
 
   const chartData = historicalData[selectedChart as keyof typeof historicalData];
-  const title = selectedChart === 'fedRate' ? 'Federal Funds Rate - 6 Month Trend' : 'Inflation Rate - 6 Month Trend';
+  
+  const getTitle = (chart: string) => {
+    switch (chart) {
+      case 'fedRate': return 'Federal Funds Rate - 6 Month Trend';
+      case 'inflation': return 'Inflation Rate - 6 Month Trend';
+      case 'unemployment': return 'Unemployment Rate - 6 Month Trend';
+      case 'gdpGrowth': return 'GDP Growth Rate - 6 Month Trend';
+      default: return 'Economic Indicator - 6 Month Trend';
+    }
+  };
+  
+  const title = getTitle(selectedChart);
 
   return (
     <Card className="border-2 border-primary/30">

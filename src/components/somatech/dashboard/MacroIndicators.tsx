@@ -11,8 +11,8 @@ const MacroIndicators = ({ onChartSelect, selectedChart }: MacroIndicatorsProps)
   const indicators = [
     { label: "Fed Rate", value: "5.25%", chartKey: "fedRate" },
     { label: "Inflation", value: "3.2%", chartKey: "inflation" },
-    { label: "Unemployment", value: "3.8%", chartKey: null },
-    { label: "GDP Growth", value: "2.4%", chartKey: null }
+    { label: "Unemployment", value: "3.8%", chartKey: "unemployment" },
+    { label: "GDP Growth", value: "2.4%", chartKey: "gdpGrowth" }
   ];
 
   const handleClick = (chartKey: string | null) => {
