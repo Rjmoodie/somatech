@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from "recharts";
 import { useState } from "react";
 import { BusinessValuationReport } from "../types";
@@ -35,35 +36,43 @@ const BusinessValuationChart = ({ report }: BusinessValuationChartProps) => {
     }
   ];
 
-  const formatCurrency = (value: number) => `$${(value / 1000000).toFixed(1)}M`;
+  const formatCurrency = (value: number) => `$${value.toLocaleString()}`;
   const formatTooltip = (value: number) => [`$${value.toLocaleString()}`, ''];
 
   const renderChart = () => {
     if (chartType === 'table') {
       return (
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b">
-                <th className="text-left py-2">Scenario</th>
-                <th className="text-right py-2">Total Value</th>
-                <th className="text-right py-2">Revenue Multiple</th>
-                <th className="text-right py-2">EBITDA Multiple</th>
-                <th className="text-right py-2">DCF Value</th>
-              </tr>
-            </thead>
-            <tbody>
-              {scenarioData.map((scenario, index) => (
-                <tr key={scenario.name} className={index % 2 === 0 ? 'bg-muted/50' : ''}>
-                  <td className="py-2 font-medium">{scenario.name}</td>
-                  <td className="text-right py-2 font-semibold">${scenario.value.toLocaleString()}</td>
-                  <td className="text-right py-2">{scenario.revenue ? `$${scenario.revenue.toLocaleString()}` : 'N/A'}</td>
-                  <td className="text-right py-2">{scenario.ebitda ? `$${scenario.ebitda.toLocaleString()}` : 'N/A'}</td>
-                  <td className="text-right py-2">{scenario.dcf ? `$${scenario.dcf.toLocaleString()}` : 'N/A'}</td>
-                </tr>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="font-semibold">Scenario</TableHead>
+                <TableHead className="text-right font-semibold">Total Value</TableHead>
+                <TableHead className="text-right font-semibold">Revenue Multiple</TableHead>
+                <TableHead className="text-right font-semibold">EBITDA Multiple</TableHead>
+                <TableHead className="text-right font-semibold">DCF Value</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {scenarioData.map((scenario) => (
+                <TableRow key={scenario.name}>
+                  <TableCell className="font-medium">{scenario.name}</TableCell>
+                  <TableCell className="text-right font-semibold text-primary">
+                    {formatCurrency(scenario.value)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {scenario.revenue ? formatCurrency(scenario.revenue) : 'N/A'}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {scenario.ebitda ? formatCurrency(scenario.ebitda) : 'N/A'}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {scenario.dcf ? formatCurrency(scenario.dcf) : 'N/A'}
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       );
     }
