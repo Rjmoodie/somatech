@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { User, Mail, Lock, LogOut, Eye, EyeOff, CheckCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import SocialLogin from "./SocialLogin";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 interface AuthDialogProps {
@@ -145,6 +146,20 @@ const AuthDialog = ({ open, onOpenChange, onAuthSuccess }: AuthDialogProps) => {
           </TabsList>
           
           <TabsContent value="signin" className="space-y-4">
+            {/* Social Login */}
+            <SocialLogin />
+            
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or continue with email
+                </span>
+              </div>
+            </div>
+
             <Card>
               <CardHeader>
                 <CardTitle>Welcome Back</CardTitle>
@@ -216,6 +231,20 @@ const AuthDialog = ({ open, onOpenChange, onAuthSuccess }: AuthDialogProps) => {
           </TabsContent>
           
           <TabsContent value="signup" className="space-y-4">
+            {/* Social Login */}
+            <SocialLogin />
+            
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or continue with email
+                </span>
+              </div>
+            </div>
+
             <Card>
               <CardHeader>
                 <CardTitle>Create Account</CardTitle>
