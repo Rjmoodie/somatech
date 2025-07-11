@@ -183,9 +183,9 @@ const FundingCampaigns = ({ user, onAuthRequired }: FundingCampaignsProps) => {
             Support community goals or create your own funding campaign
           </p>
         </div>
-        <Button onClick={handleCreateCampaign} className="btn-premium gap-2 px-4 py-2">
+        <Button onClick={handleCreateCampaign} className="btn-premium gap-2 px-4 py-2 sm:px-6">
           <Plus className="h-4 w-4" />
-          Create Campaign
+          <span className="hidden sm:inline">Create Campaign</span>
         </Button>
       </div>
 
