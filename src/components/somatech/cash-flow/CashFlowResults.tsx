@@ -40,33 +40,39 @@ const CashFlowResults = ({ report, onScenarioChange, activeScenario }: CashFlowR
       {/* Scenario Selector */}
       <Card>
         <CardHeader>
-          <CardTitle>Scenario Analysis</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-lg sm:text-xl">Scenario Analysis</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             Compare different scenarios for your cash flow projection
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-2">
+          <div className="flex gap-1 sm:gap-2 flex-wrap">
             <Button
               variant={activeScenario === 'conservative' ? 'default' : 'outline'}
               onClick={() => onScenarioChange('conservative')}
               size="sm"
+              className="px-2 sm:px-4 text-xs sm:text-sm"
             >
-              Conservative
+              <span className="hidden sm:inline">Conservative</span>
+              <span className="sm:hidden">Cons</span>
             </Button>
             <Button
               variant={activeScenario === 'base' ? 'default' : 'outline'}
               onClick={() => onScenarioChange('base')}
               size="sm"
+              className="px-2 sm:px-4 text-xs sm:text-sm"
             >
-              Base Case
+              <span className="hidden sm:inline">Base Case</span>
+              <span className="sm:hidden">Base</span>
             </Button>
             <Button
               variant={activeScenario === 'optimistic' ? 'default' : 'outline'}
               onClick={() => onScenarioChange('optimistic')}
               size="sm"
+              className="px-2 sm:px-4 text-xs sm:text-sm"
             >
-              Optimistic
+              <span className="hidden sm:inline">Optimistic</span>
+              <span className="sm:hidden">Opt</span>
             </Button>
           </div>
         </CardContent>
@@ -138,16 +144,16 @@ const CashFlowResults = ({ report, onScenarioChange, activeScenario }: CashFlowR
       {/* Cash Flow Timeline */}
       <Card>
         <CardHeader>
-          <CardTitle>Monthly Cash Flow Timeline</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-lg sm:text-xl">Monthly Cash Flow Timeline</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             Detailed month-by-month projection for {activeScenario} scenario
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="summary" className="w-full">
-            <TabsList>
-              <TabsTrigger value="summary">Summary</TabsTrigger>
-              <TabsTrigger value="detailed">Detailed</TabsTrigger>
+            <TabsList className="text-xs sm:text-sm">
+              <TabsTrigger value="summary" className="px-2 sm:px-4">Summary</TabsTrigger>
+              <TabsTrigger value="detailed" className="px-2 sm:px-4">Detailed</TabsTrigger>
             </TabsList>
             
             <TabsContent value="summary" className="space-y-4">
@@ -191,8 +197,8 @@ const CashFlowResults = ({ report, onScenarioChange, activeScenario }: CashFlowR
             </TabsContent>
             
             <TabsContent value="detailed" className="space-y-4">
-              <div className="max-h-96 overflow-y-auto">
-                <div className="grid grid-cols-6 gap-2 text-sm font-medium border-b pb-2 mb-2">
+              <div className="max-h-96 overflow-y-auto overflow-x-auto">
+                <div className="grid grid-cols-6 gap-1 sm:gap-2 text-xs sm:text-sm font-medium border-b pb-2 mb-2 min-w-[500px]">
                   <span>Month</span>
                   <span>Inflows</span>
                   <span>Outflows</span>
@@ -202,19 +208,19 @@ const CashFlowResults = ({ report, onScenarioChange, activeScenario }: CashFlowR
                 </div>
                 
                 {currentScenario.monthlyProjections.map((month, index) => (
-                  <div key={index} className="grid grid-cols-6 gap-2 text-sm py-2 border-b">
+                  <div key={index} className="grid grid-cols-6 gap-1 sm:gap-2 text-xs sm:text-sm py-1 sm:py-2 border-b min-w-[500px]">
                     <span className="font-medium">{month.month}</span>
-                    <span className="text-green-600">{formatCurrency(month.inflows)}</span>
-                    <span className="text-red-600">{formatCurrency(month.outflows)}</span>
-                    <span className={month.netFlow >= 0 ? 'text-green-600' : 'text-red-600'}>
+                    <span className="text-green-600 truncate">{formatCurrency(month.inflows)}</span>
+                    <span className="text-red-600 truncate">{formatCurrency(month.outflows)}</span>
+                    <span className={`truncate ${month.netFlow >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                       {formatCurrency(month.netFlow)}
                     </span>
-                    <span className={month.cashBalance >= 0 ? 'font-medium' : 'font-medium text-red-600'}>
+                    <span className={`truncate ${month.cashBalance >= 0 ? 'font-medium' : 'font-medium text-red-600'}`}>
                       {formatCurrency(month.cashBalance)}
                     </span>
                     <Badge 
                       variant={month.cashBalance < 0 ? 'destructive' : month.cashBalance < 10000 ? 'secondary' : 'default'}
-                      className="text-xs"
+                      className="text-[10px] sm:text-xs px-1"
                     >
                       {month.cashBalance < 0 ? 'Critical' : month.cashBalance < 10000 ? 'Low' : 'Healthy'}
                     </Badge>

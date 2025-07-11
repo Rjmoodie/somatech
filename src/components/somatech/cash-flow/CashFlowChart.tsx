@@ -129,15 +129,15 @@ const CashFlowChart = ({ report, activeScenario }: CashFlowChartProps) => {
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>Cash Flow Visualization</CardTitle>
-            <CardDescription>
+        <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+          <div className="min-w-0 flex-1">
+            <CardTitle className="text-lg sm:text-xl">Cash Flow Visualization</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">
               Interactive charts showing your cash flow projections
             </CardDescription>
           </div>
           <Select value={chartType} onValueChange={(value: any) => setChartType(value)}>
-            <SelectTrigger className="w-48">
+            <SelectTrigger className="w-full sm:w-48">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

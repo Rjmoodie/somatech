@@ -55,21 +55,21 @@ const CashFlowInputForm = ({ inputs, onInputChange, onCalculate, isCalculating }
   return (
     <Card className="h-fit">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Calculator className="h-5 w-5" />
-          Cash Flow Simulator
+        <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+          <Calculator className="h-4 w-4 sm:h-5 sm:w-5" />
+          <span className="truncate">Cash Flow Simulator</span>
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-xs sm:text-sm">
           Model your business cash flow across multiple scenarios
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="business">Business</TabsTrigger>
-            <TabsTrigger value="revenue">Revenue</TabsTrigger>
-            <TabsTrigger value="expenses">Expenses</TabsTrigger>
-            <TabsTrigger value="financing">Financing</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-4 text-xs sm:text-sm">
+            <TabsTrigger value="business" className="px-1 sm:px-3">Business</TabsTrigger>
+            <TabsTrigger value="revenue" className="px-1 sm:px-3">Revenue</TabsTrigger>
+            <TabsTrigger value="expenses" className="px-1 sm:px-3">Expenses</TabsTrigger>
+            <TabsTrigger value="financing" className="px-1 sm:px-3">Financing</TabsTrigger>
           </TabsList>
 
           <TabsContent value="business" className="space-y-4">
@@ -185,39 +185,42 @@ const CashFlowInputForm = ({ inputs, onInputChange, onCalculate, isCalculating }
           <TabsContent value="expenses" className="space-y-4">
             <div>
               <div className="flex items-center justify-between mb-3">
-                <Label className="text-base font-medium">Fixed Expenses (Monthly)</Label>
+                <Label className="text-sm sm:text-base font-medium">Fixed Expenses (Monthly)</Label>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
                   onClick={() => addExpenseItem('fixed')}
+                  className="px-2 sm:px-3"
                 >
                   <Plus className="h-4 w-4" />
+                  <span className="hidden sm:inline ml-1">Add</span>
                 </Button>
               </div>
               <div className="space-y-2">
                 {inputs.fixedExpenses.map((expense, index) => (
-                  <div key={index} className="flex gap-2">
+                  <div key={index} className="flex gap-1 sm:gap-2">
                     <Input
                       placeholder="Expense name"
                       value={expense.name}
                       onChange={(e) => updateExpenseItem('fixed', index, 'name', e.target.value)}
-                      className="flex-1"
+                      className="flex-1 text-xs sm:text-sm"
                     />
                     <Input
                       type="number"
                       placeholder="Amount"
                       value={expense.amount || ''}
                       onChange={(e) => updateExpenseItem('fixed', index, 'amount', parseFloat(e.target.value) || 0)}
-                      className="w-32"
+                      className="w-20 sm:w-32 text-xs sm:text-sm"
                     />
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
                       onClick={() => removeExpenseItem('fixed', index)}
+                      className="px-2"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                     </Button>
                   </div>
                 ))}
@@ -228,36 +231,39 @@ const CashFlowInputForm = ({ inputs, onInputChange, onCalculate, isCalculating }
 
             <div>
               <div className="flex items-center justify-between mb-3">
-                <Label className="text-base font-medium">Variable Expenses</Label>
+                <Label className="text-sm sm:text-base font-medium">Variable Expenses</Label>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
                   onClick={() => addExpenseItem('variable')}
+                  className="px-2 sm:px-3"
                 >
                   <Plus className="h-4 w-4" />
+                  <span className="hidden sm:inline ml-1">Add</span>
                 </Button>
               </div>
               <div className="space-y-2">
                 {inputs.variableExpenses.map((expense, index) => (
-                  <div key={index} className="flex gap-2">
+                  <div key={index} className="flex gap-1 sm:gap-2 items-center">
                     <Input
-                      placeholder="Expense name"
+                      placeholder="e.g. Marketing"
                       value={expense.name}
                       onChange={(e) => updateExpenseItem('variable', index, 'name', e.target.value)}
-                      className="flex-1"
+                      className="flex-1 text-xs sm:text-sm"
                     />
                     <Input
                       type="number"
                       placeholder={expense.isPercentage ? "%" : "$"}
                       value={expense.amount || ''}
                       onChange={(e) => updateExpenseItem('variable', index, 'amount', parseFloat(e.target.value) || 0)}
-                      className="w-32"
+                      className="w-16 sm:w-24 text-xs sm:text-sm"
                     />
-                    <div className="flex items-center">
+                    <div className="flex items-center px-1">
                       <Switch
                         checked={expense.isPercentage}
                         onCheckedChange={(checked) => updateExpenseItem('variable', index, 'isPercentage', checked)}
+                        className="scale-75 sm:scale-100"
                       />
                     </div>
                     <Button
@@ -265,8 +271,9 @@ const CashFlowInputForm = ({ inputs, onInputChange, onCalculate, isCalculating }
                       variant="ghost"
                       size="sm"
                       onClick={() => removeExpenseItem('variable', index)}
+                      className="px-2"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                     </Button>
                   </div>
                 ))}
