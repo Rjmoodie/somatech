@@ -292,10 +292,10 @@ const SomaTech = () => {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex overflow-hidden">
+      <div className="min-h-screen w-full bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex overflow-x-hidden box-border">
         <OfflineIndicator />
-      {/* Sidebar - Hidden on mobile, shown on desktop */}
-      <div className={`${sidebarCollapsed ? 'w-16' : 'w-72'} transition-all duration-500 ease-apple flex-col hidden lg:flex flex-shrink-0`}>
+        {/* Sidebar - Hidden on mobile, shown on desktop */}
+        <div className={`${sidebarCollapsed ? 'w-16' : 'w-72'} transition-all duration-500 ease-apple flex-col hidden lg:flex flex-shrink-0 max-w-[300px]`}>
         <div className="glass-card m-4 mb-2 p-6 rounded-2xl border-0">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
@@ -330,110 +330,115 @@ const SomaTech = () => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 max-w-full">
-        {/* Header */}
-        <header className="glass-card m-2 md:m-4 mb-2 px-4 md:px-8 py-4 md:py-6 rounded-2xl border-0 flex-shrink-0">
-          <div className="flex items-center justify-between">
-            <ResponsiveNavigation activeModule={activeModule} onModuleChange={handleModuleChange} />
-            <div className="animate-slide-in-left">
-              <h2 className="text-xl md:text-3xl font-display font-bold text-gray-900 dark:text-white mb-1">
-                {modules.find(m => m.id === activeModule)?.name || "Dashboard"}
-              </h2>
-              <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 font-medium hidden sm:block">
-                Professional business intelligence platform
-              </p>
-            </div>
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col min-w-0 w-full overflow-x-hidden">
+          {/* Header */}
+          <header className="glass-card m-2 md:m-4 mb-2 px-2 sm:px-4 md:px-8 py-3 md:py-6 rounded-2xl border-0 flex-shrink-0">
+            <div className="flex items-center justify-between gap-2 w-full">
+              <div className="flex items-center gap-2 min-w-0">
+                <ResponsiveNavigation activeModule={activeModule} onModuleChange={handleModuleChange} />
+                <div className="animate-slide-in-left min-w-0 flex-1">
+                  <h2 className="text-lg sm:text-xl md:text-3xl font-display font-bold text-gray-900 dark:text-white mb-1 truncate">
+                    {modules.find(m => m.id === activeModule)?.name || "Dashboard"}
+                  </h2>
+                  <p className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-400 font-medium hidden sm:block truncate">
+                    Professional business intelligence platform
+                  </p>
+                </div>
+              </div>
             
-            <div className="flex items-center space-x-2 md:space-x-4 animate-slide-in-right">
-              <DarkModeToggle />
-              {authLoading ? (
-                <div className="flex items-center space-x-2 md:space-x-3">
-                  <div className="w-6 h-6 md:w-8 md:h-8 bg-gray-200 rounded-full animate-skeleton"></div>
-                  <div className="w-16 md:w-24 h-3 md:h-4 bg-gray-200 rounded animate-skeleton hidden sm:block"></div>
-                </div>
-              ) : user ? (
-                <div className="flex items-center space-x-2 md:space-x-4">
-                  <div className="premium-card px-3 md:px-6 py-2 md:py-3 rounded-xl flex items-center space-x-2 md:space-x-3">
-                    <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                      <User className="h-3 w-3 md:h-4 md:w-4 text-white" />
-                    </div>
-                    <div className="text-xs md:text-sm hidden sm:block">
-                      <div className="font-semibold text-gray-900 dark:text-white">
-                        {profile?.username || user.email?.split('@')[0]}
-                      </div>
-                      <div className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-                        Pro Member
-                      </div>
-                    </div>
+              <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4 animate-slide-in-right flex-shrink-0">
+                <DarkModeToggle />
+                {authLoading ? (
+                  <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-3">
+                    <div className="w-6 h-6 md:w-8 md:h-8 bg-gray-200 rounded-full animate-skeleton"></div>
+                    <div className="w-12 sm:w-16 md:w-24 h-3 md:h-4 bg-gray-200 rounded animate-skeleton hidden sm:block"></div>
                   </div>
-                  <button
-                    onClick={signOut}
-                    className="premium-card p-2 md:p-3 rounded-xl hover-lift text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-                  >
-                    <LogOut className="h-3 w-3 md:h-4 md:w-4" />
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-2 md:space-x-3">
-                  <button 
-                    onClick={() => setShowAuthDialog(true)}
-                    className="px-3 md:px-6 py-2 md:py-3 text-xs md:text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-300 hidden sm:block"
-                  >
-                    Sign In
-                  </button>
-                  <button 
-                    onClick={() => setShowAuthDialog(true)}
-                    className="btn-apple text-xs md:text-sm px-3 md:px-6 py-2 md:py-3"
-                  >
-                    Get Started
-                  </button>
-                </div>
-              )}
+                ) : user ? (
+                  <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4">
+                    <div className="premium-card px-2 sm:px-3 md:px-6 py-2 md:py-3 rounded-xl flex items-center space-x-1 sm:space-x-2 md:space-x-3 max-w-[200px]">
+                      <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+                        <User className="h-3 w-3 md:h-4 md:w-4 text-white" />
+                      </div>
+                      <div className="text-xs md:text-sm hidden sm:block min-w-0">
+                        <div className="font-semibold text-gray-900 dark:text-white truncate">
+                          {profile?.username || user.email?.split('@')[0]}
+                        </div>
+                        <div className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                          Pro Member
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={signOut}
+                      className="premium-card p-2 md:p-3 rounded-xl hover-lift text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white flex-shrink-0"
+                      aria-label="Sign out"
+                    >
+                      <LogOut className="h-3 w-3 md:h-4 md:w-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-3">
+                    <button 
+                      onClick={() => setShowAuthDialog(true)}
+                      className="px-2 sm:px-3 md:px-6 py-2 md:py-3 text-xs md:text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-300 hidden sm:block"
+                    >
+                      Sign In
+                    </button>
+                    <button 
+                      onClick={() => setShowAuthDialog(true)}
+                      className="btn-apple text-xs md:text-sm px-2 sm:px-3 md:px-6 py-2 md:py-3 whitespace-nowrap"
+                    >
+                      Get Started
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        </header>
+          </header>
 
-        {/* Main Content Area */}
-        <main className="flex-1 px-2 md:px-4 pb-20 lg:pb-4 overflow-auto max-w-full">
-          <div className="premium-card p-4 md:p-8 rounded-2xl animate-fade-in min-h-[calc(100vh-200px)] max-w-full overflow-hidden">
-            {renderContent()}
-          </div>
-        </main>
-      </div>
+          {/* Main Content Area */}
+          <main className="flex-1 px-2 sm:px-3 md:px-4 pb-20 lg:pb-4 overflow-auto w-full box-border">
+            <div className="premium-card p-3 sm:p-4 md:p-8 rounded-2xl animate-fade-in min-h-[calc(100vh-200px)] w-full overflow-x-auto">
+              <div className="w-full min-w-0">
+                {renderContent()}
+              </div>
+            </div>
+          </main>
+        </div>
 
-      {/* Mobile Bottom Navigation */}
-      <BottomNavigation activeModule={activeModule} onModuleChange={handleModuleChange} />
+        {/* Mobile Bottom Navigation */}
+        <BottomNavigation activeModule={activeModule} onModuleChange={handleModuleChange} />
 
-      {/* Floating Action Menu - Hidden on mobile */}
-      <div className="hidden lg:block">
-        <FloatingActionMenu onModuleSelect={handleModuleChange} />
-      </div>
+        {/* Floating Action Menu - Hidden on mobile */}
+        <div className="hidden lg:block">
+          <FloatingActionMenu onModuleSelect={handleModuleChange} />
+        </div>
 
-      {/* Dialogs */}
-      <AuthDialog
-        open={showAuthDialog}
-        onOpenChange={setShowAuthDialog}
-        onAuthSuccess={() => setShowAuthDialog(false)}
-      />
-      
-      <PricingDialog
-        open={showPricingDialog}
-        onOpenChange={setShowPricingDialog}
-        onSubscriptionChange={() => {
-          // Refresh subscription status if needed
-        }}
-      />
-      
-      
-      <OnboardingWelcome
-        open={showOnboarding && !!user && !authLoading}
-        onOpenChange={setShowOnboarding}
-        onComplete={handleOnboardingComplete}
-      />
+        {/* Dialogs */}
+        <AuthDialog
+          open={showAuthDialog}
+          onOpenChange={setShowAuthDialog}
+          onAuthSuccess={() => setShowAuthDialog(false)}
+        />
+        
+        <PricingDialog
+          open={showPricingDialog}
+          onOpenChange={setShowPricingDialog}
+          onSubscriptionChange={() => {
+            // Refresh subscription status if needed
+          }}
+        />
+        
+        <OnboardingWelcome
+          open={showOnboarding && !!user && !authLoading}
+          onOpenChange={setShowOnboarding}
+          onComplete={handleOnboardingComplete}
+        />
       </div>
     </ErrorBoundary>
   );
+
 };
 
 export default SomaTech;
