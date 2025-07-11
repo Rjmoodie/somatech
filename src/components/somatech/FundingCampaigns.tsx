@@ -302,24 +302,50 @@ const FundingCampaigns = ({ user, onAuthRequired }: FundingCampaignsProps) => {
       </div>
       )}
 
-      {/* Empty State */}
+      {/* Empty State with Better UX */}
       {!loading && (activeTab === 'explore' ? campaigns : myCampaigns).length === 0 && (
         <Card className="text-center py-12">
           <CardContent>
-            <Heart className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">
-              {activeTab === 'explore' ? 'No campaigns found' : 'No campaigns yet'}
-            </h3>
-            <p className="text-muted-foreground mb-4">
-              {activeTab === 'explore' 
-                ? 'Try adjusting your filters or check back later'
-                : 'Create your first campaign to get started'
-              }
-            </p>
-            {activeTab === 'my-campaigns' && (
-              <Button onClick={handleCreateCampaign} variant="outline">
-                Create Your First Campaign
-              </Button>
+            {activeTab === 'explore' ? (
+              <div>
+                <Search className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No campaigns found</h3>
+                <p className="text-muted-foreground mb-4">
+                  {filters.search || filters.category 
+                    ? 'Try adjusting your search filters to find more campaigns' 
+                    : 'Be the first to create a campaign in this community!'
+                  }
+                </p>
+                {filters.search || filters.category ? (
+                  <div className="flex justify-center gap-2">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setFilters({ sortBy: 'newest', search: '' })}
+                    >
+                      Clear Filters
+                    </Button>
+                    <Button onClick={handleCreateCampaign}>
+                      Create Campaign
+                    </Button>
+                  </div>
+                ) : (
+                  <Button onClick={handleCreateCampaign}>
+                    Create First Campaign
+                  </Button>
+                )}
+              </div>
+            ) : (
+              <div>
+                <Heart className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No campaigns yet</h3>
+                <p className="text-muted-foreground mb-4">
+                  Ready to start your first funding campaign? It only takes a few minutes!
+                </p>
+                <Button onClick={handleCreateCampaign} className="gap-2">
+                  <Plus className="h-4 w-4" />
+                  Create Your First Campaign
+                </Button>
+              </div>
             )}
           </CardContent>
         </Card>

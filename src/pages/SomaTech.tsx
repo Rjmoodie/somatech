@@ -17,6 +17,9 @@ import ModuleWrapper from "@/components/somatech/ModuleWrapper";
 import { useAuth } from "@/components/somatech/AuthProvider";
 import { useError } from "@/components/somatech/ErrorProvider";
 import { usePerformance } from "@/components/somatech/PerformanceProvider";
+import UserFeedbackSystem from "@/components/somatech/UserFeedbackSystem";
+import NetworkStatus from "@/components/somatech/NetworkStatus";
+import ProgressiveOnboarding from "@/components/somatech/ProgressiveOnboarding";
 
 // Lazy load modules for better performance
 const Dashboard = lazy(() => import("@/components/somatech/Dashboard"));
@@ -55,6 +58,7 @@ const SomaTech = () => {
   const [showPricingDialog, setShowPricingDialog] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
+  const [showProgressiveOnboarding, setShowProgressiveOnboarding] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   
   const { user, profile, loading: authLoading, signOut } = useAuth();
@@ -67,7 +71,8 @@ const SomaTech = () => {
       const completed = localStorage.getItem(`onboarding-completed-${user.id}`);
       setHasCompletedOnboarding(!!completed);
       if (!completed) {
-        setShowOnboarding(true);
+        // Show progressive onboarding for better UX
+        setShowProgressiveOnboarding(true);
       }
     }
   }, [user, authLoading]);
@@ -435,6 +440,18 @@ const SomaTech = () => {
           onOpenChange={setShowOnboarding}
           onComplete={handleOnboardingComplete}
         />
+
+        {/* Progressive Onboarding */}
+        <ProgressiveOnboarding
+          onStepComplete={(stepId) => console.log('Step completed:', stepId)}
+          onSkip={() => setShowProgressiveOnboarding(false)}
+        />
+
+        {/* Network Status */}
+        <NetworkStatus />
+
+        {/* User Feedback System */}
+        <UserFeedbackSystem />
       </div>
     </ErrorBoundary>
   );

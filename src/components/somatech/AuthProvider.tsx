@@ -48,21 +48,24 @@ const AuthProviderComponent: React.FC<{ children: React.ReactNode }> = ({ childr
 
   useEffect(() => {
     let mounted = true;
+    let profileTimeout: NodeJS.Timeout;
 
-    // Get initial session
+    // Get initial session with optimized error handling
     const getInitialSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
           console.error('Session error:', error);
+          if (mounted) setLoading(false);
           return;
         }
 
         if (mounted) {
           setUser(session?.user ?? null);
           if (session?.user) {
-            loadProfile(session.user.id);
+            // Debounce profile loading to prevent excessive API calls
+            profileTimeout = setTimeout(() => loadProfile(session.user.id), 100);
           }
           setLoading(false);
         }
@@ -76,18 +79,22 @@ const AuthProviderComponent: React.FC<{ children: React.ReactNode }> = ({ childr
 
     getInitialSession();
 
-    // Listen for auth changes
+    // Listen for auth changes with optimized handling
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (!mounted) return;
 
         console.log('Auth state changed:', event);
         
+        // Clear any pending profile timeout
+        if (profileTimeout) clearTimeout(profileTimeout);
+        
         setUser(session?.user ?? null);
         
-        if (session?.user) {
-          loadProfile(session.user.id);
-        } else {
+        if (session?.user && event !== 'TOKEN_REFRESHED') {
+          // Only load profile on actual sign-in, not token refresh
+          profileTimeout = setTimeout(() => loadProfile(session.user.id), 150);
+        } else if (!session?.user) {
           setProfile(null);
         }
         
@@ -97,6 +104,7 @@ const AuthProviderComponent: React.FC<{ children: React.ReactNode }> = ({ childr
 
     return () => {
       mounted = false;
+      if (profileTimeout) clearTimeout(profileTimeout);
       subscription.unsubscribe();
     };
   }, [loadProfile]);
