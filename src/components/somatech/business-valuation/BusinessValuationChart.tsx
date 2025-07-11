@@ -113,10 +113,10 @@ const BusinessValuationChart = ({ report }: BusinessValuationChartProps) => {
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>Valuation Visualization</CardTitle>
-            <CardDescription>
+        <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+          <div className="min-w-0 flex-1">
+            <CardTitle className="text-lg sm:text-xl">Valuation Visualization</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">
               {chartType === 'table' 
                 ? 'Detailed valuation breakdown by scenario' 
                 : chartType === 'line'
@@ -125,27 +125,33 @@ const BusinessValuationChart = ({ report }: BusinessValuationChartProps) => {
               }
             </CardDescription>
           </div>
-          <div className="flex space-x-2">
+          <div className="flex space-x-1 sm:space-x-2">
             <Button
               variant={chartType === 'bar' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setChartType('bar')}
+              className="px-2 sm:px-3"
             >
-              Bar Chart
+              <span className="hidden sm:inline">Bar Chart</span>
+              <span className="sm:hidden">Bar</span>
             </Button>
             <Button
               variant={chartType === 'line' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setChartType('line')}
+              className="px-2 sm:px-3"
             >
-              Line Chart
+              <span className="hidden sm:inline">Line Chart</span>
+              <span className="sm:hidden">Line</span>
             </Button>
             <Button
               variant={chartType === 'table' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setChartType('table')}
+              className="px-2 sm:px-3"
             >
-              Table
+              <span className="hidden sm:inline">Table</span>
+              <span className="sm:hidden">Tbl</span>
             </Button>
           </div>
         </div>

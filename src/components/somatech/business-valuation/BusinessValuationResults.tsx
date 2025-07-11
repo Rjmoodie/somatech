@@ -35,8 +35,8 @@ const BusinessValuationResults = ({ report }: BusinessValuationResultsProps) => 
       {/* Valuation Summary */}
       <Card>
         <CardHeader>
-          <CardTitle>Valuation Summary</CardTitle>
-          <CardDescription>Business valuation across multiple scenarios</CardDescription>
+          <CardTitle className="text-lg sm:text-xl">Valuation Summary</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">Business valuation across multiple scenarios</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -58,8 +58,8 @@ const BusinessValuationResults = ({ report }: BusinessValuationResultsProps) => 
       {/* Method Breakdown */}
       <Card>
         <CardHeader>
-          <CardTitle>Valuation Method Breakdown</CardTitle>
-          <CardDescription>How each method contributes to the valuation</CardDescription>
+          <CardTitle className="text-lg sm:text-xl">Valuation Method Breakdown</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">How each method contributes to the valuation</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
@@ -107,29 +107,29 @@ const BusinessValuationResults = ({ report }: BusinessValuationResultsProps) => 
       {/* Future Projections */}
       <Card>
         <CardHeader>
-          <CardTitle>Financial Projections</CardTitle>
-          <CardDescription>Year-by-year financial and valuation projections</CardDescription>
+          <CardTitle className="text-lg sm:text-xl">Financial Projections</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">Year-by-year financial and valuation projections</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-xs sm:text-sm min-w-[500px]">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left py-2">Year</th>
-                  <th className="text-right py-2">Revenue</th>
-                  <th className="text-right py-2">EBITDA</th>
-                  <th className="text-right py-2">Net Income</th>
-                  <th className="text-right py-2">Est. Value</th>
+                  <th className="text-left py-2 px-1 font-medium">Year</th>
+                  <th className="text-right py-2 px-1 font-medium">Revenue</th>
+                  <th className="text-right py-2 px-1 font-medium">EBITDA</th>
+                  <th className="text-right py-2 px-1 font-medium">Net Income</th>
+                  <th className="text-right py-2 px-1 font-medium">Est. Value</th>
                 </tr>
               </thead>
               <tbody>
                 {report.projections.map((projection, index) => (
                   <tr key={projection.year} className={index % 2 === 0 ? 'bg-muted/50' : ''}>
-                    <td className="py-2 font-medium">{projection.year}</td>
-                    <td className="text-right py-2">{formatCurrency(projection.revenue)}</td>
-                    <td className="text-right py-2">{formatCurrency(projection.ebitda)}</td>
-                    <td className="text-right py-2">{formatCurrency(projection.netIncome)}</td>
-                    <td className="text-right py-2 font-semibold">{formatCurrency(projection.value)}</td>
+                    <td className="py-2 px-1 font-medium">{projection.year}</td>
+                    <td className="text-right py-2 px-1">{formatCurrency(projection.revenue)}</td>
+                    <td className="text-right py-2 px-1">{formatCurrency(projection.ebitda)}</td>
+                    <td className="text-right py-2 px-1">{formatCurrency(projection.netIncome)}</td>
+                    <td className="text-right py-2 px-1 font-semibold">{formatCurrency(projection.value)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -141,8 +141,8 @@ const BusinessValuationResults = ({ report }: BusinessValuationResultsProps) => 
       {/* Sensitivity Analysis */}
       <Card>
         <CardHeader>
-          <CardTitle>Sensitivity Analysis</CardTitle>
-          <CardDescription>How key variables impact your business valuation</CardDescription>
+          <CardTitle className="text-lg sm:text-xl">Sensitivity Analysis</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">How key variables impact your business valuation</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
