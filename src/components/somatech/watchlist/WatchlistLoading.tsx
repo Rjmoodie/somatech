@@ -1,4 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
+import LoadingSpinner from "../LoadingSpinner";
 
 /**
  * Loading state component for watchlist
@@ -7,9 +8,11 @@ export const WatchlistLoading = () => {
   return (
     <div className="space-y-8">
       <Card>
-        <CardContent className="text-center py-12">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading your watchlist...</p>
+        <CardContent className="text-center py-16">
+          <LoadingSpinner size="lg" text="Loading your watchlist..." />
+          <p className="text-sm text-muted-foreground mt-4">
+            Fetching your saved stocks and latest market data
+          </p>
         </CardContent>
       </Card>
     </div>

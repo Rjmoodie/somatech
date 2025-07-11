@@ -7,6 +7,9 @@ import { PieChart, User, LogOut } from "lucide-react";
 import DarkModeToggle from "@/components/somatech/DarkModeToggle";
 import FloatingActionMenu from "@/components/somatech/FloatingActionMenu";
 import BottomNavigation from "@/components/somatech/BottomNavigation";
+import OnboardingWelcome from "@/components/somatech/OnboardingWelcome";
+import OfflineIndicator from "@/components/somatech/OfflineIndicator";
+import ErrorBoundary from "@/components/somatech/ErrorBoundary";
 import { modules } from "@/components/somatech/constants";
 import StockAnalysis from "@/components/somatech/StockAnalysis";
 import WatchlistModule from "@/components/somatech/WatchlistModule";
@@ -44,9 +47,21 @@ const SomaTech = () => {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showPricingDialog, setShowPricingDialog] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   
   const { user, profile, loading: authLoading, signOut } = useAuth();
+
+  // Check onboarding status
+  useEffect(() => {
+    if (user && !authLoading) {
+      const completed = localStorage.getItem(`onboarding-completed-${user.id}`);
+      setHasCompletedOnboarding(!!completed);
+      if (!completed) {
+        setShowOnboarding(true);
+      }
+    }
+  }, [user, authLoading]);
 
   useEffect(() => {
     const donation = searchParams.get('donation');
@@ -92,8 +107,10 @@ const SomaTech = () => {
   const handleOnboardingComplete = () => {
     if (user) {
       localStorage.setItem(`onboarding-completed-${user.id}`, 'true');
+      setHasCompletedOnboarding(true);
     }
     setShowOnboarding(false);
+    setActiveModule('stock-analysis'); // Start with stock analysis
   };
 
   const renderContent = () => {
@@ -146,7 +163,9 @@ const SomaTech = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex">
+    <ErrorBoundary>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex">
+        <OfflineIndicator />
       {/* Sidebar - Hidden on mobile, shown on desktop */}
       <div className={`${sidebarCollapsed ? 'w-16' : 'w-72'} transition-all duration-500 ease-apple flex-col hidden lg:flex`}>
         <div className="glass-card m-4 mb-2 p-6 rounded-2xl border-0">
@@ -294,12 +313,14 @@ const SomaTech = () => {
         }}
       />
       
-      <OnboardingFlow
-        open={showOnboarding}
+      
+      <OnboardingWelcome
+        open={showOnboarding && !!user && !authLoading}
         onOpenChange={setShowOnboarding}
         onComplete={handleOnboardingComplete}
       />
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 };
 

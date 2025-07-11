@@ -32,13 +32,21 @@ interface WatchlistModuleProps {
 const WatchlistModule = ({ setActiveModule }: WatchlistModuleProps) => {
   const [watchlistItems, setWatchlistItems] = useState<WatchlistItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { fetchWatchlist, removeFromWatchlist } = useWatchlistOperations();
 
   const loadWatchlist = async () => {
     setLoading(true);
-    const items = await fetchWatchlist();
-    setWatchlistItems(items);
-    setLoading(false);
+    setError(null);
+    try {
+      const items = await fetchWatchlist();
+      setWatchlistItems(items);
+    } catch (err) {
+      setError('Failed to load your watchlist. Please try again.');
+      console.error('Error loading watchlist:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleRemoveItem = async (id: string) => {
@@ -58,6 +66,26 @@ const WatchlistModule = ({ setActiveModule }: WatchlistModuleProps) => {
 
   if (loading) {
     return <WatchlistLoading />;
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-16">
+        <div className="w-16 h-16 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center mx-auto mb-4">
+          <span className="text-red-600 dark:text-red-400 font-bold">!</span>
+        </div>
+        <h3 className="text-lg font-medium mb-2 text-red-800 dark:text-red-200">
+          Unable to Load Watchlist
+        </h3>
+        <p className="text-muted-foreground mb-4">{error}</p>
+        <button 
+          onClick={loadWatchlist}
+          className="btn-premium"
+        >
+          Try Again
+        </button>
+      </div>
+    );
   }
 
   return (
