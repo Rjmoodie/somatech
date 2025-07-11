@@ -2,9 +2,22 @@ import { toast } from "@/hooks/use-toast";
 import { RetirementInputs, RetirementResults } from "./retirementOperations";
 
 /**
- * Format currency values for display
+ * Format currency values for display in millions
  */
 export const formatCurrency = (amount: number): string => {
+  const millions = amount / 1000000;
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 2,
+  }).format(millions) + 'M';
+};
+
+/**
+ * Format currency values for display (original format for smaller amounts)
+ */
+export const formatCurrencyFull = (amount: number): string => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',

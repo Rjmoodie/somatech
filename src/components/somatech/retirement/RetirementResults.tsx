@@ -7,6 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { formatCurrency, formatCurrencyFull } from "./retirementUtils";
 
 interface RetirementResult {
   totalSavingsAtRetirement: number;
@@ -51,9 +52,9 @@ const RetirementResults = ({ result }: RetirementResultsProps) => {
                       <p><strong>Calculation Breakdown:</strong></p>
                       {result.breakdown && (
                         <>
-                          <p>• Current savings grown: ${result.breakdown.futureValueCurrentSavings.toLocaleString()}</p>
-                          <p>• Future contributions: ${result.breakdown.futureValueContributions.toLocaleString()}</p>
-                          <p>• Monthly contribution: ${result.breakdown.actualMonthlyContribution.toLocaleString()}</p>
+                          <p>• Current savings grown: {formatCurrency(result.breakdown.futureValueCurrentSavings)}</p>
+                          <p>• Future contributions: {formatCurrency(result.breakdown.futureValueContributions)}</p>
+                          <p>• Monthly contribution: {formatCurrencyFull(result.breakdown.actualMonthlyContribution)}</p>
                         </>
                       )}
                       <p className="text-xs text-muted-foreground mt-2">This is in future dollars, not today's purchasing power.</p>
@@ -63,7 +64,7 @@ const RetirementResults = ({ result }: RetirementResultsProps) => {
               </TooltipProvider>
             </div>
             <div className="text-2xl sm:text-3xl font-bold text-primary">
-              ${result.totalSavingsAtRetirement.toLocaleString()}
+              {formatCurrency(result.totalSavingsAtRetirement)}
             </div>
           </div>
 
@@ -81,7 +82,7 @@ const RetirementResults = ({ result }: RetirementResultsProps) => {
             
             <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center p-3 bg-card rounded-lg border">
               <span className="text-sm font-medium text-muted-foreground">Annual income gap</span>
-              <span className="text-lg font-semibold mt-1 sm:mt-0">${result.annualIncomeGap.toLocaleString()}</span>
+              <span className="text-lg font-semibold mt-1 sm:mt-0">{formatCurrencyFull(result.annualIncomeGap)}</span>
             </div>
             
             <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center p-3 bg-card rounded-lg border">
@@ -99,7 +100,7 @@ const RetirementResults = ({ result }: RetirementResultsProps) => {
                   variant={result.surplusOrShortfall >= 0 ? "default" : "destructive"}
                   className="text-sm"
                 >
-                  ${Math.abs(result.surplusOrShortfall).toLocaleString()} 
+                  {formatCurrency(Math.abs(result.surplusOrShortfall))} 
                   {result.surplusOrShortfall >= 0 ? ' surplus' : ' shortfall'}
                 </Badge>
               </div>
