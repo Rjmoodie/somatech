@@ -48,7 +48,7 @@ const Dashboard = ({ globalTicker, setGlobalTicker, setActiveModule }: Dashboard
         </p>
       </div>
       
-      <WelcomeSection />
+      <WelcomeSection setActiveModule={setActiveModule} />
       
       <AnnouncementsSection announcements={announcements} />
 

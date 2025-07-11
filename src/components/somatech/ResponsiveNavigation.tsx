@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { modules } from './constants';
 import { cn } from '@/lib/utils';
+import GroupedNavigation from './GroupedNavigation';
 
 interface ResponsiveNavigationProps {
   activeModule: string;
@@ -51,29 +52,13 @@ const ResponsiveNavigation = ({ activeModule, onModuleChange }: ResponsiveNaviga
 
             {/* Navigation */}
             <div className="flex-1 overflow-y-auto">
-              <nav className="p-4 space-y-2">
-                {modules.map((module, index) => {
-                  const Icon = module.icon;
-                  const isActive = activeModule === module.id;
-                  
-                  return (
-                    <button
-                      key={module.id}
-                      onClick={() => handleModuleSelect(module.id)}
-                      className={cn(
-                        "w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-200",
-                        isActive 
-                          ? 'bg-primary text-primary-foreground shadow-lg' 
-                          : 'hover:bg-accent hover:text-accent-foreground text-muted-foreground'
-                      )}
-                      aria-label={`Navigate to ${module.name}`}
-                    >
-                      <Icon className="h-5 w-5 flex-shrink-0" />
-                      <span className="font-medium text-sm truncate">{module.name}</span>
-                    </button>
-                  );
-                })}
-              </nav>
+              <div className="p-4">
+                <GroupedNavigation
+                  activeModule={activeModule}
+                  onModuleChange={handleModuleSelect}
+                  variant="mobile"
+                />
+              </div>
             </div>
           </div>
         </SheetContent>
