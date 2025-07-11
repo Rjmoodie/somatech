@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { MapPin, Search, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PropertyMapProps {
   onAddressChange?: (address: string) => void;
@@ -58,13 +59,20 @@ const PropertyMap: React.FC<PropertyMapProps> = ({ onAddressChange, initialAddre
   useEffect(() => {
     const fetchMapboxToken = async () => {
       try {
-        // In a real implementation, this would be an edge function call
-        // For now, we'll use a placeholder
-        const token = 'pk.example.token'; // This should be fetched from Supabase secrets
-        setMapboxToken(token);
+        const { data, error } = await supabase.functions.invoke('get-mapbox-token');
+        
+        if (error) {
+          throw error;
+        }
+        
+        if (data?.token) {
+          setMapboxToken(data.token);
+        } else {
+          throw new Error('No Mapbox token received');
+        }
       } catch (error) {
         console.error('Failed to fetch Mapbox token:', error);
-        setError('Failed to load map configuration');
+        setError('Failed to load map configuration. Please check your Mapbox token setup.');
       }
     };
 
