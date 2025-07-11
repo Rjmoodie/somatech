@@ -125,6 +125,45 @@ export type Database = {
         }
         Relationships: []
       }
+      data_export_requests: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          download_url: string | null
+          expires_at: string | null
+          id: string
+          notes: string | null
+          request_type: string
+          requested_at: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          download_url?: string | null
+          expires_at?: string | null
+          id?: string
+          notes?: string | null
+          request_type: string
+          requested_at?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          download_url?: string | null
+          expires_at?: string | null
+          id?: string
+          notes?: string | null
+          request_type?: string
+          requested_at?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       donations: {
         Row: {
           amount: number
@@ -229,6 +268,48 @@ export type Database = {
         }
         Relationships: []
       }
+      login_activity: {
+        Row: {
+          created_at: string
+          device_type: string | null
+          failure_reason: string | null
+          id: string
+          ip_address: unknown | null
+          location: string | null
+          login_timestamp: string
+          session_id: string | null
+          success: boolean
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_type?: string | null
+          failure_reason?: string | null
+          id?: string
+          ip_address?: unknown | null
+          location?: string | null
+          login_timestamp?: string
+          session_id?: string | null
+          success?: boolean
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          device_type?: string | null
+          failure_reason?: string | null
+          id?: string
+          ip_address?: unknown | null
+          location?: string | null
+          login_timestamp?: string
+          session_id?: string | null
+          success?: boolean
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       marketplace_messages: {
         Row: {
           created_at: string
@@ -303,42 +384,78 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          backup_codes: string[] | null
           bio: string | null
           created_at: string
           email: string | null
+          email_verification_sent_at: string | null
+          email_verification_token: string | null
+          email_verified: boolean | null
+          first_login_at: string | null
           id: string
+          last_login_at: string | null
           location: string | null
+          login_count: number | null
           onboarding_completed: boolean | null
+          onboarding_progress: Json | null
+          onboarding_step: number | null
           profile_completion_score: number | null
           theme_preference: string | null
+          tutorial_completed: boolean | null
+          two_factor_enabled: boolean | null
+          two_factor_secret: string | null
           updated_at: string
           username: string | null
           website: string | null
         }
         Insert: {
           avatar_url?: string | null
+          backup_codes?: string[] | null
           bio?: string | null
           created_at?: string
           email?: string | null
+          email_verification_sent_at?: string | null
+          email_verification_token?: string | null
+          email_verified?: boolean | null
+          first_login_at?: string | null
           id: string
+          last_login_at?: string | null
           location?: string | null
+          login_count?: number | null
           onboarding_completed?: boolean | null
+          onboarding_progress?: Json | null
+          onboarding_step?: number | null
           profile_completion_score?: number | null
           theme_preference?: string | null
+          tutorial_completed?: boolean | null
+          two_factor_enabled?: boolean | null
+          two_factor_secret?: string | null
           updated_at?: string
           username?: string | null
           website?: string | null
         }
         Update: {
           avatar_url?: string | null
+          backup_codes?: string[] | null
           bio?: string | null
           created_at?: string
           email?: string | null
+          email_verification_sent_at?: string | null
+          email_verification_token?: string | null
+          email_verified?: boolean | null
+          first_login_at?: string | null
           id?: string
+          last_login_at?: string | null
           location?: string | null
+          login_count?: number | null
           onboarding_completed?: boolean | null
+          onboarding_progress?: Json | null
+          onboarding_step?: number | null
           profile_completion_score?: number | null
           theme_preference?: string | null
+          tutorial_completed?: boolean | null
+          two_factor_enabled?: boolean | null
+          two_factor_secret?: string | null
           updated_at?: string
           username?: string | null
           website?: string | null
@@ -538,6 +655,16 @@ export type Database = {
           profile_record: Database["public"]["Tables"]["profiles"]["Row"]
         }
         Returns: number
+      }
+      track_login_activity: {
+        Args: {
+          p_user_id: string
+          p_ip_address?: string
+          p_user_agent?: string
+          p_success?: boolean
+          p_failure_reason?: string
+        }
+        Returns: string
       }
     }
     Enums: {

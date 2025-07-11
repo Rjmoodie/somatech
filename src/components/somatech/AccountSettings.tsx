@@ -8,7 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { User, Settings, Shield, Bell } from "lucide-react";
 import ProfileSettings from "./account/ProfileSettings";
-import SecuritySettings from "./account/SecuritySettings";
+import EnhancedSecuritySettings from "./account/EnhancedSecuritySettings";
 import NotificationSettings from "./account/NotificationSettings";
 import ThemeSettings from "./account/ThemeSettings";
 
@@ -178,7 +178,7 @@ const AccountSettings = () => {
           </TabsContent>
 
           <TabsContent value="security">
-            <SecuritySettings />
+            <EnhancedSecuritySettings />
           </TabsContent>
 
           <TabsContent value="notifications">
