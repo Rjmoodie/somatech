@@ -251,12 +251,15 @@
     transition: var(--transition-fast);
   }
   
-  /* Button with premium microinteractions */
+  /* Luxury button styles */
   .btn-premium {
     @apply relative overflow-hidden rounded-xl px-6 py-3 text-sm font-medium transition-all duration-300;
-    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary)) 50%, hsl(var(--primary) / 0.9));
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(221 83% 58%), hsl(217 91% 65%));
     color: hsl(var(--primary-foreground));
-    box-shadow: 0 4px 12px hsl(var(--primary) / 0.4), 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 
+      0 8px 25px hsl(var(--primary) / 0.4), 
+      0 4px 12px rgba(0, 0, 0, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
   
   .btn-premium::before {
@@ -266,13 +269,16 @@
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .btn-premium:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px hsl(var(--primary) / 0.4), 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 
+      0 15px 35px hsl(var(--primary) / 0.5), 
+      0 8px 20px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
   }
   
   .btn-premium:hover::before {
@@ -280,8 +286,62 @@
   }
   
   .btn-premium:active {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px hsl(var(--primary) / 0.4), 0 2px 4px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px) scale(1.01);
+    box-shadow: 
+      0 8px 25px hsl(var(--primary) / 0.4), 
+      0 4px 12px rgba(0, 0, 0, 0.15);
+    transition-duration: 0.1s;
+  }
+  
+  /* Ultra luxury button variant */
+  .btn-luxury {
+    @apply relative overflow-hidden rounded-xl px-8 py-4 text-sm font-semibold transition-all duration-500;
+    background: linear-gradient(135deg, 
+      hsl(262 83% 58%), 
+      hsl(258 90% 66%), 
+      hsl(250 84% 70%),
+      hsl(217 91% 65%));
+    background-size: 200% 200%;
+    color: white;
+    box-shadow: 
+      0 12px 40px hsl(262 83% 58% / 0.4), 
+      0 6px 20px rgba(0, 0, 0, 0.2),
+      inset 0 2px 0 rgba(255, 255, 255, 0.25),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.1);
+    animation: gradient-shift 8s ease infinite;
+  }
+  
+  .btn-luxury::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+      transparent, 
+      rgba(255, 255, 255, 0.4), 
+      rgba(255, 255, 255, 0.2), 
+      transparent);
+    transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .btn-luxury:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 
+      0 20px 60px hsl(262 83% 58% / 0.6), 
+      0 12px 30px rgba(0, 0, 0, 0.3),
+      inset 0 2px 0 rgba(255, 255, 255, 0.4);
+    background-position: 100% 0%;
+  }
+  
+  .btn-luxury:hover::before {
+    left: 100%;
+  }
+  
+  .btn-luxury:active {
+    transform: translateY(-2px) scale(1.03);
+    transition-duration: 0.1s;
   }
   
   /* Card with elegant hover states */
@@ -407,6 +467,15 @@
   50% {
     opacity: 0.8;
     transform: scale(1.05);
+  }
+}
+
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
   }
 }
 
