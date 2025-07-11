@@ -102,7 +102,6 @@ const UsageAnalytics = ({ onUpgrade }: UsageAnalyticsProps) => {
                     <Progress 
                       value={metric.percentage} 
                       className="mt-2"
-                      // @ts-ignore
                       indicatorClassName={
                         isAtLimit(metric.percentage) ? "bg-red-500" :
                         isNearLimit(metric.percentage) ? "bg-yellow-500" : 
