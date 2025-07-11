@@ -145,21 +145,257 @@ export const BRRRRCalculator = ({
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Desktop BRRRR Input Forms */}
+          {/* Desktop BRRRR Input Forms - COMPLETE */}
           <div className="space-y-6">
-            {/* Complete input forms would go here - using simplified version for brevity */}
+            {/* Buy Phase */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Home className="h-5 w-5 text-blue-500" />
-                  BRRRR Inputs
+                  Buy Phase
                 </CardTitle>
-                <CardDescription>Complete all phases to calculate your analysis</CardDescription>
+                <CardDescription>Property acquisition details</CardDescription>
               </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  All input forms are available in mobile view or use the original calculator.
-                </p>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Purchase Price ($)</label>
+                    <input
+                      type="number"
+                      value={inputs.purchasePrice}
+                      onChange={(e) => onInputChange('purchasePrice', Number(e.target.value))}
+                      className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Down Payment (%)</label>
+                    <input
+                      type="number"
+                      value={inputs.downPaymentPercent}
+                      onChange={(e) => onInputChange('downPaymentPercent', Number(e.target.value))}
+                      className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Closing Costs ($)</label>
+                    <input
+                      type="number"
+                      value={inputs.closingCosts}
+                      onChange={(e) => onInputChange('closingCosts', Number(e.target.value))}
+                      className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Acquisition Fees ($)</label>
+                    <input
+                      type="number"
+                      value={inputs.acquisitionFees}
+                      onChange={(e) => onInputChange('acquisitionFees', Number(e.target.value))}
+                      className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Monthly Holding Costs ($)</label>
+                  <input
+                    type="number"
+                    value={inputs.holdingCosts}
+                    onChange={(e) => onInputChange('holdingCosts', Number(e.target.value))}
+                    className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Rehab Phase */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <RefreshCw className="h-5 w-5 text-orange-500" />
+                  Rehab Phase
+                </CardTitle>
+                <CardDescription>Renovation details</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Renovation Budget ($)</label>
+                    <input
+                      type="number"
+                      value={inputs.renovationBudget}
+                      onChange={(e) => onInputChange('renovationBudget', Number(e.target.value))}
+                      className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Contingency (%)</label>
+                    <input
+                      type="number"
+                      value={inputs.contingencyPercent}
+                      onChange={(e) => onInputChange('contingencyPercent', Number(e.target.value))}
+                      className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Rehab Duration (months)</label>
+                    <input
+                      type="number"
+                      value={inputs.rehabDuration}
+                      onChange={(e) => onInputChange('rehabDuration', Number(e.target.value))}
+                      className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Financing Rate (%)</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={inputs.rehabFinancingRate}
+                      onChange={(e) => onInputChange('rehabFinancingRate', Number(e.target.value))}
+                      className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Rent Phase */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <DollarSign className="h-5 w-5 text-green-500" />
+                  Rent Phase
+                </CardTitle>
+                <CardDescription>Rental income and expenses</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Monthly Rent ($)</label>
+                    <input
+                      type="number"
+                      value={inputs.monthlyRent}
+                      onChange={(e) => onInputChange('monthlyRent', Number(e.target.value))}
+                      className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Vacancy Rate (%)</label>
+                    <input
+                      type="number"
+                      value={inputs.vacancyRate}
+                      onChange={(e) => onInputChange('vacancyRate', Number(e.target.value))}
+                      className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Property Management ($)</label>
+                    <input
+                      type="number"
+                      value={inputs.propertyManagement}
+                      onChange={(e) => onInputChange('propertyManagement', Number(e.target.value))}
+                      className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Insurance ($)</label>
+                    <input
+                      type="number"
+                      value={inputs.insurance}
+                      onChange={(e) => onInputChange('insurance', Number(e.target.value))}
+                      className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Property Tax ($)</label>
+                    <input
+                      type="number"
+                      value={inputs.propertyTax}
+                      onChange={(e) => onInputChange('propertyTax', Number(e.target.value))}
+                      className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Maintenance ($)</label>
+                    <input
+                      type="number"
+                      value={inputs.maintenance}
+                      onChange={(e) => onInputChange('maintenance', Number(e.target.value))}
+                      className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Refinance Phase */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-purple-500" />
+                  Refinance Phase
+                </CardTitle>
+                <CardDescription>Refinancing details</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">After Repair Value ($)</label>
+                    <input
+                      type="number"
+                      value={inputs.arv}
+                      onChange={(e) => onInputChange('arv', Number(e.target.value))}
+                      className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Refinance LTV (%)</label>
+                    <input
+                      type="number"
+                      value={inputs.refinanceLTV}
+                      onChange={(e) => onInputChange('refinanceLTV', Number(e.target.value))}
+                      className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">New Loan Rate (%)</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={inputs.newLoanRate}
+                      onChange={(e) => onInputChange('newLoanRate', Number(e.target.value))}
+                      className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">New Loan Term (years)</label>
+                    <input
+                      type="number"
+                      value={inputs.newLoanTerm}
+                      onChange={(e) => onInputChange('newLoanTerm', Number(e.target.value))}
+                      className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Refinance Costs ($)</label>
+                  <input
+                    type="number"
+                    value={inputs.refinanceCosts}
+                    onChange={(e) => onInputChange('refinanceCosts', Number(e.target.value))}
+                    className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  />
+                </div>
               </CardContent>
             </Card>
 
