@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
@@ -113,6 +114,7 @@ export const calculateRetirement = (
  * Custom hook for retirement plan operations
  */
 export const useRetirementOperations = () => {
+  const [savedPlans, setSavedPlans] = useState<SavedPlan[]>([]);
   const loadSavedPlans = async (): Promise<SavedPlan[]> => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -241,6 +243,7 @@ export const useRetirementOperations = () => {
   };
 
   return {
+    savedPlans,
     loadSavedPlans,
     savePlan,
     deletePlan,
