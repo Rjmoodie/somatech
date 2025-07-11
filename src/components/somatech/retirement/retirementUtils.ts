@@ -34,9 +34,12 @@ export const calculateRetirement = (inputs: RetirementInputs): RetirementResults
   const monthsToRetirement = yearsToRetirement * 12;
   const monthlyReturn = expectedReturn / 100 / 12;
 
-  // Future value at retirement
-  const totalSavingsAtRetirement = currentSavings * Math.pow(1 + expectedReturn / 100, yearsToRetirement) +
-    monthlyContribution * (Math.pow(1 + monthlyReturn, monthsToRetirement) - 1) / monthlyReturn;
+  // Future value at retirement - corrected calculation
+  const futureValueCurrentSavings = currentSavings * Math.pow(1 + expectedReturn / 100, yearsToRetirement);
+  const futureValueContributions = monthlyReturn > 0 ? 
+    monthlyContribution * (Math.pow(1 + monthlyReturn, monthsToRetirement) - 1) / monthlyReturn :
+    monthlyContribution * monthsToRetirement;
+  const totalSavingsAtRetirement = futureValueCurrentSavings + futureValueContributions;
 
   // Adjust spending for inflation
   const inflationAdjustedSpending = retirementSpending * Math.pow(1 + inflationRate / 100, yearsToRetirement);

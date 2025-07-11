@@ -100,29 +100,32 @@ const RealEstateCalculatorContainer = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 w-full max-w-full overflow-hidden">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="traditional" className="gap-2">
-            <Calculator className="h-4 w-4" />
-            Traditional Analysis
+        <TabsList className="grid w-full grid-cols-3 h-auto p-1">
+          <TabsTrigger value="traditional" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 py-2">
+            <Calculator className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Traditional Analysis</span>
+            <span className="sm:hidden">Traditional</span>
           </TabsTrigger>
-          <TabsTrigger value="brrrr" className="gap-2">
-            <RefreshCw className="h-4 w-4" />
-            BRRRR Calculator
+          <TabsTrigger value="brrrr" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 py-2">
+            <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">BRRRR Calculator</span>
+            <span className="sm:hidden">BRRRR</span>
           </TabsTrigger>
-          <TabsTrigger value="saved-deals" className="gap-2">
-            <FolderOpen className="h-4 w-4" />
-            Saved Deals
+          <TabsTrigger value="saved-deals" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 py-2">
+            <FolderOpen className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Saved Deals</span>
+            <span className="sm:hidden">Saved</span>
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="traditional" className="space-y-6">
+        <TabsContent value="traditional" className="space-y-4 sm:space-y-6 mt-4">
           <PropertyMap />
           <TraditionalCalculator />
         </TabsContent>
 
-        <TabsContent value="brrrr" className="space-y-6">
+        <TabsContent value="brrrr" className="space-y-4 sm:space-y-6 mt-4">
           <PropertyMap />
           <BRRRRCalculator
             inputs={brrrrInputs}

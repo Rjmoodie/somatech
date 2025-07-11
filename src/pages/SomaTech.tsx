@@ -412,10 +412,7 @@ const SomaTech = () => {
           </main>
         </div>
 
-        {/* Mobile Bottom Navigation */}
-        <BottomNavigation activeModule={activeModule} onModuleChange={handleModuleChange} />
-
-        {/* Floating Action Menu - Hidden on mobile */}
+        {/* Floating Action Menu - Desktop only */}
         <div className="hidden lg:block">
           <FloatingActionMenu onModuleSelect={handleModuleChange} />
         </div>
@@ -442,16 +439,21 @@ const SomaTech = () => {
         />
 
         {/* Progressive Onboarding */}
-        <ProgressiveOnboarding
-          onStepComplete={(stepId) => console.log('Step completed:', stepId)}
-          onSkip={() => setShowProgressiveOnboarding(false)}
-        />
+        {showProgressiveOnboarding && user && !hasCompletedOnboarding && (
+          <ProgressiveOnboarding
+            onStepComplete={() => {
+              setShowProgressiveOnboarding(false);
+              if (user) {
+                localStorage.setItem(`onboarding-completed-${user.id}`, 'true');
+                setHasCompletedOnboarding(true);
+              }
+            }}
+            onSkip={() => setShowProgressiveOnboarding(false)}
+          />
+        )}
 
         {/* Network Status */}
         <NetworkStatus />
-
-        {/* User Feedback System */}
-        <UserFeedbackSystem />
       </div>
     </ErrorBoundary>
   );

@@ -49,9 +49,9 @@ export const useBRRRROperations = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         toast({
-          title: "Authentication Required",
-          description: "Please sign in to save deals.",
-          variant: "destructive",
+          title: "Sign In Required",
+          description: "Please sign in or create an account to save your analysis and access advanced features.",
+          variant: "default",
         });
         return false;
       }

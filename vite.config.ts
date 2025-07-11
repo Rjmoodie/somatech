@@ -8,6 +8,7 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    historyApiFallback: true,
   },
   plugins: [
     react(),
@@ -21,5 +22,12 @@ export default defineConfig(({ mode }) => ({
   optimizeDeps: {
     force: true,
     include: ['react', 'react-dom']
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      },
+    },
   },
 }));

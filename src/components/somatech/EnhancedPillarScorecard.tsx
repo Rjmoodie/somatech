@@ -229,15 +229,15 @@ const EnhancedPillarScorecard = ({ ticker, stockData }: EnhancedPillarScorecardP
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{ticker} 8-Pillar Business Strength Scorecard</CardTitle>
-        <CardDescription>
-          Comprehensive evaluation of {ticker}'s long-term business quality indicators with industry benchmarks
+    <Card className="w-full">
+      <CardHeader className="p-4 sm:p-6">
+        <CardTitle className="text-lg sm:text-xl">{ticker} 8-Pillar Scorecard</CardTitle>
+        <CardDescription className="text-sm">
+          Comprehensive evaluation of {ticker}'s business quality with industry benchmarks
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
+      <CardContent className="p-4 sm:p-6">
+        <div className="space-y-3 sm:space-y-4">
           {Object.entries(pillarsData).map(([key, pillar]) => {
             const Icon = getStatusIcon(pillar.status);
             const isSelected = selectedPillar === key;
@@ -245,31 +245,31 @@ const EnhancedPillarScorecard = ({ ticker, stockData }: EnhancedPillarScorecardP
             return (
               <div key={key} className="space-y-3">
                 <div 
-                  className={`flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-all ${
+                  className={`flex flex-col sm:flex-row sm:items-center p-3 sm:p-4 border rounded-lg cursor-pointer transition-all ${
                     isSelected ? 'border-primary bg-primary/5' : 'hover:bg-muted/50'
                   }`}
                   onClick={() => setSelectedPillar(isSelected ? null : key)}
                 >
-                  <div className="flex items-center space-x-4 flex-1">
-                    <Icon className={`h-5 w-5 ${getStatusColor(pillar.status)}`} />
-                    <div className="flex-1">
+                  <div className="flex items-center space-x-3 flex-1 min-w-0">
+                    <Icon className={`h-4 w-4 sm:h-5 sm:w-5 ${getStatusColor(pillar.status)} flex-shrink-0`} />
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-2">
-                        <div className="font-medium">{pillar.name}</div>
+                        <div className="font-medium text-sm sm:text-base truncate">{pillar.name}</div>
                         {getTrendIcon(pillar.trend)}
                       </div>
-                      <div className="flex items-center space-x-4">
-                        <div className="text-sm text-muted-foreground">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                        <div className="text-xs sm:text-sm text-muted-foreground">
                           {ticker}: <span className="font-medium text-foreground">{pillar.value}</span>
                         </div>
-                        <div className="text-sm text-muted-foreground">
-                          Industry Avg: <span className="font-medium text-foreground">{pillar.industryAvg}</span>
+                        <div className="text-xs sm:text-sm text-muted-foreground">
+                          Avg: <span className="font-medium text-foreground">{pillar.industryAvg}</span>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <Progress value={pillar.score} className="w-24" />
-                    <span className="text-sm font-medium w-12 text-right">{pillar.score}/100</span>
+                  <div className="flex items-center justify-between sm:justify-end space-x-3 mt-3 sm:mt-0">
+                    <Progress value={pillar.score} className="flex-1 sm:w-16 lg:w-24" />
+                    <span className="text-xs sm:text-sm font-medium w-12 text-right">{pillar.score}/100</span>
                   </div>
                 </div>
 

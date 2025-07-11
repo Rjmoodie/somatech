@@ -142,26 +142,26 @@ const FinancialStatements = ({ ticker, stockData }: FinancialStatementsProps) =>
   };
 
   const renderFinancialTable = (data: Record<string, Array<{ period: string; value: number }>>, title: string) => (
-    <div className="space-y-4">
-      <h4 className="font-semibold">{title}</h4>
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+    <div className="space-y-4 w-full">
+      <h4 className="font-semibold text-sm sm:text-base">{title}</h4>
+      <div className="overflow-x-auto w-full">
+        <table className="w-full text-xs sm:text-sm min-w-[500px]">
           <thead>
             <tr className="border-b">
-              <th className="text-left py-2 font-medium">Metric</th>
+              <th className="text-left py-2 px-1 font-medium sticky left-0 bg-background">Metric</th>
               {data[Object.keys(data)[0]].map(item => (
-                <th key={item.period} className="text-right py-2 font-medium">{item.period}</th>
+                <th key={item.period} className="text-right py-2 px-1 font-medium min-w-[60px]">{item.period}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {Object.entries(data).map(([key, values]) => (
               <tr key={key} className="border-b">
-                <td className="py-2 font-medium">
+                <td className="py-2 px-1 font-medium sticky left-0 bg-background max-w-[120px] truncate">
                   {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
                 </td>
                 {values.map(item => (
-                  <td key={item.period} className="text-right py-2">
+                  <td key={item.period} className="text-right py-2 px-1 min-w-[60px]">
                     {formatNumber(item.value)}
                   </td>
                 ))}
@@ -174,19 +174,25 @@ const FinancialStatements = ({ ticker, stockData }: FinancialStatementsProps) =>
   );
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{ticker} Financial Statements</CardTitle>
-        <CardDescription>
+    <Card className="w-full">
+      <CardHeader className="p-4 sm:p-6">
+        <CardTitle className="text-lg sm:text-xl">{ticker} Financial Statements</CardTitle>
+        <CardDescription className="text-sm">
           Complete financial statements for {ticker} with 5-year historical data
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-4 sm:p-6">
         <Tabs defaultValue="income" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="income">Income Statement</TabsTrigger>
-            <TabsTrigger value="balance">Balance Sheet</TabsTrigger>
-            <TabsTrigger value="cashflow">Cash Flow</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 h-auto">
+            <TabsTrigger value="income" className="text-xs sm:text-sm px-2 py-2">
+              Income
+            </TabsTrigger>
+            <TabsTrigger value="balance" className="text-xs sm:text-sm px-2 py-2">
+              Balance
+            </TabsTrigger>
+            <TabsTrigger value="cashflow" className="text-xs sm:text-sm px-2 py-2">
+              Cash Flow
+            </TabsTrigger>
           </TabsList>
           
           <TabsContent value="income" className="mt-6">

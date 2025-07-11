@@ -181,11 +181,19 @@ export const useRetirementOperations = () => {
       return false;
     } catch (error) {
       console.error('Error saving plan:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save plan. Please try again.",
-        variant: "destructive",
-      });
+      if (error instanceof Error && error.message.includes('not authenticated')) {
+        toast({
+          title: "Sign In Required",
+          description: "Please sign in or create an account to save your retirement plans and access advanced features.",
+          variant: "default",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to save plan. Please try again.",
+          variant: "destructive",
+        });
+      }
       return false;
     }
   };
