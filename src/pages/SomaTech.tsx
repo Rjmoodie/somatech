@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, lazy } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,32 +13,37 @@ import ErrorBoundary from "@/components/somatech/ErrorBoundary";
 import ResponsiveNavigation from "@/components/somatech/ResponsiveNavigation";
 import { modules } from "@/components/somatech/constants";
 import GroupedNavigation from "@/components/somatech/GroupedNavigation";
-import StockAnalysis from "@/components/somatech/StockAnalysis";
-import WatchlistModule from "@/components/somatech/WatchlistModule";
-import BusinessValuation from "@/components/somatech/BusinessValuation";
-import CashFlowSimulator from "@/components/somatech/CashFlowSimulator";
-import RetirementPlanning from "@/components/somatech/RetirementPlanning";
-import RealEstateCalculator from "@/components/somatech/RealEstateCalculator";
+import ModuleWrapper from "@/components/somatech/ModuleWrapper";
+import { useAuth } from "@/components/somatech/AuthProvider";
+import { useError } from "@/components/somatech/ErrorProvider";
+import { usePerformance } from "@/components/somatech/PerformanceProvider";
 
-import Dashboard from "@/components/somatech/Dashboard";
-import Marketplace from "@/components/somatech/Marketplace";
-import FundingCampaigns from "@/components/somatech/FundingCampaigns";
-import CampaignProjection from "@/components/somatech/CampaignProjection";
-import DonationSuccess from "@/components/somatech/funding/DonationSuccess";
-import AuthDialog, { useAuth } from "@/components/somatech/AuthDialog";
+// Lazy load modules for better performance
+const Dashboard = lazy(() => import("@/components/somatech/Dashboard"));
+const StockAnalysis = lazy(() => import("@/components/somatech/StockAnalysis"));
+const WatchlistModule = lazy(() => import("@/components/somatech/WatchlistModule"));
+const BusinessValuation = lazy(() => import("@/components/somatech/BusinessValuation"));
+const CashFlowSimulator = lazy(() => import("@/components/somatech/CashFlowSimulator"));
+const RetirementPlanning = lazy(() => import("@/components/somatech/RetirementPlanning"));
+const RealEstateCalculatorContainer = lazy(() => import("@/components/somatech/RealEstateCalculatorContainer"));
+const Marketplace = lazy(() => import("@/components/somatech/Marketplace"));
+const FundingCampaigns = lazy(() => import("@/components/somatech/FundingCampaigns"));
+const CampaignProjection = lazy(() => import("@/components/somatech/CampaignProjection"));
+const DonationSuccess = lazy(() => import("@/components/somatech/funding/DonationSuccess"));
+const AuthDialog = lazy(() => import("@/components/somatech/AuthDialog"));
 
 // Enterprise Components
-import PricingDialog from "@/components/somatech/enterprise/PricingDialog";
-import SubscriptionStatus from "@/components/somatech/enterprise/SubscriptionStatus";
-import OnboardingFlow from "@/components/somatech/enterprise/OnboardingFlow";
-import UsageAnalytics from "@/components/somatech/enterprise/UsageAnalytics";
-import AdminPanel from "@/components/somatech/enterprise/AdminPanel";
-import WhiteLabelCustomizer from "@/components/somatech/enterprise/WhiteLabelCustomizer";
-import AdvancedReporting from "@/components/somatech/enterprise/AdvancedReporting";
-import PerformanceMonitoring from "@/components/somatech/enterprise/PerformanceMonitoring";
-import CustomerSuccessDashboard from "@/components/somatech/enterprise/CustomerSuccessDashboard";
-import SecurityAuditDashboard from "@/components/somatech/enterprise/SecurityAuditDashboard";
-import MultiTenantArchitecture from "@/components/somatech/enterprise/MultiTenantArchitecture";
+const PricingDialog = lazy(() => import("@/components/somatech/enterprise/PricingDialog"));
+const SubscriptionStatus = lazy(() => import("@/components/somatech/enterprise/SubscriptionStatus"));
+const OnboardingFlow = lazy(() => import("@/components/somatech/enterprise/OnboardingFlow"));
+const UsageAnalytics = lazy(() => import("@/components/somatech/enterprise/UsageAnalytics"));
+const AdminPanel = lazy(() => import("@/components/somatech/enterprise/AdminPanel"));
+const WhiteLabelCustomizer = lazy(() => import("@/components/somatech/enterprise/WhiteLabelCustomizer"));
+const AdvancedReporting = lazy(() => import("@/components/somatech/enterprise/AdvancedReporting"));
+const PerformanceMonitoring = lazy(() => import("@/components/somatech/enterprise/PerformanceMonitoring"));
+const CustomerSuccessDashboard = lazy(() => import("@/components/somatech/enterprise/CustomerSuccessDashboard"));
+const SecurityAuditDashboard = lazy(() => import("@/components/somatech/enterprise/SecurityAuditDashboard"));
+const MultiTenantArchitecture = lazy(() => import("@/components/somatech/enterprise/MultiTenantArchitecture"));
 
 import { toast } from "@/hooks/use-toast";
 
@@ -53,6 +58,8 @@ const SomaTech = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   
   const { user, profile, loading: authLoading, signOut } = useAuth();
+  const { reportError } = useError();
+  const { trackPerformance, debounce } = usePerformance();
 
   // Check onboarding status
   useEffect(() => {
@@ -105,11 +112,16 @@ const SomaTech = () => {
     </Card>
   );
 
-  const handleModuleChange = (module: string) => {
-    setActiveModule(module);
-    // Update URL with proper navigation
-    setSearchParams({ module });
-  };
+  const handleModuleChange = debounce((module: string) => {
+    try {
+      trackPerformance('moduleChange', () => {
+        setActiveModule(module);
+        setSearchParams({ module });
+      });
+    } catch (error) {
+      reportError(error as Error, 'module-change');
+    }
+  }, 150);
 
   const handleOnboardingComplete = () => {
     if (user) {
@@ -121,51 +133,160 @@ const SomaTech = () => {
   };
 
   const renderContent = () => {
-    switch (activeModule) {
-      case "dashboard":
-        return <Dashboard globalTicker={globalTicker} setGlobalTicker={setGlobalTicker} setActiveModule={setActiveModule} />;
-      case "stock-analysis":
-        return <StockAnalysis globalTicker={globalTicker} setGlobalTicker={setGlobalTicker} />;
-      case "watchlist":
-        return <WatchlistModule setActiveModule={setActiveModule} />;
-      case "marketplace":
-        return <Marketplace />;
-      case "funding-campaigns":
-        const sessionId = searchParams.get('session_id');
-        const donation = searchParams.get('donation');
-        
-        if (donation === 'success' && sessionId) {
-          return <DonationSuccess />;
-        }
-        return <FundingCampaigns user={user} onAuthRequired={() => setShowAuthDialog(true)} />;
-      case "business-valuation":
-        return <BusinessValuation />;
-      case "cash-flow":
-        return <CashFlowSimulator />;
-      case "retirement-planning":
-        return <RetirementPlanning />;
-      case "real-estate":
-        return <RealEstateCalculator />;
-      case "subscription":
-        return <SubscriptionStatus onUpgradeClick={() => setShowPricingDialog(true)} />;
-      case "enterprise-analytics":
-        return <UsageAnalytics onUpgrade={() => setShowPricingDialog(true)} />;
-      case "enterprise-admin":
-        return <AdminPanel />;
-      case "enterprise-whitelabel":
-        return <WhiteLabelCustomizer onUpgrade={() => setShowPricingDialog(true)} />;
-      case "enterprise-reporting":
-        return <AdvancedReporting onUpgrade={() => setShowPricingDialog(true)} />;
-      case "enterprise-performance":
-        return <PerformanceMonitoring />;
-      case "enterprise-success":
-        return <CustomerSuccessDashboard />;
-      case "enterprise-security":
-        return <SecurityAuditDashboard />;
-      case "enterprise-tenant":
-        return <MultiTenantArchitecture onUpgrade={() => setShowPricingDialog(true)} />;
-      default:
-        return renderPlaceholder(modules.find(m => m.id === activeModule)?.name || "Tool");
+    try {
+      const moduleProps = {
+        globalTicker,
+        setGlobalTicker,
+        setActiveModule: handleModuleChange,
+        user,
+        onAuthRequired: () => setShowAuthDialog(true),
+        onUpgradeClick: () => setShowPricingDialog(true),
+        onUpgrade: () => setShowPricingDialog(true),
+      };
+
+      switch (activeModule) {
+        case "dashboard":
+          return (
+            <ModuleWrapper>
+              <Dashboard {...moduleProps} />
+            </ModuleWrapper>
+          );
+        case "stock-analysis":
+          return (
+            <ModuleWrapper>
+              <StockAnalysis globalTicker={globalTicker} setGlobalTicker={setGlobalTicker} />
+            </ModuleWrapper>
+          );
+        case "watchlist":
+          return (
+            <ModuleWrapper>
+              <WatchlistModule setActiveModule={handleModuleChange} />
+            </ModuleWrapper>
+          );
+        case "marketplace":
+          return (
+            <ModuleWrapper>
+              <Marketplace />
+            </ModuleWrapper>
+          );
+        case "funding-campaigns":
+          const sessionId = searchParams.get('session_id');
+          const donation = searchParams.get('donation');
+          
+          if (donation === 'success' && sessionId) {
+            return (
+              <ModuleWrapper>
+                <DonationSuccess />
+              </ModuleWrapper>
+            );
+          }
+          return (
+            <ModuleWrapper>
+              <FundingCampaigns user={user} onAuthRequired={() => setShowAuthDialog(true)} />
+            </ModuleWrapper>
+          );
+        case "business-valuation":
+          return (
+            <ModuleWrapper>
+              <BusinessValuation />
+            </ModuleWrapper>
+          );
+        case "cash-flow":
+          return (
+            <ModuleWrapper>
+              <CashFlowSimulator />
+            </ModuleWrapper>
+          );
+        case "retirement-planning":
+          return (
+            <ModuleWrapper>
+              <RetirementPlanning />
+            </ModuleWrapper>
+          );
+        case "real-estate":
+          return (
+            <ModuleWrapper>
+              <RealEstateCalculatorContainer />
+            </ModuleWrapper>
+          );
+        case "subscription":
+          return (
+            <ModuleWrapper>
+              <SubscriptionStatus onUpgradeClick={() => setShowPricingDialog(true)} />
+            </ModuleWrapper>
+          );
+        case "enterprise-analytics":
+          return (
+            <ModuleWrapper>
+              <UsageAnalytics onUpgrade={() => setShowPricingDialog(true)} />
+            </ModuleWrapper>
+          );
+        case "enterprise-admin":
+          return (
+            <ModuleWrapper>
+              <AdminPanel />
+            </ModuleWrapper>
+          );
+        case "enterprise-whitelabel":
+          return (
+            <ModuleWrapper>
+              <WhiteLabelCustomizer onUpgrade={() => setShowPricingDialog(true)} />
+            </ModuleWrapper>
+          );
+        case "enterprise-reporting":
+          return (
+            <ModuleWrapper>
+              <AdvancedReporting onUpgrade={() => setShowPricingDialog(true)} />
+            </ModuleWrapper>
+          );
+        case "enterprise-performance":
+          return (
+            <ModuleWrapper>
+              <PerformanceMonitoring />
+            </ModuleWrapper>
+          );
+        case "enterprise-success":
+          return (
+            <ModuleWrapper>
+              <CustomerSuccessDashboard />
+            </ModuleWrapper>
+          );
+        case "enterprise-security":
+          return (
+            <ModuleWrapper>
+              <SecurityAuditDashboard />
+            </ModuleWrapper>
+          );
+        case "enterprise-tenant":
+          return (
+            <ModuleWrapper>
+              <MultiTenantArchitecture onUpgrade={() => setShowPricingDialog(true)} />
+            </ModuleWrapper>
+          );
+        default:
+          return (
+            <ModuleWrapper>
+              {renderPlaceholder(modules.find(m => m.id === activeModule)?.name || "Tool")}
+            </ModuleWrapper>
+          );
+      }
+    } catch (error) {
+      reportError(error as Error, `render-content-${activeModule}`);
+      return (
+        <Card>
+          <CardContent className="p-8 text-center">
+            <p className="text-muted-foreground">
+              Something went wrong loading this module. Please try again.
+            </p>
+            <Button 
+              onClick={() => handleModuleChange('dashboard')} 
+              className="mt-4"
+            >
+              Return to Dashboard
+            </Button>
+          </CardContent>
+        </Card>
+      );
     }
   };
 

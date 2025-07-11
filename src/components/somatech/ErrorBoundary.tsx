@@ -1,75 +1,59 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { AlertTriangle, RefreshCw } from "lucide-react";
+import ErrorFallback from './ErrorFallback';
 
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
+  context?: string;
 }
 
 interface State {
   hasError: boolean;
   error?: Error;
+  errorInfo?: ErrorInfo;
 }
 
 class ErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = { hasError: false };
-  }
+  public state: State = {
+    hasError: false,
+  };
 
-  static getDerivedStateFromError(error: Error): State {
+  public static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Error caught by boundary:', error, errorInfo);
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    this.setState({
+      error,
+      errorInfo,
+    });
+
+    // Report to error tracking service if available
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'exception', {
+        description: error.message,
+        fatal: false,
+      });
+    }
   }
 
-  handleRetry = () => {
-    this.setState({ hasError: false, error: undefined });
+  private handleReset = () => {
+    this.setState({ hasError: false, error: undefined, errorInfo: undefined });
   };
 
-  render() {
-    if (this.state.hasError) {
+  public render() {
+    if (this.state.hasError && this.state.error) {
       if (this.props.fallback) {
         return this.props.fallback;
       }
 
       return (
-        <Card className="mx-auto max-w-md mt-8">
-          <CardHeader className="text-center">
-            <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <CardTitle className="text-red-700 dark:text-red-400">Something went wrong</CardTitle>
-          </CardHeader>
-          <CardContent className="text-center space-y-4">
-            <p className="text-muted-foreground">
-              We encountered an unexpected error. Please try refreshing the page or contact support if the problem persists.
-            </p>
-            {this.state.error && (
-              <details className="text-left">
-                <summary className="cursor-pointer text-sm font-medium">Technical details</summary>
-                <pre className="mt-2 text-xs bg-muted p-2 rounded overflow-auto">
-                  {this.state.error.message}
-                </pre>
-              </details>
-            )}
-            <div className="flex flex-col sm:flex-row gap-2">
-              <Button onClick={this.handleRetry} className="flex-1">
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Try Again
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => window.location.reload()} 
-                className="flex-1"
-              >
-                Refresh Page
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <ErrorFallback
+          error={this.state.error}
+          resetError={this.handleReset}
+          context={this.props.context}
+        />
       );
     }
 
