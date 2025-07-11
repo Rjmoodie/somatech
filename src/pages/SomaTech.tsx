@@ -20,6 +20,7 @@ import { usePerformance } from "@/components/somatech/PerformanceProvider";
 import UserFeedbackSystem from "@/components/somatech/UserFeedbackSystem";
 import NetworkStatus from "@/components/somatech/NetworkStatus";
 import ProgressiveOnboarding from "@/components/somatech/ProgressiveOnboarding";
+import { ProfileDropdown } from "@/components/somatech/ProfileDropdown";
 
 // Lazy load modules for better performance
 const Dashboard = lazy(() => import("@/components/somatech/Dashboard"));
@@ -361,26 +362,10 @@ const SomaTech = () => {
                   </div>
                 ) : user ? (
                   <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4">
-                    <div className="premium-card px-2 sm:px-3 md:px-6 py-2 md:py-3 rounded-xl flex items-center space-x-1 sm:space-x-2 md:space-x-3 max-w-[200px]">
-                      <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-                        <User className="h-3 w-3 md:h-4 md:w-4 text-white" />
-                      </div>
-                      <div className="text-xs md:text-sm hidden sm:block min-w-0">
-                        <div className="font-semibold text-gray-900 dark:text-white truncate">
-                          {profile?.username || user.email?.split('@')[0]}
-                        </div>
-                        <div className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-                          Pro Member
-                        </div>
-                      </div>
-                    </div>
-                    <button
-                      onClick={signOut}
-                      className="premium-card p-2 md:p-3 rounded-xl hover-lift text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white flex-shrink-0"
-                      aria-label="Sign out"
-                    >
-                      <LogOut className="h-3 w-3 md:h-4 md:w-4" />
-                    </button>
+                    <ProfileDropdown 
+                      username={profile?.username || user.email?.split('@')[0] || 'User'}
+                      userEmail={user.email || ''}
+                    />
                   </div>
                 ) : (
                   <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-3">
