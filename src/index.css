@@ -299,6 +299,7 @@
   .status-warning { @apply bg-yellow-500; }
   .status-error { @apply bg-red-500; }
   .status-info { @apply bg-blue-500; }
+}
 
 /* Keyframes */
 @keyframes fadeIn {
