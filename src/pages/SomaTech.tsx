@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,12 @@ import FundingCampaigns from "@/components/somatech/FundingCampaigns";
 import CampaignProjection from "@/components/somatech/CampaignProjection";
 import DonationSuccess from "@/components/somatech/funding/DonationSuccess";
 import AuthDialog, { useAuth } from "@/components/somatech/AuthDialog";
+
+// Enterprise Components
+import PricingDialog from "@/components/somatech/enterprise/PricingDialog";
+import SubscriptionStatus from "@/components/somatech/enterprise/SubscriptionStatus";
+import OnboardingFlow from "@/components/somatech/enterprise/OnboardingFlow";
+
 import { toast } from "@/hooks/use-toast";
 
 const SomaTech = () => {
@@ -25,6 +31,8 @@ const SomaTech = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [globalTicker, setGlobalTicker] = useState("AAPL");
   const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [showPricingDialog, setShowPricingDialog] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   
   const { user, profile, loading: authLoading, signOut } = useAuth();
@@ -63,6 +71,20 @@ const SomaTech = () => {
     </Card>
   );
 
+  const handleModuleChange = (module: string) => {
+    setActiveModule(module);
+    // Update URL without page reload
+    const newUrl = `/somatech?module=${module}`;
+    window.history.pushState({}, '', newUrl);
+  };
+
+  const handleOnboardingComplete = () => {
+    if (user) {
+      localStorage.setItem(`onboarding-completed-${user.id}`, 'true');
+    }
+    setShowOnboarding(false);
+  };
+
   const renderContent = () => {
     switch (activeModule) {
       case "dashboard":
@@ -89,6 +111,8 @@ const SomaTech = () => {
         return <RetirementPlanning />;
       case "real-estate":
         return <RealEstateCalculator />;
+      case "subscription":
+        return <SubscriptionStatus onUpgradeClick={() => setShowPricingDialog(true)} />;
       default:
         return renderPlaceholder(modules.find(m => m.id === activeModule)?.name || "Tool");
     }
@@ -201,16 +225,32 @@ const SomaTech = () => {
           </div>
         </header>
 
-        <main className="flex-1 p-6 overflow-auto">
-          {renderContent()}
+        <main className="flex-1 p-6 overflow-auto bg-gradient-to-br from-background to-muted/20">
+          <div className="animate-fade-in">
+            {renderContent()}
+          </div>
         </main>
       </div>
 
-      {/* Auth Dialog */}
+      {/* Dialogs */}
       <AuthDialog
         open={showAuthDialog}
         onOpenChange={setShowAuthDialog}
         onAuthSuccess={() => setShowAuthDialog(false)}
+      />
+      
+      <PricingDialog
+        open={showPricingDialog}
+        onOpenChange={setShowPricingDialog}
+        onSubscriptionChange={() => {
+          // Refresh subscription status if needed
+        }}
+      />
+      
+      <OnboardingFlow
+        open={showOnboarding}
+        onOpenChange={setShowOnboarding}
+        onComplete={handleOnboardingComplete}
       />
     </div>
   );
