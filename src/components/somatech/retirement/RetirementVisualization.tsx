@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from "recharts";
 import { generateRetirementChartData } from "../utils";
+import { formatCurrency, formatCurrencyFull } from "./retirementUtils";
 
 interface RetirementVisualizationProps {
   currentAge: string;
@@ -58,7 +59,7 @@ const RetirementVisualization = ({
                 <AreaChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="age" />
-                  <YAxis tickFormatter={(value) => `$${(value / 1000)}k`} />
+                  <YAxis tickFormatter={(value) => formatCurrency(value)} />
                   <Tooltip 
                     formatter={(value, name) => {
                       const labels: Record<string, string> = {
@@ -66,7 +67,7 @@ const RetirementVisualization = ({
                         contributions: 'Total Contributions',
                         growth: 'Investment Growth'
                       };
-                      return [`$${Number(value).toLocaleString()}`, labels[name as string] || name];
+                      return [formatCurrency(Number(value)), labels[name as string] || name];
                     }}
                     labelFormatter={(label) => `Age: ${label}`}
                   />
@@ -113,9 +114,9 @@ const RetirementVisualization = ({
                   {chartData.map((row, index) => (
                     <tr key={index} className="border-b">
                       <td className="p-2">{row.age}</td>
-                      <td className="p-2 text-right">${row.balance.toLocaleString()}</td>
-                      <td className="p-2 text-right">${row.contributions.toLocaleString()}</td>
-                      <td className="p-2 text-right">${row.growth.toLocaleString()}</td>
+                      <td className="p-2 text-right">{formatCurrency(row.balance)}</td>
+                      <td className="p-2 text-right">{formatCurrency(row.contributions)}</td>
+                      <td className="p-2 text-right">{formatCurrency(row.growth)}</td>
                       <td className="p-2 text-center">
                         <span className={`px-2 py-1 rounded text-xs ${
                           row.phase === 'accumulation' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
