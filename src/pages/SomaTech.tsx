@@ -37,6 +37,7 @@ const CampaignProjection = lazy(() => import("@/components/somatech/CampaignProj
 const DonationSuccess = lazy(() => import("@/components/somatech/funding/DonationSuccess"));
 const AuthDialog = lazy(() => import("@/components/somatech/AuthDialog"));
 const PrivacyPolicy = lazy(() => import("@/components/somatech/PrivacyPolicy"));
+const AccountSettings = lazy(() => import("@/components/somatech/AccountSettings"));
 
 // Enterprise Components
 const PricingDialog = lazy(() => import("@/components/somatech/enterprise/PricingDialog"));
@@ -275,6 +276,12 @@ const SomaTech = () => {
           return (
             <ModuleWrapper>
               <PrivacyPolicy />
+            </ModuleWrapper>
+          );
+        case "account-settings":
+          return (
+            <ModuleWrapper>
+              <AccountSettings />
             </ModuleWrapper>
           );
         default:

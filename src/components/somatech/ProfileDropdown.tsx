@@ -115,8 +115,13 @@ export const ProfileDropdown = ({ username, userEmail }: ProfileDropdownProps) =
           <DropdownMenuSeparator />
           
           <DropdownMenuItem onClick={() => setShowProfileDialog(true)}>
+            <User className="mr-2 h-4 w-4" />
+            <span>Quick Profile Edit</span>
+          </DropdownMenuItem>
+          
+          <DropdownMenuItem onClick={() => window.location.href = '/somatech?module=account-settings'}>
             <Settings className="mr-2 h-4 w-4" />
-            <span>Profile Settings</span>
+            <span>Account Settings</span>
           </DropdownMenuItem>
           
           <DropdownMenuSeparator />

@@ -302,25 +302,46 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
+          bio: string | null
           created_at: string
           email: string | null
           id: string
+          location: string | null
+          onboarding_completed: boolean | null
+          profile_completion_score: number | null
+          theme_preference: string | null
           updated_at: string
           username: string | null
+          website: string | null
         }
         Insert: {
+          avatar_url?: string | null
+          bio?: string | null
           created_at?: string
           email?: string | null
           id: string
+          location?: string | null
+          onboarding_completed?: boolean | null
+          profile_completion_score?: number | null
+          theme_preference?: string | null
           updated_at?: string
           username?: string | null
+          website?: string | null
         }
         Update: {
+          avatar_url?: string | null
+          bio?: string | null
           created_at?: string
           email?: string | null
           id?: string
+          location?: string | null
+          onboarding_completed?: boolean | null
+          profile_completion_score?: number | null
+          theme_preference?: string | null
           updated_at?: string
           username?: string | null
+          website?: string | null
         }
         Relationships: []
       }
@@ -512,7 +533,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      calculate_profile_completion: {
+        Args: {
+          profile_record: Database["public"]["Tables"]["profiles"]["Row"]
+        }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never
