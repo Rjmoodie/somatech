@@ -172,9 +172,10 @@ const PricingDialog = ({ open, onOpenChange, currentSubscription, onSubscription
           {PLANS.map((plan) => {
             const Icon = plan.icon;
             const isCurrentPlan = currentSubscription?.subscription_tier === plan.id;
-            const isUpgrade = currentSubscription && 
+            const isUpgrade = currentSubscription && (
               (currentSubscription.subscription_tier === 'free' && plan.id !== 'free') ||
-              (currentSubscription.subscription_tier === 'professional' && plan.id === 'enterprise');
+              (currentSubscription.subscription_tier === 'professional' && plan.id === 'enterprise')
+            );
 
             return (
               <Card 
