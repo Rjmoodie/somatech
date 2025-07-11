@@ -125,8 +125,26 @@ const RealEstateCalculator = () => {
   };
 
   const handleCalculateBRRRR = () => {
-    const results = calculateBRRRR(brrrrInputs);
-    setBrrrrResults(results);
+    console.log("Calculate BRRRR button clicked");
+    console.log("BRRRR Inputs:", brrrrInputs);
+    
+    try {
+      const results = calculateBRRRR(brrrrInputs);
+      console.log("BRRRR Results:", results);
+      setBrrrrResults(results);
+      
+      toast({
+        title: "BRRRR Analysis Complete",
+        description: "Your BRRRR analysis has been calculated successfully.",
+      });
+    } catch (error) {
+      console.error("Error calculating BRRRR:", error);
+      toast({
+        title: "Calculation Error",
+        description: "There was an error calculating the BRRRR analysis. Please check your inputs.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleEditDealNotes = async (dealId: string, dealName: string, notes: string) => {
