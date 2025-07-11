@@ -35,10 +35,11 @@ const ExportActions = ({ ticker, stockData, dcfScenarios, investmentThesis }: Ex
           <CardDescription>Save your {ticker} analysis or export as a report</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex space-x-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <Button className="flex-1">
               <Download className="h-4 w-4 mr-2" />
-              Export {ticker} PDF Report
+              <span className="hidden sm:inline">Export {ticker} PDF Report</span>
+              <span className="sm:hidden">Export PDF</span>
             </Button>
             <Button 
               variant="outline" 
@@ -47,7 +48,8 @@ const ExportActions = ({ ticker, stockData, dcfScenarios, investmentThesis }: Ex
               disabled={!stockData}
             >
               <Save className="h-4 w-4 mr-2" />
-              Save to Watchlist
+              <span className="hidden sm:inline">Save to Watchlist</span>
+              <span className="sm:hidden">Save</span>
             </Button>
           </div>
         </CardContent>

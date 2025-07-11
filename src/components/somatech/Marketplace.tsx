@@ -19,28 +19,29 @@ const Marketplace = () => {
       {/* Header */}
       <Card className="elevated-card primary-glow">
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <CardTitle className="text-2xl">Business Marketplace</CardTitle>
-              <p className="text-muted-foreground mt-2">
+              <CardTitle className="text-xl sm:text-2xl">Business Marketplace</CardTitle>
+              <p className="text-muted-foreground mt-2 text-sm sm:text-base">
                 Discover investment opportunities and list your business for sale
               </p>
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               <Button
                 variant="outline"
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-2"
+                className="flex items-center justify-center gap-2"
               >
                 <Filter className="h-4 w-4" />
                 Filters
               </Button>
               <Button 
                 onClick={() => setShowCreateListing(true)}
-                className="flex items-center gap-2"
+                className="flex items-center justify-center gap-2"
               >
                 <Plus className="h-4 w-4" />
-                List My Business
+                <span className="hidden sm:inline">List My Business</span>
+                <span className="sm:hidden">Create Listing</span>
               </Button>
             </div>
           </div>
