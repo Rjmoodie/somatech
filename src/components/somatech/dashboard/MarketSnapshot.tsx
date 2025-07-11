@@ -30,10 +30,10 @@ const MarketSnapshot = ({ marketData }: MarketSnapshotProps) => {
   }
 
   const indices = [
-    { name: "S&P 500", value: marketData.sp500, change: marketData.change.sp500 },
-    { name: "NASDAQ", value: marketData.nasdaq, change: marketData.change.nasdaq },
-    { name: "DOW", value: marketData.dow, change: marketData.change.dow },
-    { name: "VIX", value: marketData.vix, change: marketData.change.vix }
+    { name: "S&P 500", value: marketData?.sp500 || 0, change: marketData?.change?.sp500 || 0 },
+    { name: "NASDAQ", value: marketData?.nasdaq || 0, change: marketData?.change?.nasdaq || 0 },
+    { name: "DOW", value: marketData?.dow || 0, change: marketData?.change?.dow || 0 },
+    { name: "VIX", value: marketData?.vix || 0, change: marketData?.change?.vix || 0 }
   ];
 
   return (
