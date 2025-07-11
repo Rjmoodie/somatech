@@ -1,4 +1,23 @@
-import { Calculator, TrendingUp, Users, FileText, Home, DollarSign, Star, ShoppingCart, LayoutDashboard, Activity, Heart, Target } from "lucide-react";
+import { 
+  Calculator, 
+  TrendingUp, 
+  Users, 
+  FileText, 
+  Home, 
+  DollarSign, 
+  Star, 
+  ShoppingCart, 
+  LayoutDashboard, 
+  Activity, 
+  Heart, 
+  Target,
+  Crown,
+  BarChart3,
+  Settings,
+  Palette,
+  Shield,
+  Building
+} from "lucide-react";
 import { Module } from "./types";
 
 export const modules: Module[] = [
@@ -11,6 +30,16 @@ export const modules: Module[] = [
   { id: "cash-flow", name: "Cash Flow Simulator", icon: Activity },
   { id: "retirement-planning", name: "Retirement Planning", icon: FileText },
   { id: "real-estate", name: "Real Estate Calculator", icon: DollarSign },
+  { id: "subscription", name: "Subscription", icon: Crown },
+  // Enterprise Features
+  { id: "enterprise-analytics", name: "Usage Analytics", icon: BarChart3 },
+  { id: "enterprise-admin", name: "Admin Panel", icon: Settings },
+  { id: "enterprise-whitelabel", name: "White Label", icon: Palette },
+  { id: "enterprise-reporting", name: "Advanced Reports", icon: FileText },
+  { id: "enterprise-performance", name: "Performance", icon: Activity },
+  { id: "enterprise-success", name: "Customer Success", icon: Heart },
+  { id: "enterprise-security", name: "Security & Audit", icon: Shield },
+  { id: "enterprise-tenant", name: "Multi-Tenant", icon: Building }
 ];
 
 export const industryMultipliers: Record<string, number> = {

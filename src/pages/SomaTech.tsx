@@ -23,6 +23,14 @@ import AuthDialog, { useAuth } from "@/components/somatech/AuthDialog";
 import PricingDialog from "@/components/somatech/enterprise/PricingDialog";
 import SubscriptionStatus from "@/components/somatech/enterprise/SubscriptionStatus";
 import OnboardingFlow from "@/components/somatech/enterprise/OnboardingFlow";
+import UsageAnalytics from "@/components/somatech/enterprise/UsageAnalytics";
+import AdminPanel from "@/components/somatech/enterprise/AdminPanel";
+import WhiteLabelCustomizer from "@/components/somatech/enterprise/WhiteLabelCustomizer";
+import AdvancedReporting from "@/components/somatech/enterprise/AdvancedReporting";
+import PerformanceMonitoring from "@/components/somatech/enterprise/PerformanceMonitoring";
+import CustomerSuccessDashboard from "@/components/somatech/enterprise/CustomerSuccessDashboard";
+import SecurityAuditDashboard from "@/components/somatech/enterprise/SecurityAuditDashboard";
+import MultiTenantArchitecture from "@/components/somatech/enterprise/MultiTenantArchitecture";
 
 import { toast } from "@/hooks/use-toast";
 
@@ -113,6 +121,22 @@ const SomaTech = () => {
         return <RealEstateCalculator />;
       case "subscription":
         return <SubscriptionStatus onUpgradeClick={() => setShowPricingDialog(true)} />;
+      case "enterprise-analytics":
+        return <UsageAnalytics onUpgrade={() => setShowPricingDialog(true)} />;
+      case "enterprise-admin":
+        return <AdminPanel />;
+      case "enterprise-whitelabel":
+        return <WhiteLabelCustomizer onUpgrade={() => setShowPricingDialog(true)} />;
+      case "enterprise-reporting":
+        return <AdvancedReporting onUpgrade={() => setShowPricingDialog(true)} />;
+      case "enterprise-performance":
+        return <PerformanceMonitoring />;
+      case "enterprise-success":
+        return <CustomerSuccessDashboard />;
+      case "enterprise-security":
+        return <SecurityAuditDashboard />;
+      case "enterprise-tenant":
+        return <MultiTenantArchitecture onUpgrade={() => setShowPricingDialog(true)} />;
       default:
         return renderPlaceholder(modules.find(m => m.id === activeModule)?.name || "Tool");
     }
