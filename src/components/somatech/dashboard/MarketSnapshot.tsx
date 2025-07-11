@@ -1,53 +1,69 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Activity, TrendingUp, TrendingDown } from "lucide-react";
-
-interface MarketData {
-  sp500: { value: number; change: number };
-  nasdaq: { value: number; change: number };
-  dow: { value: number; change: number };
-  treasury10y: { value: number; change: number };
-  oil: { value: number; change: number };
-  gold: { value: number; change: number };
-}
+import { TrendingUp, TrendingDown, BarChart3 } from "lucide-react";
+import { MarketData } from "./mockData";
 
 interface MarketSnapshotProps {
   marketData: MarketData | null;
 }
 
 const MarketSnapshot = ({ marketData }: MarketSnapshotProps) => {
-  const formatChange = (change: number) => {
-    const isPositive = change >= 0;
+  if (!marketData) {
     return (
-      <span className={`flex items-center ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-        {isPositive ? <TrendingUp className="h-3 w-3 mr-1" /> : <TrendingDown className="h-3 w-3 mr-1" />}
-        {isPositive ? '+' : ''}{change.toFixed(2)}%
-      </span>
+      <Card className="h-full">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <BarChart3 className="h-5 w-5 text-blue-600" />
+            <span>Market Snapshot</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex items-center justify-center h-40">
+          <div className="animate-pulse flex space-x-4">
+            <div className="rounded-full bg-gray-300 h-10 w-10"></div>
+            <div className="flex-1 space-y-2 py-1">
+              <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+              <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     );
-  };
+  }
 
-  const marketItems = marketData ? [
-    { label: "S&P 500", value: marketData.sp500.value, change: marketData.sp500.change },
-    { label: "NASDAQ", value: marketData.nasdaq.value, change: marketData.nasdaq.change },
-    { label: "10Y Treasury", value: `${marketData.treasury10y.value}%`, change: marketData.treasury10y.change, isPercentage: true }
-  ] : [];
+  const indices = [
+    { name: "S&P 500", value: marketData.sp500, change: marketData.change.sp500 },
+    { name: "NASDAQ", value: marketData.nasdaq, change: marketData.change.nasdaq },
+    { name: "DOW", value: marketData.dow, change: marketData.change.dow },
+    { name: "VIX", value: marketData.vix, change: marketData.change.vix }
+  ];
 
   return (
-    <Card className="border border-border">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-medium flex items-center">
-          <Activity className="h-4 w-4 mr-2" />
-          Market Snapshot
+    <Card className="h-full">
+      <CardHeader>
+        <CardTitle className="flex items-center space-x-2">
+          <BarChart3 className="h-5 w-5 text-blue-600" />
+          <span>Market Snapshot</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        {marketItems.map((item) => (
-          <div key={item.label} className="flex justify-between items-center p-2 bg-muted/20 rounded">
-            <span className="text-sm text-muted-foreground">{item.label}</span>
-            <div className="text-right">
-              <div className="text-sm font-medium">
-                {item.isPercentage ? item.value : (item.value as number).toLocaleString()}
-              </div>
-              {formatChange(item.change)}
+        {indices.map((index, i) => (
+          <div key={i} className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{index.name}</p>
+              <p className="text-lg font-bold text-gray-900 dark:text-white">
+                {index.value.toLocaleString()}
+              </p>
+            </div>
+            <div className="flex items-center space-x-1">
+              {index.change > 0 ? (
+                <TrendingUp className="h-4 w-4 text-green-500" />
+              ) : (
+                <TrendingDown className="h-4 w-4 text-red-500" />
+              )}
+              <span className={`text-sm font-medium ${
+                index.change > 0 ? "text-green-600" : "text-red-600"
+              }`}>
+                {index.change > 0 ? "+" : ""}{index.change}%
+              </span>
             </div>
           </div>
         ))}

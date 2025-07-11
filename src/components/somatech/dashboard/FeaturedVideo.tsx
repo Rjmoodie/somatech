@@ -1,54 +1,51 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlayCircle } from "lucide-react";
+import { Play, Clock, Users } from "lucide-react";
 
 const FeaturedVideo = () => {
-  const featuredVideo = {
-    title: "SomaTech Financial Analysis Deep Dive",
-    thumbnail: "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
-    duration: "24:15",
-    description: "Learn advanced valuation techniques and cash flow modeling with real-world examples."
-  };
-
   return (
-    <Card className="border border-border">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center">
-          <PlayCircle className="h-5 w-5 mr-2" />
-          Featured Video
+    <Card className="premium-card">
+      <CardHeader>
+        <CardTitle className="flex items-center space-x-2">
+          <Play className="h-5 w-5 text-blue-600" />
+          <span>Featured Learning</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="group cursor-pointer">
-            <div className="relative overflow-hidden rounded-lg">
-              <img 
-                src={featuredVideo.thumbnail} 
-                alt={featuredVideo.title}
-                className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors">
-                <div className="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-1 rounded font-medium">
-                  FEATURED
-                </div>
-                <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded font-medium">
-                  {featuredVideo.duration}
-                </div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm group-hover:bg-white/30 transition-colors">
-                    <PlayCircle className="h-8 w-8 text-white" />
-                  </div>
-                </div>
+      <CardContent>
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+              Advanced Financial Modeling Techniques
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              Learn how to build sophisticated financial models for business valuation, 
+              DCF analysis, and investment decision making. This comprehensive guide 
+              covers best practices used by top investment professionals.
+            </p>
+            <div className="flex items-center space-x-4 text-sm text-gray-500">
+              <div className="flex items-center space-x-1">
+                <Clock className="h-4 w-4" />
+                <span>45 min</span>
+              </div>
+              <div className="flex items-center space-x-1">
+                <Users className="h-4 w-4" />
+                <span>2,847 views</span>
               </div>
             </div>
-          </div>
-          <div className="flex flex-col justify-center space-y-4">
-            <h3 className="text-xl font-bold text-foreground">{featuredVideo.title}</h3>
-            <p className="text-muted-foreground">{featuredVideo.description}</p>
-            <Button className="w-fit bg-red-600 hover:bg-red-700">
-              <PlayCircle className="h-4 w-4 mr-2" />
+            <Button className="btn-apple">
+              <Play className="mr-2 h-4 w-4" />
               Watch Now
             </Button>
+          </div>
+          <div className="relative">
+            <div className="aspect-video bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-lg flex items-center justify-center">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-white/80 dark:bg-gray-800/80 rounded-full flex items-center justify-center mb-3 mx-auto">
+                  <Play className="h-8 w-8 text-blue-600 ml-1" />
+                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Video Preview</p>
+              </div>
+            </div>
           </div>
         </div>
       </CardContent>

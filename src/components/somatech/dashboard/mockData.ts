@@ -1,50 +1,58 @@
-// Mock data for dashboard components
 export interface MarketData {
-  sp500: { value: number; change: number };
-  nasdaq: { value: number; change: number };
-  dow: { value: number; change: number };
-  treasury10y: { value: number; change: number };
-  oil: { value: number; change: number };
-  gold: { value: number; change: number };
+  sp500: number;
+  nasdaq: number;
+  dow: number;
+  vix: number;
+  change: {
+    sp500: number;
+    nasdaq: number;
+    dow: number;
+    vix: number;
+  };
 }
 
 export interface NewsItem {
+  id: string;
   title: string;
   summary: string;
-  url: string;
-  time_published: string;
+  timestamp: string;
   source: string;
+  url?: string;
 }
 
 export const mockMarketData: MarketData = {
-  sp500: { value: 4563.45, change: 1.2 },
-  nasdaq: { value: 14234.56, change: 0.8 },
-  dow: { value: 35234.78, change: -0.3 },
-  treasury10y: { value: 4.25, change: 0.05 },
-  oil: { value: 78.45, change: 2.1 },
-  gold: { value: 1985.34, change: -0.5 }
+  sp500: 4156.82,
+  nasdaq: 12845.39,
+  dow: 33596.61,
+  vix: 18.45,
+  change: {
+    sp500: 0.75,
+    nasdaq: 1.23,
+    dow: 0.45,
+    vix: -2.1
+  }
 };
 
 export const mockNews: NewsItem[] = [
   {
-    title: "Federal Reserve Holds Interest Rates Steady",
-    summary: "The Fed maintains current rates while signaling potential future adjustments based on inflation data.",
-    url: "#",
-    time_published: "2025-07-03T08:00:00Z",
+    id: "1",
+    title: "Federal Reserve Signals Potential Rate Cut",
+    summary: "Markets rally as Fed hints at possible monetary policy adjustments in response to economic indicators.",
+    timestamp: "2 hours ago",
     source: "Financial Times"
   },
   {
-    title: "Small Business Confidence Index Reaches Highest Level This Year",
-    summary: "NFIB report shows increased optimism among small business owners regarding economic outlook.",
-    url: "#",
-    time_published: "2025-07-03T07:30:00Z",
-    source: "Reuters"
+    id: "2", 
+    title: "Tech Sector Shows Strong Q4 Performance",
+    summary: "Major technology companies report better-than-expected earnings, driving sector gains.",
+    timestamp: "4 hours ago",
+    source: "Bloomberg"
   },
   {
-    title: "Tech Startup Funding Shows Signs of Recovery",
-    summary: "VC investment in early-stage companies increases 15% quarter-over-quarter.",
-    url: "#",
-    time_published: "2025-07-03T06:45:00Z",
-    source: "Bloomberg"
+    id: "3",
+    title: "Oil Prices Stabilize After Weekly Volatility", 
+    summary: "Crude oil futures find support amid geopolitical tensions and supply concerns.",
+    timestamp: "6 hours ago",
+    source: "Reuters"
   }
 ];

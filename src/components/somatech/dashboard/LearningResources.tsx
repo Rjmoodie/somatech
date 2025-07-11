@@ -1,44 +1,66 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { BookOpen, ExternalLink } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { BookOpen, ExternalLink, Clock, Star } from "lucide-react";
 
 const LearningResources = () => {
-  const contentResources = [
+  const resources = [
     {
-      title: "The Complete Guide to Business Valuation",
-      type: "Guide",
-      description: "Learn the fundamentals of valuing any business with our comprehensive guide."
+      title: "Financial Statement Analysis",
+      description: "Master the art of reading and analyzing financial statements",
+      duration: "30 min",
+      rating: 4.8,
+      category: "Fundamentals"
     },
     {
-      title: "Financial Modeling Templates",
-      type: "Templates",
-      description: "Ready-to-use Excel templates for financial projections and analysis."
+      title: "DCF Modeling Best Practices", 
+      description: "Advanced techniques for discounted cash flow valuation",
+      duration: "45 min",
+      rating: 4.9,
+      category: "Valuation"
     },
     {
-      title: "Investment Due Diligence Checklist",
-      type: "Checklist",
-      description: "Essential items to review before making any investment decision."
+      title: "Portfolio Risk Management",
+      description: "Strategies for managing portfolio risk and diversification",
+      duration: "25 min", 
+      rating: 4.7,
+      category: "Risk Management"
     }
   ];
 
   return (
-    <Card className="border border-border">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center">
-          <BookOpen className="h-5 w-5 mr-2" />
-          Learning Resources
+    <Card className="premium-card">
+      <CardHeader>
+        <CardTitle className="flex items-center space-x-2">
+          <BookOpen className="h-5 w-5 text-blue-600" />
+          <span>Learning Resources</span>
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {contentResources.map((resource, index) => (
-            <div key={index} className="p-4 bg-muted/20 rounded-lg hover:bg-muted/30 transition-colors cursor-pointer border border-border/30">
-              <div className="flex items-start justify-between mb-2">
-                <Badge variant="outline">{resource.type}</Badge>
-                <ExternalLink className="h-4 w-4 text-muted-foreground" />
+        <div className="grid md:grid-cols-3 gap-4">
+          {resources.map((resource, index) => (
+            <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow">
+              <div className="space-y-3">
+                <div className="flex items-start justify-between">
+                  <span className="text-xs font-medium text-blue-600 bg-blue-100 dark:bg-blue-900/30 px-2 py-1 rounded">
+                    {resource.category}
+                  </span>
+                  <div className="flex items-center space-x-1">
+                    <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                    <span className="text-xs text-gray-600">{resource.rating}</span>
+                  </div>
+                </div>
+                <h4 className="font-semibold text-gray-900 dark:text-white">{resource.title}</h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{resource.description}</p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-1 text-xs text-gray-500">
+                    <Clock className="h-3 w-3" />
+                    <span>{resource.duration}</span>
+                  </div>
+                  <Button variant="ghost" size="sm">
+                    <ExternalLink className="h-3 w-3" />
+                  </Button>
+                </div>
               </div>
-              <h4 className="font-medium mb-2">{resource.title}</h4>
-              <p className="text-sm text-muted-foreground">{resource.description}</p>
             </div>
           ))}
         </div>
