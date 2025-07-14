@@ -3,9 +3,10 @@ import { Separator } from "@/components/ui/separator";
 
 interface FooterProps {
   onPrivacyClick: () => void;
+  onTermsClick: () => void;
 }
 
-const Footer = ({ onPrivacyClick }: FooterProps) => {
+const Footer = ({ onPrivacyClick, onTermsClick }: FooterProps) => {
   return (
     <footer className="mt-8 pt-6">
       <Separator className="mb-6" />
@@ -23,12 +24,17 @@ const Footer = ({ onPrivacyClick }: FooterProps) => {
             Privacy Policy
           </button>
           <a 
-            href="mailto:support@somatech.com" 
+            href="mailto:support@somatech.pro" 
             className="hover:text-foreground transition-colors"
           >
             Contact
           </a>
-          <span>Terms of Service</span>
+          <button 
+            onClick={onTermsClick}
+            className="hover:text-foreground transition-colors"
+          >
+            Terms of Service
+          </button>
         </div>
       </div>
     </footer>

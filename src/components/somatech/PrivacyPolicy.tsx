@@ -14,29 +14,24 @@ const PrivacyPolicy = () => {
               <Shield className="h-8 w-8 text-white" />
             </div>
           </div>
-          <CardTitle className="text-3xl font-bold text-gray-900 dark:text-white">
+          <CardTitle className="text-3xl font-bold">
             Privacy Policy
           </CardTitle>
           <p className="text-muted-foreground mt-2">
-            Last updated: {new Date().toLocaleDateString()}
+            Effective Date: July 1, 2025<br />
+            Last Updated: July 14, 2025
           </p>
         </CardHeader>
       </Card>
 
       {/* Introduction */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5" />
-            Introduction
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="pt-6">
           <p className="text-muted-foreground leading-relaxed">
-            SomaTech ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our financial intelligence platform and related services.
+            At SomaTech ("we," "us," or "our"), we are committed to protecting your privacy. This Privacy Policy describes how we collect, use, disclose, and safeguard your personal information when you use our website (<a href="https://www.somatech.pro" className="text-blue-600 hover:text-blue-800">https://www.somatech.pro</a>), apps, and services (collectively, the "Services").
           </p>
-          <p className="text-muted-foreground leading-relaxed">
-            By using our services, you agree to the collection and use of information in accordance with this policy.
+          <p className="text-muted-foreground leading-relaxed mt-4">
+            By accessing or using our Services, you agree to this Privacy Policy.
           </p>
         </CardContent>
       </Card>
@@ -46,40 +41,47 @@ const PrivacyPolicy = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Eye className="h-5 w-5" />
-            Information We Collect
+            1. Information We Collect
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
-            <h3 className="font-semibold mb-2">Personal Information</h3>
+            <h3 className="font-semibold mb-2">a. Information You Provide</h3>
+            <p className="text-muted-foreground mb-3">We collect personal information when you:</p>
             <ul className="list-disc pl-6 space-y-1 text-muted-foreground">
-              <li>Name and email address when you create an account</li>
-              <li>Profile information you choose to provide</li>
-              <li>Payment information processed securely through Stripe</li>
-              <li>Communication preferences and settings</li>
+              <li>Create an account</li>
+              <li>Fill out forms (e.g., valuation tools, funding campaigns)</li>
+              <li>Make purchases or subscribe to services</li>
+              <li>Contact our support team</li>
+              <li>Post content or share feedback</li>
+            </ul>
+            <p className="text-muted-foreground mt-3 mb-2">This may include:</p>
+            <ul className="list-disc pl-6 space-y-1 text-muted-foreground">
+              <li>Name</li>
+              <li>Email address</li>
+              <li>Phone number</li>
+              <li>Business name and details</li>
+              <li>Financial data (entered for calculators or valuation tools)</li>
+              <li>Uploaded documents</li>
             </ul>
           </div>
           
           <div>
-            <h3 className="font-semibold mb-2">Financial Data</h3>
+            <h3 className="font-semibold mb-2">b. Automatically Collected Data</h3>
+            <p className="text-muted-foreground mb-3">When you use our Services, we may collect:</p>
             <ul className="list-disc pl-6 space-y-1 text-muted-foreground">
-              <li>Investment portfolios and watchlist data</li>
-              <li>Financial calculations and projections you create</li>
-              <li>Business valuation models and cash flow simulations</li>
-              <li>Real estate investment calculations</li>
-              <li>Retirement planning data</li>
+              <li>Device type and browser</li>
+              <li>IP address and location</li>
+              <li>Referring URLs and site activity</li>
+              <li>Cookies and analytics identifiers</li>
             </ul>
           </div>
 
           <div>
-            <h3 className="font-semibold mb-2">Technical Information</h3>
-            <ul className="list-disc pl-6 space-y-1 text-muted-foreground">
-              <li>Device information and browser type</li>
-              <li>IP address and location data</li>
-              <li>Usage patterns and feature interactions</li>
-              <li>Performance metrics and error logs</li>
-              <li>Cookies and similar tracking technologies</li>
-            </ul>
+            <h3 className="font-semibold mb-2">c. Third-Party Data</h3>
+            <p className="text-muted-foreground">
+              We may receive data from APIs or services (e.g., financial data providers, Google Maps, Stripe) to enhance your experience.
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -87,79 +89,33 @@ const PrivacyPolicy = () => {
       {/* How We Use Information */}
       <Card>
         <CardHeader>
-          <CardTitle>How We Use Your Information</CardTitle>
+          <CardTitle>2. How We Use Your Information</CardTitle>
         </CardHeader>
         <CardContent>
+          <p className="text-muted-foreground mb-4">We use your information to:</p>
           <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
-            <li>Provide and maintain our financial intelligence services</li>
-            <li>Process transactions and manage subscriptions</li>
-            <li>Personalize your experience and improve our platform</li>
-            <li>Send important updates and service notifications</li>
-            <li>Provide customer support and respond to inquiries</li>
-            <li>Detect fraud and ensure platform security</li>
-            <li>Comply with legal obligations and regulatory requirements</li>
-            <li>Conduct analytics to improve our services</li>
+            <li>Provide, personalize, and improve the Services</li>
+            <li>Enable financial calculations, dashboards, and tools</li>
+            <li>Process payments and subscriptions</li>
+            <li>Communicate with you (updates, support, promotions)</li>
+            <li>Ensure platform security and compliance</li>
+            <li>Analyze trends and performance (using anonymized data)</li>
           </ul>
+          <p className="text-muted-foreground mt-4 font-medium">We do not sell your personal information.</p>
         </CardContent>
       </Card>
 
       {/* Information Sharing */}
       <Card>
         <CardHeader>
-          <CardTitle>Information Sharing and Disclosure</CardTitle>
+          <CardTitle>3. Sharing of Information</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-muted-foreground">
-            We do not sell, trade, or rent your personal information to third parties. We may share your information only in the following circumstances:
-          </p>
-          
-          <div className="space-y-4">
-            <div>
-              <h4 className="font-semibold mb-2">Service Providers</h4>
-              <ul className="list-disc pl-6 space-y-1 text-muted-foreground">
-                <li><strong>Stripe:</strong> Payment processing and subscription management</li>
-                <li><strong>Supabase:</strong> Database and authentication services</li>
-                <li><strong>Analytics providers:</strong> Usage analytics and performance monitoring</li>
-                <li><strong>Cloud infrastructure:</strong> Hosting and data storage</li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-2">Legal Requirements</h4>
-              <p className="text-muted-foreground">
-                We may disclose your information if required by law, court order, or regulatory authority, or to protect our rights, property, or safety.
-              </p>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-2">Business Transfers</h4>
-              <p className="text-muted-foreground">
-                In the event of a merger, acquisition, or sale of assets, your information may be transferred as part of the transaction.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Data Security */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Lock className="h-5 w-5" />
-            Data Security
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-muted-foreground">
-            We implement industry-standard security measures to protect your information:
-          </p>
-          <ul className="list-disc pl-6 space-y-1 text-muted-foreground">
-            <li>End-to-end encryption for data transmission</li>
-            <li>Secure cloud infrastructure with regular backups</li>
-            <li>Multi-factor authentication options</li>
-            <li>Regular security audits and vulnerability assessments</li>
-            <li>PCI DSS compliance for payment processing</li>
-            <li>Role-based access controls for internal systems</li>
+          <p className="text-muted-foreground">We may share your data with:</p>
+          <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
+            <li>Trusted third-party service providers (hosting, payments, analytics, email tools)</li>
+            <li>Legal authorities, when required by law</li>
+            <li>Other users, only if you choose to make your funding campaign or profile public</li>
           </ul>
         </CardContent>
       </Card>
@@ -167,28 +123,44 @@ const PrivacyPolicy = () => {
       {/* Cookies and Tracking */}
       <Card>
         <CardHeader>
-          <CardTitle>Cookies and Tracking Technologies</CardTitle>
+          <CardTitle>4. Cookies & Tracking Technologies</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          <p className="text-muted-foreground">We use cookies and similar technologies to:</p>
+          <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
+            <li>Keep you logged in</li>
+            <li>Understand user behavior</li>
+            <li>Measure traffic and improve usability</li>
+          </ul>
           <p className="text-muted-foreground">
-            We use cookies and similar technologies to enhance your experience:
+            You may disable cookies in your browser settings, but some features may not work properly.
           </p>
-          <div className="space-y-3">
-            <div>
-              <h4 className="font-semibold">Essential Cookies</h4>
-              <p className="text-muted-foreground text-sm">Required for basic platform functionality and security</p>
-            </div>
-            <div>
-              <h4 className="font-semibold">Analytics Cookies</h4>
-              <p className="text-muted-foreground text-sm">Help us understand how you use our platform to improve services</p>
-            </div>
-            <div>
-              <h4 className="font-semibold">Preference Cookies</h4>
-              <p className="text-muted-foreground text-sm">Remember your settings and personalize your experience</p>
-            </div>
-          </div>
-          <p className="text-muted-foreground text-sm">
-            You can control cookies through your browser settings, though this may affect platform functionality.
+        </CardContent>
+      </Card>
+
+      {/* Data Retention */}
+      <Card>
+        <CardHeader>
+          <CardTitle>5. Data Retention</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground">
+            We retain your personal data as long as your account is active or as needed to provide Services. You can request account deletion by contacting <a href="mailto:support@somatech.pro" className="text-blue-600 hover:text-blue-800">support@somatech.pro</a>.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Security */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Lock className="h-5 w-5" />
+            6. Security
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground">
+            We implement industry-standard security protocols (e.g., HTTPS, encryption, secure cloud storage). However, no method is 100% secure. Use caution and safeguard your login credentials.
           </p>
         </CardContent>
       </Card>
@@ -196,88 +168,20 @@ const PrivacyPolicy = () => {
       {/* Your Rights */}
       <Card>
         <CardHeader>
-          <CardTitle>Your Privacy Rights</CardTitle>
+          <CardTitle>7. Your Rights</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground mb-4">
-            Depending on your location, you may have the following rights regarding your personal information:
+            Depending on your location, you may have the right to:
           </p>
-          <ul className="list-disc pl-6 space-y-1 text-muted-foreground">
-            <li><strong>Access:</strong> Request a copy of your personal data</li>
-            <li><strong>Rectification:</strong> Correct inaccurate or incomplete information</li>
-            <li><strong>Erasure:</strong> Request deletion of your personal data</li>
-            <li><strong>Portability:</strong> Receive your data in a structured, machine-readable format</li>
-            <li><strong>Restriction:</strong> Limit how we process your information</li>
-            <li><strong>Objection:</strong> Object to certain types of processing</li>
-            <li><strong>Withdraw consent:</strong> Revoke previously given consent</li>
+          <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
+            <li>Access the data we hold about you</li>
+            <li>Request correction or deletion</li>
+            <li>Object to or restrict certain uses</li>
+            <li>Withdraw consent</li>
           </ul>
-        </CardContent>
-      </Card>
-
-      {/* Data Retention */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Data Retention</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            We retain your information for as long as necessary to provide our services and comply with legal obligations:
-          </p>
-          <ul className="list-disc pl-6 mt-4 space-y-1 text-muted-foreground">
-            <li>Account information: Until account deletion</li>
-            <li>Financial calculations: Until you delete them or close your account</li>
-            <li>Transaction records: 7 years for tax and regulatory compliance</li>
-            <li>Usage logs: 2 years for security and analytics purposes</li>
-          </ul>
-        </CardContent>
-      </Card>
-
-      {/* Third-Party Services */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Third-Party Services</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-muted-foreground">
-            Our platform integrates with third-party services that have their own privacy policies:
-          </p>
-          <div className="space-y-2">
-            <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
-              <span className="font-medium">Stripe</span>
-              <a 
-                href="https://stripe.com/privacy" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-800 text-sm"
-              >
-                View Privacy Policy
-              </a>
-            </div>
-            <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
-              <span className="font-medium">Supabase</span>
-              <a 
-                href="https://supabase.com/privacy" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-800 text-sm"
-              >
-                View Privacy Policy
-              </a>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* International Transfers */}
-      <Card>
-        <CardHeader>
-          <CardTitle>International Data Transfers</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            Your information may be transferred to and processed in countries other than your country of residence. 
-            We ensure appropriate safeguards are in place to protect your data in accordance with applicable data protection laws, 
-            including the GDPR for EU residents and CCPA for California residents.
+          <p className="text-muted-foreground mt-4">
+            Contact us at <a href="mailto:privacy@somatech.pro" className="text-blue-600 hover:text-blue-800">privacy@somatech.pro</a> for requests.
           </p>
         </CardContent>
       </Card>
@@ -285,13 +189,23 @@ const PrivacyPolicy = () => {
       {/* Children's Privacy */}
       <Card>
         <CardHeader>
-          <CardTitle>Children's Privacy</CardTitle>
+          <CardTitle>8. Children's Privacy</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground">
-            Our services are not intended for children under 13 years of age. We do not knowingly collect personal 
-            information from children under 13. If you are a parent or guardian and believe your child has provided 
-            us with personal information, please contact us to have it removed.
+            SomaTech is not intended for users under the age of 18. We do not knowingly collect data from children.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Third-Party Links */}
+      <Card>
+        <CardHeader>
+          <CardTitle>9. Third-Party Links</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground">
+            Our platform may link to third-party websites. We are not responsible for their privacy practices or content.
           </p>
         </CardContent>
       </Card>
@@ -299,14 +213,11 @@ const PrivacyPolicy = () => {
       {/* Updates to Policy */}
       <Card>
         <CardHeader>
-          <CardTitle>Changes to This Privacy Policy</CardTitle>
+          <CardTitle>10. Policy Updates</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground">
-            We may update this Privacy Policy from time to time. We will notify you of any changes by posting the 
-            new Privacy Policy on this page and updating the "Last updated" date. For material changes, we may also 
-            send you an email notification. Your continued use of our services after any modifications constitutes 
-            acceptance of the updated Privacy Policy.
+            We may revise this Privacy Policy from time to time. If significant changes are made, we will notify you via email or prominent site notice.
           </p>
         </CardContent>
       </Card>
@@ -318,12 +229,11 @@ const PrivacyPolicy = () => {
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground mb-4">
-            If you have any questions about this Privacy Policy or our data practices, please contact us:
+            If you have any questions about this Privacy Policy, please contact us:
           </p>
           <div className="space-y-2 text-muted-foreground">
-            <p><strong>Email:</strong> privacy@somatech.com</p>
-            <p><strong>Address:</strong> SomaTech Inc., [Your Address]</p>
-            <p><strong>Data Protection Officer:</strong> dpo@somatech.com</p>
+            <p><strong>Email:</strong> <a href="mailto:privacy@somatech.pro" className="text-blue-600 hover:text-blue-800">privacy@somatech.pro</a></p>
+            <p><strong>Website:</strong> <a href="https://somatech.pro" className="text-blue-600 hover:text-blue-800">somatech.pro</a></p>
           </div>
         </CardContent>
       </Card>

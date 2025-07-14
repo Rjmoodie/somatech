@@ -38,6 +38,7 @@ const CampaignProjection = lazy(() => import("@/components/somatech/CampaignProj
 const DonationSuccess = lazy(() => import("@/components/somatech/funding/DonationSuccess"));
 const AuthDialog = lazy(() => import("@/components/somatech/AuthDialog"));
 const PrivacyPolicy = lazy(() => import("@/components/somatech/PrivacyPolicy"));
+const TermsOfService = lazy(() => import("@/components/somatech/TermsOfService"));
 const AccountSettings = lazy(() => import("@/components/somatech/AccountSettings"));
 const UserDashboard = lazy(() => import("@/components/somatech/UserDashboard"));
 const OnboardingModal = lazy(() => import("@/components/somatech/OnboardingModal"));
@@ -284,6 +285,12 @@ const SomaTech = () => {
               <PrivacyPolicy />
             </ModuleWrapper>
           );
+        case "terms-of-service":
+          return (
+            <ModuleWrapper>
+              <TermsOfService />
+            </ModuleWrapper>
+          );
         case "account-settings":
           return (
             <ModuleWrapper>
@@ -432,7 +439,10 @@ const SomaTech = () => {
             <div className="premium-card p-3 sm:p-4 md:p-8 rounded-2xl animate-fade-in min-h-[calc(100vh-200px)] w-full overflow-x-auto">
               <div className="w-full min-w-0">
                 {renderContent()}
-                <Footer onPrivacyClick={() => handleModuleChange('privacy-policy')} />
+                <Footer 
+                  onPrivacyClick={() => handleModuleChange('privacy-policy')} 
+                  onTermsClick={() => handleModuleChange('terms-of-service')} 
+                />
               </div>
             </div>
           </main>
