@@ -224,7 +224,10 @@ export interface RealEstateResult {
 export interface Module {
   id: string;
   name: string;
-  icon: any;
+  description: string;
+  icon: string;
+  category: string;
+  featured: boolean;
 }
 
 // Business Marketplace Types

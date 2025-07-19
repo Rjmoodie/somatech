@@ -47,18 +47,34 @@ const RetirementInputForm = ({
   setOtherIncome,
   onCalculate
 }: RetirementInputFormProps) => {
+  // Simplified validation - only check if basic fields are filled
+  const isFormValid = () => {
+    return currentAge.trim() !== "" && 
+      retirementAge.trim() !== "" && 
+      lifeExpectancy.trim() !== "" && 
+      currentSavings.trim() !== "" && 
+      monthlyContribution.trim() !== "" && 
+      retirementSpending.trim() !== "";
+  };
+
+  const handleCalculate = () => {
+    if (isFormValid()) {
+      onCalculate();
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Retirement Planning</CardTitle>
-        <CardDescription>Plan your financial future</CardDescription>
+        <CardDescription>Plan your financial future with comprehensive analysis</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <Label>Current Age</Label>
           <Input
             type="number"
-            placeholder="30"
+            placeholder="Enter your current age"
             value={currentAge}
             onChange={(e) => setCurrentAge(e.target.value)}
           />
@@ -69,7 +85,7 @@ const RetirementInputForm = ({
             <Label>Target Retirement Age</Label>
             <Input
               type="number"
-              placeholder="65"
+              placeholder="Enter retirement age"
               value={retirementAge}
               onChange={(e) => setRetirementAge(e.target.value)}
             />
@@ -79,7 +95,7 @@ const RetirementInputForm = ({
             <Label>Life Expectancy</Label>
             <Input
               type="number"
-              placeholder="90"
+              placeholder="Enter life expectancy"
               value={lifeExpectancy}
               onChange={(e) => setLifeExpectancy(e.target.value)}
             />
@@ -90,7 +106,7 @@ const RetirementInputForm = ({
           <Label>Current Savings ($)</Label>
           <Input
             type="number"
-            placeholder="50000"
+            placeholder="Enter current savings"
             value={currentSavings}
             onChange={(e) => setCurrentSavings(e.target.value)}
           />
@@ -100,7 +116,7 @@ const RetirementInputForm = ({
           <Label>Annual Contributions ($)</Label>
           <Input
             type="number"
-            placeholder="12000"
+            placeholder="Enter annual contributions"
             value={monthlyContribution}
             onChange={(e) => setMonthlyContribution(e.target.value)}
           />
@@ -113,7 +129,7 @@ const RetirementInputForm = ({
           <Label>Expected Retirement Spending (Annual $)</Label>
           <Input
             type="number"
-            placeholder="60000"
+            placeholder="Enter retirement spending"
             value={retirementSpending}
             onChange={(e) => setRetirementSpending(e.target.value)}
           />
@@ -123,7 +139,7 @@ const RetirementInputForm = ({
           <Label>Other Income Sources (Annual $)</Label>
           <Input
             type="number"
-            placeholder="20000"
+            placeholder="Enter other income sources"
             value={otherIncome}
             onChange={(e) => setOtherIncome(e.target.value)}
           />
@@ -134,8 +150,8 @@ const RetirementInputForm = ({
           <Slider
             value={expectedReturn}
             onValueChange={setExpectedReturn}
-            max={15}
-            min={3}
+            max={50}
+            min={0}
             step={0.5}
             className="w-full"
           />
@@ -146,15 +162,15 @@ const RetirementInputForm = ({
           <Slider
             value={inflationRate}
             onValueChange={setInflationRate}
-            max={5}
-            min={1}
+            max={20}
+            min={0}
             step={0.25}
             className="w-full"
           />
         </div>
         
-        <Button onClick={onCalculate} className="w-full">
-          Calculate Retirement
+        <Button onClick={handleCalculate} className="w-full" disabled={!isFormValid()}>
+          Calculate Retirement Plan
         </Button>
       </CardContent>
     </Card>

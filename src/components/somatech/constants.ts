@@ -16,30 +16,264 @@ import {
   Settings,
   Palette,
   Shield,
-  Building
+  Building,
+  Eye,
+  Calendar,
+  Search,
+  Store,
+  Database,
+  RefreshCw,
+  CreditCard,
+  Bell,
+  MessageSquare,
+  User,
+  Building2,
+  BarChart,
+  AlertTriangle
 } from "lucide-react";
 import { Module } from "./types";
 
 export const modules: Module[] = [
-  { id: "dashboard", name: "Dashboard", icon: LayoutDashboard },
-  { id: "stock-analysis", name: "Stock Analysis", icon: TrendingUp },
-  { id: "watchlist", name: "Watchlist", icon: Star },
-  { id: "marketplace", name: "Business Marketplace", icon: ShoppingCart },
-  { id: "funding-campaigns", name: "Funding Campaigns", icon: Heart },
-  { id: "business-valuation", name: "Business Valuation", icon: Calculator },
-  { id: "cash-flow", name: "Cash Flow Simulator", icon: Activity },
-  { id: "retirement-planning", name: "Retirement Planning", icon: FileText },
-  { id: "real-estate", name: "Real Estate Calculator", icon: DollarSign },
-  { id: "subscription", name: "Subscription", icon: Crown },
-  // Enterprise Features
-  { id: "enterprise-analytics", name: "Usage Analytics", icon: BarChart3 },
-  { id: "enterprise-admin", name: "Admin Panel", icon: Settings },
-  { id: "enterprise-whitelabel", name: "White Label", icon: Palette },
-  { id: "enterprise-reporting", name: "Advanced Reports", icon: FileText },
-  { id: "enterprise-performance", name: "Performance", icon: Activity },
-  { id: "enterprise-success", name: "Customer Success", icon: Heart },
-  { id: "enterprise-security", name: "Security & Audit", icon: Shield },
-  { id: "enterprise-tenant", name: "Multi-Tenant", icon: Building }
+  {
+    id: "dashboard",
+    name: "Dashboard",
+    description: "Overview of your financial portfolio and market insights",
+    icon: "LayoutDashboard",
+    category: "overview",
+    featured: true
+  },
+  {
+    id: "stock-analysis",
+    name: "Stock Analysis",
+    description: "Comprehensive stock research and technical analysis",
+    icon: "TrendingUp",
+    category: "investing",
+    featured: true
+  },
+  {
+    id: "watchlist",
+    name: "Watchlist",
+    description: "Track your favorite stocks and market movements",
+    icon: "Eye",
+    category: "investing",
+    featured: false
+  },
+  {
+    id: "business-valuation",
+    name: "Business Valuation",
+    description: "Professional business valuation and analysis tools",
+    icon: "Building2",
+    category: "business",
+    featured: true
+  },
+  {
+    id: "cash-flow",
+    name: "Cash Flow Simulator",
+    description: "Model and analyze business cash flows",
+    icon: "DollarSign",
+    category: "business",
+    featured: false
+  },
+  {
+    id: "retirement-planning",
+    name: "Retirement Planning",
+    description: "Plan your financial future with retirement tools",
+    icon: "Calendar",
+    category: "planning",
+    featured: false
+  },
+  {
+    id: "real-estate",
+    name: "Real Estate Calculator",
+    description: "Real estate investment analysis and calculations",
+    icon: "Home",
+    category: "real-estate",
+    featured: true
+  },
+  {
+    id: "real-estate-deal-sourcing",
+    name: "Deal Sourcing",
+    description: "Access real estate leads from all 50 U.S. states",
+    icon: "Search",
+    category: "real-estate",
+    featured: true
+  },
+  {
+    id: "deal-sourcing-data-manager",
+    name: "Data Manager",
+    description: "Manage data sources and ingestion pipelines",
+    icon: "Database",
+    category: "real-estate",
+    featured: false
+  },
+  {
+    id: "data-ingestion-pipeline",
+    name: "Data Pipeline",
+    description: "Monitor automated data collection and processing",
+    icon: "RefreshCw",
+    category: "real-estate",
+    featured: false
+  },
+  {
+    id: "data-scraping-engine",
+    name: "Scraping Engine",
+    description: "Automated data collection from public sources",
+    icon: "Database",
+    category: "real-estate",
+    featured: false
+  },
+  {
+    id: "tax-delinquent-scraper",
+    name: "Tax Delinquent Scraper",
+    description: "Extract tax delinquent property data",
+    icon: "DollarSign",
+    category: "real-estate",
+    featured: false
+  },
+  {
+    id: "code-violation-scraper",
+    name: "Code Violation Scraper",
+    description: "Extract code violation property data",
+    icon: "AlertTriangle",
+    category: "real-estate",
+    featured: false
+  },
+  {
+    id: "pre-foreclosure-scraper",
+    name: "Pre-Foreclosure Scraper",
+    description: "Extract pre-foreclosure property data",
+    icon: "Building2",
+    category: "real-estate",
+    featured: false
+  },
+  {
+    id: "marketplace",
+    name: "Marketplace",
+    description: "Buy and sell businesses in the marketplace",
+    icon: "Store",
+    category: "business",
+    featured: true
+  },
+  {
+    id: "funding-campaigns",
+    name: "Funding Campaigns",
+    description: "Create and manage funding campaigns",
+    icon: "Target",
+    category: "business",
+    featured: false
+  },
+  {
+    id: "campaign-projection",
+    name: "Campaign Projection",
+    description: "Project and analyze funding campaign performance",
+    icon: "BarChart3",
+    category: "business",
+    featured: false
+  },
+  {
+    id: "subscription",
+    name: "Subscription",
+    description: "Manage your subscription and billing",
+    icon: "CreditCard",
+    category: "account",
+    featured: false
+  },
+  {
+    id: "enterprise-analytics",
+    name: "Usage Analytics",
+    description: "Advanced analytics and usage insights",
+    icon: "BarChart",
+    category: "enterprise",
+    featured: false
+  },
+  {
+    id: "enterprise-admin",
+    name: "Admin Panel",
+    description: "Administrative tools and user management",
+    icon: "Settings",
+    category: "enterprise",
+    featured: false
+  },
+  {
+    id: "enterprise-whitelabel",
+    name: "White Label",
+    description: "Customize branding and white label options",
+    icon: "Palette",
+    category: "enterprise",
+    featured: false
+  },
+  {
+    id: "enterprise-reporting",
+    name: "Advanced Reporting",
+    description: "Comprehensive reporting and analytics",
+    icon: "FileText",
+    category: "enterprise",
+    featured: false
+  },
+  {
+    id: "enterprise-performance",
+    name: "Performance Monitoring",
+    description: "Monitor system performance and metrics",
+    icon: "Activity",
+    category: "enterprise",
+    featured: false
+  },
+  {
+    id: "enterprise-success",
+    name: "Customer Success",
+    description: "Customer success and support tools",
+    icon: "Users",
+    category: "enterprise",
+    featured: false
+  },
+  {
+    id: "enterprise-security",
+    name: "Security Audit",
+    description: "Security monitoring and audit tools",
+    icon: "Shield",
+    category: "enterprise",
+    featured: false
+  },
+  {
+    id: "enterprise-tenant",
+    name: "Multi-Tenant",
+    description: "Multi-tenant architecture management",
+    icon: "Building",
+    category: "enterprise",
+    featured: false
+  },
+  {
+    id: "account-settings",
+    name: "Account Settings",
+    description: "Manage your account and preferences",
+    icon: "User",
+    category: "account",
+    featured: false
+  },
+  {
+    id: "user-dashboard",
+    name: "User Dashboard",
+    description: "Personal user dashboard and analytics",
+    icon: "LayoutDashboard",
+    category: "account",
+    featured: false
+  },
+  {
+    id: "notifications",
+    name: "Notifications",
+    description: "Manage notifications and alerts",
+    icon: "Bell",
+    category: "account",
+    featured: false
+  },
+  {
+    id: "feedback",
+    name: "Feedback Hub",
+    description: "Submit feedback and view responses",
+    icon: "MessageSquare",
+    category: "account",
+    featured: false
+  }
 ];
 
 export const industryMultipliers: Record<string, number> = {

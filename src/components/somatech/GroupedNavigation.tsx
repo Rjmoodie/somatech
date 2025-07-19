@@ -38,8 +38,20 @@ const moduleGroups = {
       'funding-campaigns',
       'business-valuation',
       'cash-flow',
-      'retirement-planning',
-      'real-estate'
+      'retirement-planning'
+    ]
+  },
+  realEstate: {
+    name: 'Real Estate',
+    modules: [
+      'real-estate',
+      'real-estate-deal-sourcing',
+      'deal-sourcing-data-manager',
+      'data-ingestion-pipeline',
+      'data-scraping-engine',
+      'tax-delinquent-scraper',
+      'code-violation-scraper',
+      'pre-foreclosure-scraper'
     ]
   },
   settings: {
@@ -66,6 +78,7 @@ const GroupedNavigation = ({
 }: GroupedNavigationProps) => {
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     financial: true, // Financial tools open by default
+    realEstate: true, // Real estate open by default
     settings: false
   });
 

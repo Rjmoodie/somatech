@@ -32,6 +32,13 @@ const BusinessValuation = lazy(() => import("@/components/somatech/BusinessValua
 const CashFlowSimulator = lazy(() => import("@/components/somatech/CashFlowSimulator"));
 const RetirementPlanning = lazy(() => import("@/components/somatech/RetirementPlanning"));
 const RealEstateCalculatorContainer = lazy(() => import("@/components/somatech/RealEstateCalculatorContainer"));
+const RealEstateDealSourcing = lazy(() => import("@/components/somatech/real-estate/RealEstateDealSourcing"));
+const DealSourcingDataManager = lazy(() => import("@/components/somatech/real-estate/DealSourcingDataManager"));
+const DataIngestionPipeline = lazy(() => import("@/components/somatech/real-estate/DataIngestionPipeline"));
+const DataScrapingEngine = lazy(() => import("@/components/somatech/real-estate/scrapers/DataScrapingEngine"));
+const TaxDelinquentScraper = lazy(() => import("@/components/somatech/real-estate/scrapers/TaxDelinquentScraper"));
+const CodeViolationScraper = lazy(() => import("@/components/somatech/real-estate/scrapers/CodeViolationScraper"));
+const PreForeclosureScraper = lazy(() => import("@/components/somatech/real-estate/scrapers/PreForeclosureScraper"));
 const Marketplace = lazy(() => import("@/components/somatech/Marketplace"));
 const FundingCampaigns = lazy(() => import("@/components/somatech/FundingCampaigns"));
 const CampaignProjection = lazy(() => import("@/components/somatech/CampaignProjection"));
@@ -133,6 +140,11 @@ const SomaTech = () => {
       trackPerformance('moduleChange', () => {
         setActiveModule(module);
         setSearchParams({ module });
+        
+        // Ensure proper scroll behavior
+        setTimeout(() => {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 100);
       });
     } catch (error) {
       reportError(error as Error, 'module-change');
@@ -223,6 +235,48 @@ const SomaTech = () => {
           return (
             <ModuleWrapper>
               <RealEstateCalculatorContainer />
+            </ModuleWrapper>
+          );
+        case "real-estate-deal-sourcing":
+          return (
+            <ModuleWrapper>
+              <RealEstateDealSourcing />
+            </ModuleWrapper>
+          );
+        case "deal-sourcing-data-manager":
+          return (
+            <ModuleWrapper>
+              <DealSourcingDataManager />
+            </ModuleWrapper>
+          );
+        case "data-ingestion-pipeline":
+          return (
+            <ModuleWrapper>
+              <DataIngestionPipeline />
+            </ModuleWrapper>
+          );
+        case "data-scraping-engine":
+          return (
+            <ModuleWrapper>
+              <DataScrapingEngine />
+            </ModuleWrapper>
+          );
+        case "tax-delinquent-scraper":
+          return (
+            <ModuleWrapper>
+              <TaxDelinquentScraper />
+            </ModuleWrapper>
+          );
+        case "code-violation-scraper":
+          return (
+            <ModuleWrapper>
+              <CodeViolationScraper />
+            </ModuleWrapper>
+          );
+        case "pre-foreclosure-scraper":
+          return (
+            <ModuleWrapper>
+              <PreForeclosureScraper />
             </ModuleWrapper>
           );
         case "subscription":
@@ -451,6 +505,14 @@ const SomaTech = () => {
         {/* Floating Action Menu - Desktop only */}
         <div className="hidden lg:block">
           <FloatingActionMenu onModuleSelect={handleModuleChange} />
+        </div>
+
+        {/* Bottom Navigation - Mobile only */}
+        <div className="lg:hidden">
+          <BottomNavigation 
+            activeModule={activeModule} 
+            onModuleChange={handleModuleChange} 
+          />
         </div>
 
         {/* Dialogs */}

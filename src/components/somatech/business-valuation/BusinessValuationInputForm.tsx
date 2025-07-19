@@ -26,7 +26,27 @@ const BusinessValuationInputForm = ({
   onCalculate,
   isCalculating
 }: BusinessValuationInputFormProps) => {
-  const isFormValid = inputs.industry && inputs.businessType && inputs.currentRevenue > 0;
+  // Simplified validation - only check if required fields are filled
+  const isFormValid = inputs.industry && 
+    inputs.businessType && 
+    inputs.currentRevenue !== undefined && 
+    inputs.currentRevenue !== null;
+
+  // Ensure at least one valuation method is selected
+  const hasValidMethods = Object.values(methods).some(method => method);
+
+  const handleInputChange = (field: keyof BusinessValuationInputs, value: any) => {
+    // Allow any input value - no validation
+    onInputChange(field, value);
+  };
+
+  const handleMethodChange = (method: keyof ValuationMethods, checked: boolean) => {
+    // Ensure at least one method is always selected
+    if (!checked && Object.values(methods).filter(m => m).length <= 1) {
+      return;
+    }
+    onMethodChange(method, checked);
+  };
 
   return (
     <Card>
@@ -41,7 +61,7 @@ const BusinessValuationInputForm = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="industry">Industry</Label>
-              <Select value={inputs.industry} onValueChange={(value) => onInputChange('industry', value)}>
+              <Select value={inputs.industry} onValueChange={(value) => handleInputChange('industry', value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select industry" />
                 </SelectTrigger>
@@ -57,7 +77,7 @@ const BusinessValuationInputForm = ({
             
             <div className="space-y-2">
               <Label htmlFor="businessType">Business Type</Label>
-              <Select value={inputs.businessType} onValueChange={(value) => onInputChange('businessType', value)}>
+              <Select value={inputs.businessType} onValueChange={(value) => handleInputChange('businessType', value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select business type" />
                 </SelectTrigger>
@@ -86,7 +106,7 @@ const BusinessValuationInputForm = ({
                 type="number"
                 placeholder="1000000"
                 value={inputs.currentRevenue || ''}
-                onChange={(e) => onInputChange('currentRevenue', parseFloat(e.target.value) || 0)}
+                onChange={(e) => handleInputChange('currentRevenue', parseFloat(e.target.value) || 0)}
               />
             </div>
             
@@ -97,7 +117,7 @@ const BusinessValuationInputForm = ({
                 type="number"
                 placeholder="15"
                 value={inputs.revenueGrowth || ''}
-                onChange={(e) => onInputChange('revenueGrowth', parseFloat(e.target.value) || 0)}
+                onChange={(e) => handleInputChange('revenueGrowth', parseFloat(e.target.value) || 0)}
               />
             </div>
             
@@ -108,7 +128,7 @@ const BusinessValuationInputForm = ({
                 type="number"
                 placeholder="60"
                 value={inputs.grossMargin || ''}
-                onChange={(e) => onInputChange('grossMargin', parseFloat(e.target.value) || 0)}
+                onChange={(e) => handleInputChange('grossMargin', parseFloat(e.target.value) || 0)}
               />
             </div>
             
@@ -119,7 +139,7 @@ const BusinessValuationInputForm = ({
                 type="number"
                 placeholder="25"
                 value={inputs.ebitdaMargin || ''}
-                onChange={(e) => onInputChange('ebitdaMargin', parseFloat(e.target.value) || 0)}
+                onChange={(e) => handleInputChange('ebitdaMargin', parseFloat(e.target.value) || 0)}
               />
             </div>
             
@@ -130,7 +150,7 @@ const BusinessValuationInputForm = ({
                 type="number"
                 placeholder="15"
                 value={inputs.netMargin || ''}
-                onChange={(e) => onInputChange('netMargin', parseFloat(e.target.value) || 0)}
+                onChange={(e) => handleInputChange('netMargin', parseFloat(e.target.value) || 0)}
               />
             </div>
             
@@ -141,7 +161,7 @@ const BusinessValuationInputForm = ({
                 type="number"
                 placeholder="5"
                 value={inputs.exitTimeframe || ''}
-                onChange={(e) => onInputChange('exitTimeframe', parseFloat(e.target.value) || 0)}
+                onChange={(e) => handleInputChange('exitTimeframe', parseFloat(e.target.value) || 0)}
               />
             </div>
           </div>
@@ -160,7 +180,7 @@ const BusinessValuationInputForm = ({
                 type="number"
                 placeholder="10"
                 value={inputs.discountRate || ''}
-                onChange={(e) => onInputChange('discountRate', parseFloat(e.target.value) || 0)}
+                onChange={(e) => handleInputChange('discountRate', parseFloat(e.target.value) || 0)}
               />
             </div>
             
@@ -171,7 +191,7 @@ const BusinessValuationInputForm = ({
                 type="number"
                 placeholder="3"
                 value={inputs.terminalGrowthRate || ''}
-                onChange={(e) => onInputChange('terminalGrowthRate', parseFloat(e.target.value) || 0)}
+                onChange={(e) => handleInputChange('terminalGrowthRate', parseFloat(e.target.value) || 0)}
               />
             </div>
           </div>
@@ -187,7 +207,7 @@ const BusinessValuationInputForm = ({
               <Checkbox
                 id="revenueMultiple"
                 checked={methods.revenueMultiple}
-                onCheckedChange={(checked) => onMethodChange('revenueMultiple', !!checked)}
+                onCheckedChange={(checked) => handleMethodChange('revenueMultiple', !!checked)}
               />
               <Label htmlFor="revenueMultiple" className="text-sm">Revenue Multiple</Label>
             </div>
@@ -196,7 +216,7 @@ const BusinessValuationInputForm = ({
               <Checkbox
                 id="ebitdaMultiple"
                 checked={methods.ebitdaMultiple}
-                onCheckedChange={(checked) => onMethodChange('ebitdaMultiple', !!checked)}
+                onCheckedChange={(checked) => handleMethodChange('ebitdaMultiple', !!checked)}
               />
               <Label htmlFor="ebitdaMultiple" className="text-sm">EBITDA Multiple</Label>
             </div>
@@ -205,7 +225,7 @@ const BusinessValuationInputForm = ({
               <Checkbox
                 id="peMultiple"
                 checked={methods.peMultiple}
-                onCheckedChange={(checked) => onMethodChange('peMultiple', !!checked)}
+                onCheckedChange={(checked) => handleMethodChange('peMultiple', !!checked)}
               />
               <Label htmlFor="peMultiple" className="text-sm">P/E Multiple</Label>
             </div>
@@ -214,7 +234,7 @@ const BusinessValuationInputForm = ({
               <Checkbox
                 id="dcf"
                 checked={methods.dcf}
-                onCheckedChange={(checked) => onMethodChange('dcf', !!checked)}
+                onCheckedChange={(checked) => handleMethodChange('dcf', !!checked)}
               />
               <Label htmlFor="dcf" className="text-sm">Discounted Cash Flow</Label>
             </div>
@@ -224,7 +244,7 @@ const BusinessValuationInputForm = ({
         <Button 
           onClick={onCalculate} 
           className="w-full" 
-          disabled={!isFormValid || isCalculating}
+          disabled={!isFormValid || !hasValidMethods || isCalculating}
         >
           {isCalculating ? "Calculating..." : "Generate Valuation Report"}
         </Button>

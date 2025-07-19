@@ -21,6 +21,17 @@ interface CashFlowInputFormProps {
 const CashFlowInputForm = ({ inputs, onInputChange, onCalculate, isCalculating }: CashFlowInputFormProps) => {
   const [activeTab, setActiveTab] = useState("business");
 
+  // Simplified validation - only check if basic fields are filled
+  const isFormValid = inputs.businessName.trim() !== "" && 
+    inputs.industry && 
+    inputs.startingCash !== undefined && 
+    inputs.monthlyRevenue !== undefined;
+
+  const handleInputChange = (field: keyof CashFlowInputs, value: any) => {
+    // Allow any input value - no validation
+    onInputChange(field, value);
+  };
+
   const addExpenseItem = (category: 'fixed' | 'variable') => {
     const newItem = { name: "", amount: 0, isPercentage: false };
     if (category === 'fixed') {
@@ -78,7 +89,7 @@ const CashFlowInputForm = ({ inputs, onInputChange, onCalculate, isCalculating }
               <Input
                 placeholder="Enter business name"
                 value={inputs.businessName}
-                onChange={(e) => onInputChange('businessName', e.target.value)}
+                onChange={(e) => handleInputChange('businessName', e.target.value)}
               />
             </div>
 
@@ -86,7 +97,7 @@ const CashFlowInputForm = ({ inputs, onInputChange, onCalculate, isCalculating }
               <Label>Industry</Label>
               <Select
                 value={inputs.industry}
-                onValueChange={(value) => onInputChange('industry', value)}
+                onValueChange={(value) => handleInputChange('industry', value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select industry" />
@@ -107,7 +118,7 @@ const CashFlowInputForm = ({ inputs, onInputChange, onCalculate, isCalculating }
                 type="number"
                 placeholder="100000"
                 value={inputs.startingCash || ''}
-                onChange={(e) => onInputChange('startingCash', parseFloat(e.target.value) || 0)}
+                onChange={(e) => handleInputChange('startingCash', parseFloat(e.target.value) || 0)}
               />
             </div>
 
@@ -115,7 +126,7 @@ const CashFlowInputForm = ({ inputs, onInputChange, onCalculate, isCalculating }
               <Label>Simulation Timeframe</Label>
               <Select
                 value={inputs.timeframe.toString()}
-                onValueChange={(value) => onInputChange('timeframe', parseInt(value))}
+                onValueChange={(value) => handleInputChange('timeframe', parseInt(value))}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -136,7 +147,7 @@ const CashFlowInputForm = ({ inputs, onInputChange, onCalculate, isCalculating }
                 type="number"
                 placeholder="50000"
                 value={inputs.monthlyRevenue || ''}
-                onChange={(e) => onInputChange('monthlyRevenue', parseFloat(e.target.value) || 0)}
+                onChange={(e) => handleInputChange('monthlyRevenue', parseFloat(e.target.value) || 0)}
               />
             </div>
 
@@ -146,14 +157,14 @@ const CashFlowInputForm = ({ inputs, onInputChange, onCalculate, isCalculating }
                 type="number"
                 placeholder="5"
                 value={inputs.revenueGrowthRate || ''}
-                onChange={(e) => onInputChange('revenueGrowthRate', parseFloat(e.target.value) || 0)}
+                onChange={(e) => handleInputChange('revenueGrowthRate', parseFloat(e.target.value) || 0)}
               />
             </div>
 
             <div className="flex items-center space-x-2">
               <Switch
                 checked={inputs.hasSeasonality}
-                onCheckedChange={(checked) => onInputChange('hasSeasonality', checked)}
+                onCheckedChange={(checked) => handleInputChange('hasSeasonality', checked)}
               />
               <Label>Revenue has seasonality</Label>
             </div>
@@ -166,7 +177,7 @@ const CashFlowInputForm = ({ inputs, onInputChange, onCalculate, isCalculating }
                   step="0.1"
                   placeholder="1.5"
                   value={inputs.seasonalityMultiplier || ''}
-                  onChange={(e) => onInputChange('seasonalityMultiplier', parseFloat(e.target.value) || 1)}
+                  onChange={(e) => handleInputChange('seasonalityMultiplier', parseFloat(e.target.value) || 1)}
                 />
               </div>
             )}
@@ -177,7 +188,7 @@ const CashFlowInputForm = ({ inputs, onInputChange, onCalculate, isCalculating }
                 type="number"
                 placeholder="30"
                 value={inputs.accountsReceivableDays || ''}
-                onChange={(e) => onInputChange('accountsReceivableDays', parseFloat(e.target.value) || 0)}
+                onChange={(e) => handleInputChange('accountsReceivableDays', parseFloat(e.target.value) || 0)}
               />
             </div>
           </TabsContent>
@@ -288,7 +299,7 @@ const CashFlowInputForm = ({ inputs, onInputChange, onCalculate, isCalculating }
                 type="number"
                 placeholder="25"
                 value={inputs.taxRate || ''}
-                onChange={(e) => onInputChange('taxRate', parseFloat(e.target.value) || 0)}
+                onChange={(e) => handleInputChange('taxRate', parseFloat(e.target.value) || 0)}
               />
             </div>
 
@@ -298,7 +309,7 @@ const CashFlowInputForm = ({ inputs, onInputChange, onCalculate, isCalculating }
                 type="number"
                 placeholder="30"
                 value={inputs.accountsPayableDays || ''}
-                onChange={(e) => onInputChange('accountsPayableDays', parseFloat(e.target.value) || 0)}
+                onChange={(e) => handleInputChange('accountsPayableDays', parseFloat(e.target.value) || 0)}
               />
             </div>
           </TabsContent>
@@ -310,7 +321,7 @@ const CashFlowInputForm = ({ inputs, onInputChange, onCalculate, isCalculating }
                 type="number"
                 placeholder="0"
                 value={inputs.loanAmount || ''}
-                onChange={(e) => onInputChange('loanAmount', parseFloat(e.target.value) || 0)}
+                onChange={(e) => handleInputChange('loanAmount', parseFloat(e.target.value) || 0)}
               />
             </div>
 
@@ -323,7 +334,7 @@ const CashFlowInputForm = ({ inputs, onInputChange, onCalculate, isCalculating }
                     step="0.1"
                     placeholder="5.5"
                     value={inputs.interestRate || ''}
-                    onChange={(e) => onInputChange('interestRate', parseFloat(e.target.value) || 0)}
+                    onChange={(e) => handleInputChange('interestRate', parseFloat(e.target.value) || 0)}
                   />
                 </div>
 
@@ -333,7 +344,7 @@ const CashFlowInputForm = ({ inputs, onInputChange, onCalculate, isCalculating }
                     type="number"
                     placeholder="60"
                     value={inputs.loanTermMonths || ''}
-                    onChange={(e) => onInputChange('loanTermMonths', parseFloat(e.target.value) || 0)}
+                    onChange={(e) => handleInputChange('loanTermMonths', parseFloat(e.target.value) || 0)}
                   />
                 </div>
               </>
@@ -345,7 +356,7 @@ const CashFlowInputForm = ({ inputs, onInputChange, onCalculate, isCalculating }
                 type="number"
                 placeholder="0"
                 value={inputs.equityRaised || ''}
-                onChange={(e) => onInputChange('equityRaised', parseFloat(e.target.value) || 0)}
+                onChange={(e) => handleInputChange('equityRaised', parseFloat(e.target.value) || 0)}
               />
             </div>
 
@@ -358,7 +369,7 @@ const CashFlowInputForm = ({ inputs, onInputChange, onCalculate, isCalculating }
                   min="1"
                   max={inputs.timeframe}
                   value={inputs.equityRaiseMonth || ''}
-                  onChange={(e) => onInputChange('equityRaiseMonth', parseFloat(e.target.value) || 1)}
+                  onChange={(e) => handleInputChange('equityRaiseMonth', parseFloat(e.target.value) || 1)}
                 />
               </div>
             )}
@@ -369,7 +380,7 @@ const CashFlowInputForm = ({ inputs, onInputChange, onCalculate, isCalculating }
           <Button 
             onClick={onCalculate} 
             className="w-full" 
-            disabled={isCalculating || !inputs.monthlyRevenue || !inputs.startingCash}
+            disabled={isCalculating || !isFormValid}
           >
             {isCalculating ? "Calculating..." : "Run Cash Flow Simulation"}
           </Button>

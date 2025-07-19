@@ -80,14 +80,7 @@ const CreateCampaignDialog = ({ open, onOpenChange, onCampaignCreated }: CreateC
       return;
     }
 
-    if (formData.target_amount > 10000000) {
-      toast({
-        title: "Validation Error",
-        description: "Target amount cannot exceed $10,000,000",
-        variant: "destructive",
-      });
-      return;
-    }
+    // Removed target amount maximum limit - users can enter any amount
 
     setLoading(true);
     
@@ -112,15 +105,7 @@ const CreateCampaignDialog = ({ open, onOpenChange, onCampaignCreated }: CreateC
       
       // Upload image if provided with enhanced error handling
       if (imageFile) {
-        // Validate file size (max 5MB)
-        if (imageFile.size > 5 * 1024 * 1024) {
-          toast({
-            title: "File Too Large",
-            description: "Image must be less than 5MB",
-            variant: "destructive",
-          });
-          return;
-        }
+        // Removed file size validation - users can upload any size image
 
         // Validate file type
         const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];

@@ -185,3 +185,157 @@ export const generateCampaignProjectionData = (
   
   return data;
 };
+
+// Utility functions for debugging and validation
+
+/**
+ * Validate numeric input and return safe value
+ */
+export const validateNumericInput = (value: string, min: number = 0, max: number = Infinity): number => {
+  const num = parseFloat(value);
+  if (isNaN(num)) return min;
+  return Math.max(min, Math.min(max, num));
+};
+
+/**
+ * Format currency for display
+ */
+export const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+};
+
+/**
+ * Format percentage for display
+ */
+export const formatPercentage = (value: number): string => {
+  return `${value.toFixed(1)}%`;
+};
+
+/**
+ * Validate email format
+ */
+export const validateEmail = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+/**
+ * Debounce function for performance optimization
+ */
+export const debounce = <T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): ((...args: Parameters<T>) => void) => {
+  let timeout: NodeJS.Timeout;
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+};
+
+/**
+ * Throttle function for performance optimization
+ */
+export const throttle = <T extends (...args: any[]) => any>(
+  func: T,
+  limit: number
+): ((...args: Parameters<T>) => void) => {
+  let inThrottle: boolean;
+  return (...args: Parameters<T>) => {
+    if (!inThrottle) {
+      func(...args);
+      inThrottle = true;
+      setTimeout(() => (inThrottle = false), limit);
+    }
+  };
+};
+
+/**
+ * Check if device is mobile
+ */
+export const isMobile = (): boolean => {
+  return window.innerWidth < 768;
+};
+
+/**
+ * Check if device is tablet
+ */
+export const isTablet = (): boolean => {
+  return window.innerWidth >= 768 && window.innerWidth < 1024;
+};
+
+/**
+ * Check if device is desktop
+ */
+export const isDesktop = (): boolean => {
+  return window.innerWidth >= 1024;
+};
+
+/**
+ * Safe scroll to top with fallback
+ */
+export const scrollToTop = (): void => {
+  try {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (error) {
+    // Fallback for older browsers
+    window.scrollTo(0, 0);
+  }
+};
+
+/**
+ * Validate stock ticker format
+ */
+export const validateStockTicker = (ticker: string): boolean => {
+  return /^[A-Z]{1,5}$/.test(ticker);
+};
+
+/**
+ * Clean stock ticker input
+ */
+export const cleanStockTicker = (input: string): string => {
+  return input.toUpperCase().replace(/[^A-Z]/g, '');
+};
+
+/**
+ * Log performance metrics
+ */
+export const logPerformance = (name: string, startTime: number): void => {
+  const duration = performance.now() - startTime;
+  console.log(`Performance [${name}]: ${duration.toFixed(2)}ms`);
+  
+  if (duration > 1000) {
+    console.warn(`Slow operation detected: ${name} took ${duration.toFixed(2)}ms`);
+  }
+};
+
+/**
+ * Generate unique ID
+ */
+export const generateId = (): string => {
+  return Math.random().toString(36).substr(2, 9);
+};
+
+/**
+ * Deep clone object
+ */
+export const deepClone = <T>(obj: T): T => {
+  if (obj === null || typeof obj !== 'object') return obj;
+  if (obj instanceof Date) return new Date(obj.getTime()) as T;
+  if (obj instanceof Array) return obj.map(item => deepClone(item)) as T;
+  if (typeof obj === 'object') {
+    const clonedObj = {} as T;
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        clonedObj[key] = deepClone(obj[key]);
+      }
+    }
+    return clonedObj;
+  }
+  return obj;
+};
