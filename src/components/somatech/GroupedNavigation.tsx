@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/collapsible';
 import { modules } from './constants';
 import { cn } from '@/lib/utils';
+import * as Icons from 'lucide-react';
 
 interface GroupedNavigationProps {
   activeModule: string;
@@ -97,6 +98,12 @@ const GroupedNavigation = ({
     return moduleGroups[groupKey as keyof typeof moduleGroups]?.modules.includes(activeModule);
   };
 
+  // Dynamic icon component
+  const DynamicIcon = ({ iconName, className }: { iconName: string; className?: string }) => {
+    const IconComponent = Icons[iconName as keyof typeof Icons] as React.ComponentType<{ className?: string }>;
+    return IconComponent ? <IconComponent className={className} /> : null;
+  };
+
   // Desktop Sidebar Navigation
   if (variant === 'desktop') {
     return (
@@ -106,7 +113,6 @@ const GroupedNavigation = ({
           const moduleData = getModuleData(moduleId);
           if (!moduleData) return null;
           
-          const Icon = moduleData.icon;
           const isActive = activeModule === moduleId;
           
           return (
@@ -120,7 +126,7 @@ const GroupedNavigation = ({
                   : 'hover:bg-accent hover:text-accent-foreground text-muted-foreground'
               )}
             >
-              <Icon className="h-5 w-5" />
+              <DynamicIcon iconName={moduleData.icon} className="h-5 w-5" />
               <span className="font-medium text-sm">{moduleData.name}</span>
             </button>
           );
@@ -156,7 +162,6 @@ const GroupedNavigation = ({
                 const moduleData = getModuleData(moduleId);
                 if (!moduleData) return null;
                 
-                const Icon = moduleData.icon;
                 const isActive = activeModule === moduleId;
                 
                 return (
@@ -170,7 +175,7 @@ const GroupedNavigation = ({
                         : 'hover:bg-accent hover:text-accent-foreground text-muted-foreground'
                     )}
                   >
-                    <Icon className="h-4 w-4" />
+                    <DynamicIcon iconName={moduleData.icon} className="h-4 w-4" />
                     <span className="text-sm">{moduleData.name}</span>
                   </button>
                 );
@@ -214,15 +219,13 @@ const GroupedNavigation = ({
               const moduleData = getModuleData(moduleId);
               if (!moduleData) return null;
               
-              const Icon = moduleData.icon;
-              
               return (
                 <DropdownMenuItem
                   key={moduleId}
                   onClick={() => onModuleChange(moduleId)}
                   className="gap-2 cursor-pointer"
                 >
-                  <Icon className="h-4 w-4" />
+                  <DynamicIcon iconName={moduleData.icon} className="h-4 w-4" />
                   {moduleData.name}
                 </DropdownMenuItem>
               );
@@ -249,15 +252,13 @@ const GroupedNavigation = ({
               const moduleData = getModuleData(moduleId);
               if (!moduleData) return null;
               
-              const Icon = moduleData.icon;
-              
               return (
                 <DropdownMenuItem
                   key={moduleId}
                   onClick={() => onModuleChange(moduleId)}
                   className="gap-2 cursor-pointer"
                 >
-                  <Icon className="h-4 w-4" />
+                  <DynamicIcon iconName={moduleData.icon} className="h-4 w-4" />
                   {moduleData.name}
                 </DropdownMenuItem>
               );
@@ -276,7 +277,6 @@ const GroupedNavigation = ({
         const moduleData = getModuleData(moduleId);
         if (!moduleData) return null;
         
-        const Icon = moduleData.icon;
         const isActive = activeModule === moduleId;
         
         return (
@@ -290,7 +290,7 @@ const GroupedNavigation = ({
                 : 'hover:bg-accent hover:text-accent-foreground text-muted-foreground'
             )}
           >
-            <Icon className="h-4 w-4" />
+            <DynamicIcon iconName={moduleData.icon} className="h-4 w-4" />
             <span className="text-sm font-medium">{moduleData.name}</span>
           </button>
         );
@@ -326,7 +326,6 @@ const GroupedNavigation = ({
               const moduleData = getModuleData(moduleId);
               if (!moduleData) return null;
               
-              const Icon = moduleData.icon;
               const isActive = activeModule === moduleId;
               
               return (
@@ -340,7 +339,7 @@ const GroupedNavigation = ({
                       : 'hover:bg-accent hover:text-accent-foreground text-muted-foreground'
                   )}
                 >
-                  <Icon className="h-3 w-3" />
+                  <DynamicIcon iconName={moduleData.icon} className="h-3 w-3" />
                   <span className="text-xs">{moduleData.name}</span>
                 </button>
               );
