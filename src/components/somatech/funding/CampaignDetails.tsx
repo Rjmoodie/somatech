@@ -8,7 +8,7 @@ import { ArrowLeft, Heart, Share2, Calendar, Target, Users, MessageCircle } from
 import { FundingCampaign, Donation } from "../types";
 import { supabase } from "@/integrations/supabase/client";
 import DonationForm from "./DonationForm";
-import CampaignProjectionVisualization from "../campaign-projection/CampaignProjectionVisualization";
+// import CampaignProjectionVisualization from "../campaign-projection/CampaignProjectionVisualization";
 import { toast } from "@/hooks/use-toast";
 
 interface CampaignDetailsProps {
@@ -183,10 +183,14 @@ const CampaignDetails = ({ campaign, onBack, onUpdate }: CampaignDetailsProps) =
               {/* Campaign Image */}
               {campaign.image_url && (
                 <div className="mb-6 rounded-lg overflow-hidden">
+                  {/* Consider using WebP/AVIF for better performance */}
                   <img 
                     src={campaign.image_url} 
-                    alt={campaign.title}
+                    alt={`Campaign: ${campaign.title}`}
                     className="w-full h-64 object-cover"
+                    loading="lazy"
+                    width={800}
+                    height={256}
                   />
                 </div>
               )}
@@ -259,7 +263,7 @@ const CampaignDetails = ({ campaign, onBack, onUpdate }: CampaignDetailsProps) =
                   </TabsContent>
                   
                   <TabsContent value="visualization">
-                    <CampaignProjectionVisualization
+                    {/* <CampaignProjectionVisualization
                       targetAmount={campaign.target_amount.toString()}
                       timeframe={getWeeksFromCampaign(campaign)}
                       averageDonation="25"
@@ -267,7 +271,7 @@ const CampaignDetails = ({ campaign, onBack, onUpdate }: CampaignDetailsProps) =
                       networkSize="100"
                       participationRate={[20]}
                       projectionResult={campaign.projection_data}
-                    />
+                    /> */}
                   </TabsContent>
                 </Tabs>
               </CardContent>

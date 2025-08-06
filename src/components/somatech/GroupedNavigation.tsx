@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
   DropdownMenuLabel
 } from '@/components/ui/dropdown-menu';
-import { 
+import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
@@ -25,62 +25,39 @@ interface GroupedNavigationProps {
   className?: string;
 }
 
-const moduleGroups = {
-  dashboard: {
-    name: 'Dashboard',
-    modules: ['dashboard']
-  },
-  financial: {
-    name: 'Financial Tools',
-    modules: [
-      'stock-analysis',
-      'watchlist', 
-      'marketplace',
-      'funding-campaigns',
-      'business-valuation',
-      'cash-flow',
-      'retirement-planning'
-    ]
-  },
-  realEstate: {
-    name: 'Real Estate',
-    modules: [
-      'real-estate',
-      'real-estate-deal-sourcing',
-      'deal-sourcing-data-manager',
-      'data-ingestion-pipeline',
-      'data-scraping-engine',
-      'tax-delinquent-scraper',
-      'code-violation-scraper',
-      'pre-foreclosure-scraper'
-    ]
-  },
-  settings: {
-    name: 'Settings & Enterprise',
-    modules: [
-      'subscription',
-      'enterprise-analytics',
-      'enterprise-admin',
-      'enterprise-whitelabel',
-      'enterprise-reporting',
-      'enterprise-performance',
-      'enterprise-success',
-      'enterprise-security',
-      'enterprise-tenant'
-    ]
+// Define the order and labels for nav groups
+const navGroupOrder: { key: string; name: string }[] = [
+  { key: 'dashboard', name: 'Dashboard' },
+  { key: 'financial', name: 'Financial Tools' },
+  { key: 'realEstate', name: 'Real Estate' },
+  { key: 'settings', name: 'Settings & Enterprise' },
+  { key: 'account', name: 'Account' },
+  { key: 'enterprise', name: 'Enterprise' },
+];
+
+// Group modules by navGroup
+const groupModules = () => {
+  const groups: Record<string, typeof modules> = {};
+  for (const m of modules) {
+    if (!m.navGroup) continue;
+    if (!groups[m.navGroup]) groups[m.navGroup] = [];
+    groups[m.navGroup].push(m);
   }
+  return groups;
 };
 
-const GroupedNavigation = ({ 
-  activeModule, 
-  onModuleChange, 
+const GroupedNavigation = ({
+  activeModule,
+  onModuleChange,
   variant = 'desktop',
-  className 
+  className
 }: GroupedNavigationProps) => {
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
-    financial: true, // Financial tools open by default
-    realEstate: true, // Real estate open by default
-    settings: false
+    financial: true,
+    realEstate: true,
+    settings: false,
+    account: false,
+    enterprise: false,
   });
 
   const toggleGroup = (groupKey: string) => {
@@ -90,13 +67,7 @@ const GroupedNavigation = ({
     }));
   };
 
-  const getModuleData = (moduleId: string) => {
-    return modules.find(m => m.id === moduleId);
-  };
-
-  const isModuleInGroup = (groupKey: string) => {
-    return moduleGroups[groupKey as keyof typeof moduleGroups]?.modules.includes(activeModule);
-  };
+  const groups = groupModules();
 
   // Dynamic icon component
   const DynamicIcon = ({ iconName, className }: { iconName: string; className?: string }) => {
@@ -107,82 +78,78 @@ const GroupedNavigation = ({
   // Desktop Sidebar Navigation
   if (variant === 'desktop') {
     return (
-      <nav className={cn("space-y-2", className)}>
-        {/* Dashboard - standalone */}
-        {moduleGroups.dashboard.modules.map(moduleId => {
-          const moduleData = getModuleData(moduleId);
-          if (!moduleData) return null;
-          
-          const isActive = activeModule === moduleId;
-          
+      <nav className={cn('space-y-2', className)}>
+        {navGroupOrder.map(({ key, name }) => {
+          const group = groups[key];
+          if (!group || group.length === 0) return null;
+          // Dashboard is standalone, not collapsible
+          if (key === 'dashboard') {
+            return group.map(module => {
+              const isActive = activeModule === module.id;
+              return (
+                <button
+                  key={module.id}
+                  onClick={() => onModuleChange(module.id)}
+                  className={cn(
+                    'w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-200',
+                    isActive
+                      ? 'bg-primary text-primary-foreground shadow-lg'
+                      : 'hover:bg-accent hover:text-accent-foreground text-muted-foreground'
+                  )}
+                >
+                  <DynamicIcon iconName={module.icon} className="h-5 w-5" />
+                  <span className="font-medium text-sm">{module.name}</span>
+                </button>
+              );
+            });
+          }
+          // Collapsible groups
           return (
-            <button
-              key={moduleId}
-              onClick={() => onModuleChange(moduleId)}
-              className={cn(
-                "w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-200",
-                isActive 
-                  ? 'bg-primary text-primary-foreground shadow-lg' 
-                  : 'hover:bg-accent hover:text-accent-foreground text-muted-foreground'
-              )}
+            <Collapsible
+              key={key}
+              open={openGroups[key]}
+              onOpenChange={() => toggleGroup(key)}
             >
-              <DynamicIcon iconName={moduleData.icon} className="h-5 w-5" />
-              <span className="font-medium text-sm">{moduleData.name}</span>
-            </button>
+              <CollapsibleTrigger asChild>
+                <button
+                  className={cn(
+                    'w-full flex items-center justify-between px-4 py-3 rounded-xl text-left transition-all duration-200 font-medium text-sm',
+                    openGroups[key]
+                      ? 'bg-accent text-accent-foreground'
+                      : 'hover:bg-accent/50 text-muted-foreground'
+                  )}
+                >
+                  <span>{name}</span>
+                  {openGroups[key] ? (
+                    <ChevronDown className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
+                </button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="ml-4 mt-1 space-y-1">
+                {group.map(module => {
+                  const isActive = activeModule === module.id;
+                  return (
+                    <button
+                      key={module.id}
+                      onClick={() => onModuleChange(module.id)}
+                      className={cn(
+                        'w-full flex items-center space-x-3 px-4 py-2 rounded-lg text-left transition-all duration-200',
+                        isActive
+                          ? 'bg-primary text-primary-foreground shadow-md'
+                          : 'hover:bg-accent hover:text-accent-foreground text-muted-foreground'
+                      )}
+                    >
+                      <DynamicIcon iconName={module.icon} className="h-4 w-4" />
+                      <span className="text-sm">{module.name}</span>
+                    </button>
+                  );
+                })}
+              </CollapsibleContent>
+            </Collapsible>
           );
         })}
-
-        {/* Grouped sections */}
-        {Object.entries(moduleGroups).filter(([key]) => key !== 'dashboard').map(([groupKey, group]) => (
-          <Collapsible 
-            key={groupKey}
-            open={openGroups[groupKey]}
-            onOpenChange={() => toggleGroup(groupKey)}
-          >
-            <CollapsibleTrigger asChild>
-              <button
-                className={cn(
-                  "w-full flex items-center justify-between px-4 py-3 rounded-xl text-left transition-all duration-200 font-medium text-sm",
-                  isModuleInGroup(groupKey)
-                    ? 'bg-accent text-accent-foreground' 
-                    : 'hover:bg-accent/50 text-muted-foreground'
-                )}
-              >
-                <span>{group.name}</span>
-                {openGroups[groupKey] ? (
-                  <ChevronDown className="h-4 w-4" />
-                ) : (
-                  <ChevronRight className="h-4 w-4" />
-                )}
-              </button>
-            </CollapsibleTrigger>
-            
-            <CollapsibleContent className="ml-4 mt-1 space-y-1">
-              {group.modules.map(moduleId => {
-                const moduleData = getModuleData(moduleId);
-                if (!moduleData) return null;
-                
-                const isActive = activeModule === moduleId;
-                
-                return (
-                  <button
-                    key={moduleId}
-                    onClick={() => onModuleChange(moduleId)}
-                    className={cn(
-                      "w-full flex items-center space-x-3 px-4 py-2 rounded-lg text-left transition-all duration-200",
-                      isActive 
-                        ? 'bg-primary text-primary-foreground shadow-md' 
-                        : 'hover:bg-accent hover:text-accent-foreground text-muted-foreground'
-                    )}
-                  >
-                    <DynamicIcon iconName={moduleData.icon} className="h-4 w-4" />
-                    <span className="text-sm">{moduleData.name}</span>
-                  </button>
-                );
-              })}
-            </CollapsibleContent>
-          </Collapsible>
-        ))}
       </nav>
     );
   }
@@ -191,162 +158,126 @@ const GroupedNavigation = ({
   if (variant === 'dropdown') {
     return (
       <div className="flex items-center space-x-2">
-        {/* Dashboard button */}
-        <Button
-          variant={activeModule === 'dashboard' ? 'default' : 'ghost'}
-          onClick={() => onModuleChange('dashboard')}
-          size="sm"
-        >
-          Dashboard
-        </Button>
-
-        {/* Financial Tools dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button 
-              variant={isModuleInGroup('financial') ? 'default' : 'ghost'} 
-              size="sm"
-              className="gap-1"
-            >
-              Financial Tools
-              <ChevronDown className="h-3 w-3" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-56">
-            <DropdownMenuLabel>Financial Tools</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {moduleGroups.financial.modules.map(moduleId => {
-              const moduleData = getModuleData(moduleId);
-              if (!moduleData) return null;
-              
-              return (
-                <DropdownMenuItem
-                  key={moduleId}
-                  onClick={() => onModuleChange(moduleId)}
-                  className="gap-2 cursor-pointer"
+        {navGroupOrder.map(({ key, name }) => {
+          const group = groups[key];
+          if (!group || group.length === 0) return null;
+          if (key === 'dashboard') {
+            return group.map(module => (
+              <Button
+                key={module.id}
+                variant={activeModule === module.id ? 'default' : 'ghost'}
+                onClick={() => onModuleChange(module.id)}
+                size="sm"
+              >
+                {module.name}
+              </Button>
+            ));
+          }
+          return (
+            <DropdownMenu key={key}>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant={group.some(m => m.id === activeModule) ? 'default' : 'ghost'}
+                  size="sm"
+                  className="gap-1"
                 >
-                  <DynamicIcon iconName={moduleData.icon} className="h-4 w-4" />
-                  {moduleData.name}
-                </DropdownMenuItem>
-              );
-            })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        {/* Settings dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button 
-              variant={isModuleInGroup('settings') ? 'default' : 'ghost'} 
-              size="sm"
-              className="gap-1"
-            >
-              Settings
-              <ChevronDown className="h-3 w-3" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-56">
-            <DropdownMenuLabel>Settings & Enterprise</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {moduleGroups.settings.modules.map(moduleId => {
-              const moduleData = getModuleData(moduleId);
-              if (!moduleData) return null;
-              
-              return (
-                <DropdownMenuItem
-                  key={moduleId}
-                  onClick={() => onModuleChange(moduleId)}
-                  className="gap-2 cursor-pointer"
-                >
-                  <DynamicIcon iconName={moduleData.icon} className="h-4 w-4" />
-                  {moduleData.name}
-                </DropdownMenuItem>
-              );
-            })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+                  {name}
+                  <ChevronDown className="h-3 w-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56">
+                <DropdownMenuLabel>{name}</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {group.map(module => (
+                  <DropdownMenuItem
+                    key={module.id}
+                    onClick={() => onModuleChange(module.id)}
+                    className="gap-2 cursor-pointer"
+                  >
+                    <DynamicIcon iconName={module.icon} className="h-4 w-4" />
+                    {module.name}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          );
+        })}
       </div>
     );
   }
 
   // Mobile Navigation (same as desktop but more compact)
   return (
-    <nav className={cn("space-y-1", className)}>
-      {/* Dashboard */}
-      {moduleGroups.dashboard.modules.map(moduleId => {
-        const moduleData = getModuleData(moduleId);
-        if (!moduleData) return null;
-        
-        const isActive = activeModule === moduleId;
-        
+    <nav className={cn('space-y-1', className)}>
+      {navGroupOrder.map(({ key, name }) => {
+        const group = groups[key];
+        if (!group || group.length === 0) return null;
+        if (key === 'dashboard') {
+          return group.map(module => {
+            const isActive = activeModule === module.id;
+            return (
+              <button
+                key={module.id}
+                onClick={() => onModuleChange(module.id)}
+                className={cn(
+                  'w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-all duration-200',
+                  isActive
+                    ? 'bg-primary text-primary-foreground'
+                    : 'hover:bg-accent hover:text-accent-foreground text-muted-foreground'
+                )}
+              >
+                <DynamicIcon iconName={module.icon} className="h-4 w-4" />
+                <span className="text-sm font-medium">{module.name}</span>
+              </button>
+            );
+          });
+        }
         return (
-          <button
-            key={moduleId}
-            onClick={() => onModuleChange(moduleId)}
-            className={cn(
-              "w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-all duration-200",
-              isActive 
-                ? 'bg-primary text-primary-foreground' 
-                : 'hover:bg-accent hover:text-accent-foreground text-muted-foreground'
-            )}
+          <Collapsible
+            key={key}
+            open={openGroups[key]}
+            onOpenChange={() => toggleGroup(key)}
           >
-            <DynamicIcon iconName={moduleData.icon} className="h-4 w-4" />
-            <span className="text-sm font-medium">{moduleData.name}</span>
-          </button>
+            <CollapsibleTrigger asChild>
+              <button
+                className={cn(
+                  'w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-all duration-200 text-sm font-medium',
+                  openGroups[key]
+                    ? 'bg-accent text-accent-foreground'
+                    : 'hover:bg-accent/50 text-muted-foreground'
+                )}
+              >
+                <span>{name}</span>
+                {openGroups[key] ? (
+                  <ChevronDown className="h-3 w-3" />
+                ) : (
+                  <ChevronRight className="h-3 w-3" />
+                )}
+              </button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="ml-3 mt-1 space-y-1">
+              {group.map(module => {
+                const isActive = activeModule === module.id;
+                return (
+                  <button
+                    key={module.id}
+                    onClick={() => onModuleChange(module.id)}
+                    className={cn(
+                      'w-full flex items-center space-x-2 px-3 py-1.5 rounded-md text-left transition-all duration-200',
+                      isActive
+                        ? 'bg-primary text-primary-foreground'
+                        : 'hover:bg-accent hover:text-accent-foreground text-muted-foreground'
+                    )}
+                  >
+                    <DynamicIcon iconName={module.icon} className="h-3 w-3" />
+                    <span className="text-xs">{module.name}</span>
+                  </button>
+                );
+              })}
+            </CollapsibleContent>
+          </Collapsible>
         );
       })}
-
-      {/* Grouped sections */}
-      {Object.entries(moduleGroups).filter(([key]) => key !== 'dashboard').map(([groupKey, group]) => (
-        <Collapsible 
-          key={groupKey}
-          open={openGroups[groupKey]}
-          onOpenChange={() => toggleGroup(groupKey)}
-        >
-          <CollapsibleTrigger asChild>
-            <button
-              className={cn(
-                "w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-all duration-200 text-sm font-medium",
-                isModuleInGroup(groupKey)
-                  ? 'bg-accent text-accent-foreground' 
-                  : 'hover:bg-accent/50 text-muted-foreground'
-              )}
-            >
-              <span>{group.name}</span>
-              {openGroups[groupKey] ? (
-                <ChevronDown className="h-3 w-3" />
-              ) : (
-                <ChevronRight className="h-3 w-3" />
-              )}
-            </button>
-          </CollapsibleTrigger>
-          
-          <CollapsibleContent className="ml-3 mt-1 space-y-1">
-            {group.modules.map(moduleId => {
-              const moduleData = getModuleData(moduleId);
-              if (!moduleData) return null;
-              
-              const isActive = activeModule === moduleId;
-              
-              return (
-                <button
-                  key={moduleId}
-                  onClick={() => onModuleChange(moduleId)}
-                  className={cn(
-                    "w-full flex items-center space-x-2 px-3 py-1.5 rounded-md text-left transition-all duration-200",
-                    isActive 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'hover:bg-accent hover:text-accent-foreground text-muted-foreground'
-                  )}
-                >
-                  <DynamicIcon iconName={moduleData.icon} className="h-3 w-3" />
-                  <span className="text-xs">{moduleData.name}</span>
-                </button>
-              );
-            })}
-          </CollapsibleContent>
-        </Collapsible>
-      ))}
     </nav>
   );
 };

@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -20,43 +21,23 @@ interface WatchlistItem {
 /**
  * Custom hook for watchlist operations
  */
-export const useWatchlistOperations = () => {
+export const useWatchlistOperations = (userId: string | undefined) => {
   const fetchWatchlist = async (): Promise<WatchlistItem[]> => {
-    try {
-      const { data, error } = await supabase
-        .from('watchlist')
-        .select('*')
-        .order('added_at', { ascending: false });
-
-      if (error) throw error;
-      return data || [];
-    } catch (error) {
-      console.error('Error fetching watchlist:', error);
-      toast.error('Failed to load watchlist');
-      return [];
-    }
+    if (!userId) return [];
+    const { data, error } = await supabase
+      .from('watchlist')
+      .select('*')
+      .eq('user_id', userId)
+      .order('added_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
   };
 
-  const removeFromWatchlist = async (id: string): Promise<boolean> => {
-    try {
-      const { error } = await supabase
-        .from('watchlist')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-      
-      toast.success('Removed from watchlist');
-      return true;
-    } catch (error) {
-      console.error('Error removing from watchlist:', error);
-      toast.error('Failed to remove from watchlist');
-      return false;
-    }
-  };
-
-  return {
-    fetchWatchlist,
-    removeFromWatchlist,
-  };
+  const query = useQuery({
+    queryKey: ['watchlist', userId],
+    queryFn: fetchWatchlist,
+    enabled: !!userId,
+    staleTime: 60000
+  });
+  return query;
 };

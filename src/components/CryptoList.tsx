@@ -13,7 +13,7 @@ const CryptoList = () => {
   const { data: cryptos, isLoading } = useQuery({
     queryKey: ['cryptos'],
     queryFn: fetchCryptoData,
-    refetchInterval: 30000, // Refetch every 30 seconds
+    refetchInterval: 30000
   });
 
   if (isLoading) {
@@ -38,7 +38,7 @@ const CryptoList = () => {
               <tr key={crypto.symbol} className="border-t border-secondary">
                 <td className="py-4">
                   <div className="flex items-center gap-2">
-                    <img src={crypto.image} alt={crypto.name} className="w-8 h-8 rounded-full" />
+                    <img src={crypto.image} alt={`Logo of ${crypto.name}`} className="w-8 h-8 rounded-full" loading="lazy" width={32} height={32} />
                     <div>
                       <p className="font-medium">{crypto.name}</p>
                       <p className="text-sm text-muted-foreground">{crypto.symbol.toUpperCase()}</p>

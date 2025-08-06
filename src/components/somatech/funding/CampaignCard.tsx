@@ -27,10 +27,14 @@ const CampaignCard = ({ campaign, onClick, showManageButton = false, onDelete }:
         {/* Campaign Image */}
         {campaign.image_url && (
           <div className="mb-4 rounded-lg overflow-hidden">
+            {/* Consider using WebP/AVIF for better performance */}
             <img 
               src={campaign.image_url} 
-              alt={campaign.title}
+              alt={`Campaign: ${campaign.title}`}
               className="w-full h-32 object-cover"
+              loading="lazy"
+              width={400}
+              height={128}
             />
           </div>
         )}

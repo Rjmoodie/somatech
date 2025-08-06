@@ -5,6 +5,10 @@ import BusinessValuationResults from "./business-valuation/BusinessValuationResu
 import BusinessValuationChart from "./business-valuation/BusinessValuationChart";
 import BusinessValuationExport from "./business-valuation/BusinessValuationExport";
 import { calculateBusinessValuation } from "./business-valuation/valuationEngine";
+import { modules } from "./constants";
+import SEO from "../SEO";
+
+const module = modules.find(m => m.id === "business-valuation");
 
 const BusinessValuation = () => {
   const [inputs, setInputs] = useState<BusinessValuationInputs>({
@@ -40,10 +44,8 @@ const BusinessValuation = () => {
 
   const handleCalculate = async () => {
     setIsCalculating(true);
-    
     // Simulate calculation delay for better UX
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
     try {
       const calculatedReport = calculateBusinessValuation(inputs, methods);
       setReport(calculatedReport);
@@ -54,30 +56,58 @@ const BusinessValuation = () => {
     }
   };
 
+  // Example JSON-LD structured data for this module
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": module?.name,
+    "description": module?.seo?.description,
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "SomaTech"
+    }
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <BusinessValuationInputForm
-          inputs={inputs}
-          methods={methods}
-          onInputChange={handleInputChange}
-          onMethodChange={handleMethodChange}
-          onCalculate={handleCalculate}
-          isCalculating={isCalculating}
+    <>
+      {module?.seo && (
+        <SEO
+          title={module.seo.title}
+          description={module.seo.description}
+          keywords={module.seo.keywords}
+          url={typeof window !== 'undefined' ? window.location.href : undefined}
+          jsonLd={jsonLd}
         />
-        
+      )}
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <BusinessValuationInputForm
+            inputs={inputs}
+            methods={methods}
+            onInputChange={handleInputChange}
+            onMethodChange={handleMethodChange}
+            onCalculate={handleCalculate}
+            isCalculating={isCalculating}
+          />
+          {report && (
+            <div className="space-y-6">
+              <BusinessValuationChart report={report} />
+              <BusinessValuationExport report={report} />
+            </div>
+          )}
+        </div>
         {report && (
-          <div className="space-y-6">
-            <BusinessValuationChart report={report} />
-            <BusinessValuationExport report={report} />
-          </div>
+          <BusinessValuationResults report={report} />
         )}
       </div>
-
-      {report && (
-        <BusinessValuationResults report={report} />
-      )}
-    </div>
+    </>
   );
 };
 

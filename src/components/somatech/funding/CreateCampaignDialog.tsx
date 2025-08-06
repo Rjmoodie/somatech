@@ -8,8 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Plus, Minus, X, Calculator, Target, Users, DollarSign, Calendar, Zap } from "lucide-react";
-import CampaignProjectionResults from "../campaign-projection/CampaignProjectionResults";
-import CampaignProjectionVisualization from "../campaign-projection/CampaignProjectionVisualization";
+// Remove or comment out the imports for CampaignProjectionResults and CampaignProjectionVisualization
+// import CampaignProjectionResults from "../campaign-projection/CampaignProjectionResults";
+// import CampaignProjectionVisualization from "../campaign-projection/CampaignProjectionVisualization";
 import { supabase } from "@/integrations/supabase/client";
 import { CreateCampaignForm, FundingCampaign } from "../types";
 import { campaignCategories } from "../constants";
@@ -544,8 +545,9 @@ const CreateCampaignDialog = ({ open, onOpenChange, onCampaignCreated }: CreateC
           {/* Projection Results */}
           {projectionResult && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <CampaignProjectionResults result={projectionResult} />
-              <CampaignProjectionVisualization
+              {/* Remove or comment out the imports for CampaignProjectionResults and CampaignProjectionVisualization */}
+              {/* <CampaignProjectionResults result={projectionResult} /> */}
+              {/* <CampaignProjectionVisualization
                 targetAmount={formData.target_amount.toString()}
                 timeframe={formData.deadline ? calculateWeeksFromDeadline(formData.deadline).toString() : "0"}
                 averageDonation={averageDonation}
@@ -553,7 +555,7 @@ const CreateCampaignDialog = ({ open, onOpenChange, onCampaignCreated }: CreateC
                 networkSize={networkSize}
                 participationRate={participationRate}
                 projectionResult={projectionResult}
-              />
+              /> */}
             </div>
           )}
 

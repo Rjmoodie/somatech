@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./AuthProvider";
 import { useToast } from "@/hooks/use-toast";
@@ -27,106 +28,72 @@ interface Feedback {
   user_vote?: 'up' | 'down' | null;
 }
 
+const fetchFeedback = async (userId: string | null) => {
+  const { data, error } = await supabase
+    .from('user_feedback')
+    .select(`*, feature_votes!inner(vote_type)`)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data || []).map(item => {
+    const userVote = item.feature_votes?.find((vote: any) => vote.user_id === userId);
+    return {
+      ...item,
+      type: item.type as Feedback['type'],
+      status: item.status as Feedback['status'],
+      user_vote: userVote?.vote_type || null
+    };
+  });
+};
+
+const submitFeedback = async (formData: any) => {
+  const { data, error } = await supabase
+    .from('user_feedback')
+    .insert([formData]);
+  if (error) throw error;
+  return data;
+};
+
 const FeedbackHub = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [feedback, setFeedback] = useState<Feedback[]>([]);
-  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState('view');
   const [filter, setFilter] = useState<'all' | 'feature_request' | 'bug_report' | 'feedback' | 'testimonial'>('all');
-  
   const [formData, setFormData] = useState({
     type: 'feedback' as const,
     title: '',
     description: '',
     category: '',
   });
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    fetchFeedback();
-  }, []);
+  const { data: feedback, isLoading, error } = useQuery({
+    queryKey: ['user-feedback', user?.id],
+    queryFn: () => fetchFeedback(user?.id || null),
+    staleTime: 60000
+  });
 
-  const fetchFeedback = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('user_feedback')
-        .select(`
-          *,
-          feature_votes!inner(vote_type)
-        `)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      // Process user votes
-      const processedFeedback = (data || []).map(item => {
-        const userVote = item.feature_votes?.find((vote: any) => vote.user_id === user?.id);
-        return {
-          ...item,
-          type: item.type as Feedback['type'],
-          status: item.status as Feedback['status'],
-          user_vote: userVote?.vote_type || null
-        };
-      });
-
-      setFeedback(processedFeedback as Feedback[]);
-    } catch (error) {
-      console.error('Error fetching feedback:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const submitFeedback = async () => {
-    if (!formData.title || !formData.description) {
-      toast({
-        title: "Error",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setSubmitting(true);
-
-    try {
-      const { error } = await supabase
-        .from('user_feedback')
-        .insert({
-          user_id: user?.id,
-          type: formData.type,
-          title: formData.title,
-          description: formData.description,
-          category: formData.category || null,
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Thank you for your feedback! We'll review it soon.",
-      });
-
-      setFormData({
-        type: 'feedback',
-        title: '',
-        description: '',
-        category: '',
-      });
-
-      setActiveTab('view');
-      fetchFeedback();
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to submit feedback",
-        variant: "destructive",
-      });
-    } finally {
+  const mutation = useMutation({
+    mutationFn: submitFeedback,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-feedback', user?.id] });
+      toast({ title: 'Thank you for your feedback!', description: 'We appreciate your input and will review it soon.' });
+      setFormData({ type: 'feedback', title: '', description: '', category: '' });
+      setSubmitting(false);
+    },
+    onError: (error: any) => {
+      toast({ title: 'Failed to submit feedback', description: error.message, variant: 'destructive' });
       setSubmitting(false);
     }
+  });
+
+  const handleSubmit = () => {
+    setSubmitting(true);
+    mutation.mutate({ ...formData, user_id: user?.id });
   };
+
+  if (isLoading) return <div>Loading feedback...</div>;
+  if (error) return <div className="text-red-500">Failed to load feedback</div>;
 
   const vote = async (feedbackId: string, voteType: 'up' | 'down') => {
     if (!user) {
@@ -164,7 +131,7 @@ const FeedbackHub = () => {
         if (error) throw error;
       }
 
-      fetchFeedback();
+      queryClient.invalidateQueries({ queryKey: ['user-feedback', user?.id] });
     } catch (error: any) {
       toast({
         title: "Error",
@@ -247,7 +214,7 @@ const FeedbackHub = () => {
             </div>
 
             {/* Feedback List */}
-            {loading ? (
+            {isLoading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               </div>
@@ -388,7 +355,7 @@ const FeedbackHub = () => {
                 </div>
 
                 <Button 
-                  onClick={submitFeedback} 
+                  onClick={handleSubmit} 
                   disabled={submitting || !formData.title || !formData.description}
                   className="w-full"
                 >

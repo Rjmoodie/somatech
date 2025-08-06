@@ -5,6 +5,10 @@ import CashFlowResults from "./cash-flow/CashFlowResults";
 import CashFlowChart from "./cash-flow/CashFlowChart";
 import CashFlowExport from "./cash-flow/CashFlowExport";
 import { calculateCashFlow } from "./cash-flow/cashFlowEngine";
+import { modules } from "./constants";
+import SEO from "../SEO";
+
+const module = modules.find(m => m.id === "cash-flow");
 
 const CashFlowSimulator = () => {
   const [inputs, setInputs] = useState<CashFlowInputs>({
@@ -44,10 +48,8 @@ const CashFlowSimulator = () => {
 
   const handleCalculate = async () => {
     setIsCalculating(true);
-    
     // Simulate calculation delay for better UX
     await new Promise(resolve => setTimeout(resolve, 1500));
-    
     try {
       const calculatedReport = calculateCashFlow(inputs);
       setReport(calculatedReport);
@@ -62,34 +64,57 @@ const CashFlowSimulator = () => {
     setActiveScenario(scenario);
   };
 
-  return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-6">
-          <CashFlowInputForm
-            inputs={inputs}
-            onInputChange={handleInputChange}
-            onCalculate={handleCalculate}
-            isCalculating={isCalculating}
-          />
-        </div>
-        
-        {report && (
-          <div className="space-y-6">
-            <CashFlowChart report={report} activeScenario={activeScenario} />
-            <CashFlowExport report={report} activeScenario={activeScenario} />
-          </div>
-        )}
-      </div>
+  // JSON-LD structured data for the cash flow simulator
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": module?.name,
+    "description": module?.seo?.description,
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "All",
+    "publisher": {
+      "@type": "Organization",
+      "name": "SomaTech"
+    }
+  };
 
-      {report && (
-        <CashFlowResults 
-          report={report} 
-          onScenarioChange={handleScenarioChange}
-          activeScenario={activeScenario}
+  return (
+    <>
+      {module?.seo && (
+        <SEO
+          title={module.seo.title}
+          description={module.seo.description}
+          keywords={module.seo.keywords}
+          url={typeof window !== 'undefined' ? window.location.href : undefined}
+          jsonLd={jsonLd}
         />
       )}
-    </div>
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-6">
+            <CashFlowInputForm
+              inputs={inputs}
+              onInputChange={handleInputChange}
+              onCalculate={handleCalculate}
+              isCalculating={isCalculating}
+            />
+          </div>
+          {report && (
+            <div className="space-y-6">
+              <CashFlowChart report={report} activeScenario={activeScenario} />
+              <CashFlowExport report={report} activeScenario={activeScenario} />
+            </div>
+          )}
+        </div>
+        {report && (
+          <CashFlowResults 
+            report={report} 
+            onScenarioChange={handleScenarioChange}
+            activeScenario={activeScenario}
+          />
+        )}
+      </div>
+    </>
   );
 };
 

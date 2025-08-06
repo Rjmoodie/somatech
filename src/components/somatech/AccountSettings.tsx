@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./AuthProvider";
 import { useToast } from "@/hooks/use-toast";
@@ -11,89 +11,66 @@ import ProfileSettings from "./account/ProfileSettings";
 import EnhancedSecuritySettings from "./account/EnhancedSecuritySettings";
 import NotificationSettings from "./account/NotificationSettings";
 import ThemeSettings from "./account/ThemeSettings";
+import { Profile } from './types';
 
-interface Profile {
-  id: string;
-  username: string | null;
-  email: string | null;
-  avatar_url: string | null;
-  bio: string | null;
-  location: string | null;
-  website: string | null;
-  theme_preference: string;
-  onboarding_completed: boolean;
-  profile_completion_score: number;
-}
+const fetchProfile = async (userId: string) => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single();
+  if (error) throw error;
+  return data;
+};
+
+const updateProfile = async ({ userId, updates }: { userId: string; updates: Partial<Profile> }) => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .update(updates)
+    .eq('id', userId);
+  if (error) throw error;
+  return data;
+};
 
 const AccountSettings = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    if (user) {
-      fetchProfile();
+  const { data: profile, isLoading, error } = useQuery({
+    queryKey: ['profile', user?.id],
+    queryFn: () => user ? fetchProfile(user.id) : Promise.resolve(null),
+    enabled: !!user
+  });
+
+  const mutation = useMutation({
+    mutationFn: updateProfile,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile', user?.id] });
+      toast({ title: 'Success', description: 'Profile updated successfully' });
+    },
+    onError: (error: any) => {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
     }
-  }, [user]);
+  });
 
-  const fetchProfile = async () => {
-    if (!user) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-
-      if (error) throw error;
-      setProfile(data);
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load profile data",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateProfile = async (updates: Partial<Profile>) => {
+  const handleUpdateProfile = (updates: Partial<Profile>) => {
     if (!user || !profile) return;
-
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update(updates)
-        .eq('id', user.id);
-
-      if (error) throw error;
-
-      setProfile({ ...profile, ...updates });
-      toast({
-        title: "Success",
-        description: "Profile updated successfully",
-      });
-      
-      // Refetch to get updated completion score
-      fetchProfile();
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update profile",
-        variant: "destructive",
-      });
-    }
+    mutation.mutate({ userId: user.id, updates });
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-red-500">Failed to load profile data</p>
       </div>
     );
   }
@@ -174,7 +151,7 @@ const AccountSettings = () => {
           </TabsList>
 
           <TabsContent value="profile">
-            <ProfileSettings profile={profile} onUpdate={updateProfile} />
+            <ProfileSettings profile={profile} onUpdate={handleUpdateProfile} />
           </TabsContent>
 
           <TabsContent value="security">
@@ -186,7 +163,7 @@ const AccountSettings = () => {
           </TabsContent>
 
           <TabsContent value="theme">
-            <ThemeSettings profile={profile} onUpdate={updateProfile} />
+            <ThemeSettings profile={profile} onUpdate={handleUpdateProfile} />
           </TabsContent>
         </Tabs>
       </div>

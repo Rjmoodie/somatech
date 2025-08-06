@@ -1,5 +1,5 @@
 import React, { useState, useEffect, lazy } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,6 +23,7 @@ import ProgressiveOnboarding from "@/components/somatech/ProgressiveOnboarding";
 import { ProfileDropdown } from "@/components/somatech/ProfileDropdown";
 import NotificationBell from "@/components/somatech/NotificationBell";
 import Footer from "@/components/somatech/Footer";
+import Trades from "@/components/somatech/Trades";
 
 // Lazy load modules for better performance
 const Dashboard = lazy(() => import("@/components/somatech/Dashboard"));
@@ -31,17 +32,8 @@ const WatchlistModule = lazy(() => import("@/components/somatech/WatchlistModule
 const BusinessValuation = lazy(() => import("@/components/somatech/BusinessValuation"));
 const CashFlowSimulator = lazy(() => import("@/components/somatech/CashFlowSimulator"));
 const RetirementPlanning = lazy(() => import("@/components/somatech/RetirementPlanning"));
-const RealEstateCalculatorContainer = lazy(() => import("@/components/somatech/RealEstateCalculatorContainer"));
-const RealEstateDealSourcing = lazy(() => import("@/components/somatech/real-estate/RealEstateDealSourcing"));
-const DealSourcingDataManager = lazy(() => import("@/components/somatech/real-estate/DealSourcingDataManager"));
-const DataIngestionPipeline = lazy(() => import("@/components/somatech/real-estate/DataIngestionPipeline"));
-const DataScrapingEngine = lazy(() => import("@/components/somatech/real-estate/scrapers/DataScrapingEngine"));
-const TaxDelinquentScraper = lazy(() => import("@/components/somatech/real-estate/scrapers/TaxDelinquentScraper"));
-const CodeViolationScraper = lazy(() => import("@/components/somatech/real-estate/scrapers/CodeViolationScraper"));
-const PreForeclosureScraper = lazy(() => import("@/components/somatech/real-estate/scrapers/PreForeclosureScraper"));
 const Marketplace = lazy(() => import("@/components/somatech/Marketplace"));
 const FundingCampaigns = lazy(() => import("@/components/somatech/FundingCampaigns"));
-const CampaignProjection = lazy(() => import("@/components/somatech/CampaignProjection"));
 const DonationSuccess = lazy(() => import("@/components/somatech/funding/DonationSuccess"));
 const AuthDialog = lazy(() => import("@/components/somatech/AuthDialog"));
 const PrivacyPolicy = lazy(() => import("@/components/somatech/PrivacyPolicy"));
@@ -67,6 +59,12 @@ const SecurityAuditDashboard = lazy(() => import("@/components/somatech/enterpri
 const MultiTenantArchitecture = lazy(() => import("@/components/somatech/enterprise/MultiTenantArchitecture"));
 
 import { toast } from "@/hooks/use-toast";
+import InvestorGuide from "@/components/somatech/investor-guide/InvestorGuide";
+const LeadGenSearchPage = lazy(() => import("@/components/somatech/lead-gen/SearchPage"));
+const DatabaseDebug = lazy(() => import("@/components/somatech/lead-gen/DatabaseDebug"));
+const DatabaseTest = lazy(() => import("@/components/somatech/lead-gen/DatabaseTest"));
+const FiftyStateDataIntegration = lazy(() => import("@/components/somatech/real-estate/50StateDataIntegrationDashboard"));
+const ExpandedDataSourcesDashboard = lazy(() => import("@/components/somatech/real-estate/scrapers/ExpandedDataSourcesDashboard"));
 
 const SomaTech = () => {
   const [activeModule, setActiveModule] = useState("dashboard");
@@ -78,6 +76,8 @@ const SomaTech = () => {
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
   const [showProgressiveOnboarding, setShowProgressiveOnboarding] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const location = useLocation();
   
   const { user, profile, loading: authLoading, signOut } = useAuth();
   const { reportError } = useError();
@@ -95,13 +95,14 @@ const SomaTech = () => {
     }
   }, [user, authLoading]);
 
+  // Handle URL parameters and module state
   useEffect(() => {
     const moduleParam = searchParams.get('module');
     const donation = searchParams.get('donation');
     const sessionId = searchParams.get('session_id');
     
     // Set active module from URL parameter
-    if (moduleParam && (modules.find(m => m.id === moduleParam) || moduleParam === 'privacy-policy')) {
+    if (moduleParam && (modules.find(m => m.id === moduleParam) || moduleParam === 'privacy-policy' || moduleParam === 'terms-of-service')) {
       setActiveModule(moduleParam);
     }
     
@@ -116,6 +117,34 @@ const SomaTech = () => {
       setSearchParams({});
     }
   }, [searchParams, setSearchParams]);
+
+  // Handle browser back/forward button
+  useEffect(() => {
+    const handlePopState = () => {
+      const moduleParam = new URLSearchParams(window.location.search).get('module');
+      if (moduleParam && modules.find(m => m.id === moduleParam)) {
+        setActiveModule(moduleParam);
+      } else if (!moduleParam) {
+        setActiveModule('dashboard');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Save module state to sessionStorage for persistence
+  useEffect(() => {
+    sessionStorage.setItem('somatech-active-module', activeModule);
+  }, [activeModule]);
+
+  // Restore module state on page load
+  useEffect(() => {
+    const savedModule = sessionStorage.getItem('somatech-active-module');
+    if (savedModule && !searchParams.get('module')) {
+      setActiveModule(savedModule);
+    }
+  }, []);
 
   const renderPlaceholder = (title: string) => (
     <Card>
@@ -139,7 +168,22 @@ const SomaTech = () => {
     try {
       trackPerformance('moduleChange', () => {
         setActiveModule(module);
-        setSearchParams({ module });
+        
+        // Update URL with module parameter
+        const newSearchParams = new URLSearchParams(searchParams);
+        if (module === 'dashboard') {
+          newSearchParams.delete('module');
+        } else {
+          newSearchParams.set('module', module);
+        }
+        
+        // Preserve other parameters
+        const donation = searchParams.get('donation');
+        const sessionId = searchParams.get('session_id');
+        if (donation) newSearchParams.set('donation', donation);
+        if (sessionId) newSearchParams.set('session_id', sessionId);
+        
+        setSearchParams(newSearchParams);
         
         // Ensure proper scroll behavior
         setTimeout(() => {
@@ -161,238 +205,53 @@ const SomaTech = () => {
   };
 
   const renderContent = () => {
-    try {
-      const moduleProps = {
-        globalTicker,
-        setGlobalTicker,
-        setActiveModule: handleModuleChange,
-        user,
-        onAuthRequired: () => setShowAuthDialog(true),
-        onUpgradeClick: () => setShowPricingDialog(true),
-        onUpgrade: () => setShowPricingDialog(true),
-      };
-
-      switch (activeModule) {
-        case "dashboard":
-          return (
-            <ModuleWrapper>
-              <Dashboard {...moduleProps} />
-            </ModuleWrapper>
-          );
-        case "stock-analysis":
-          return (
-            <ModuleWrapper>
-              <StockAnalysis globalTicker={globalTicker} setGlobalTicker={setGlobalTicker} />
-            </ModuleWrapper>
-          );
-        case "watchlist":
-          return (
-            <ModuleWrapper>
-              <WatchlistModule setActiveModule={handleModuleChange} />
-            </ModuleWrapper>
-          );
-        case "marketplace":
-          return (
-            <ModuleWrapper>
-              <Marketplace />
-            </ModuleWrapper>
-          );
-        case "funding-campaigns":
-          const sessionId = searchParams.get('session_id');
-          const donation = searchParams.get('donation');
-          
-          if (donation === 'success' && sessionId) {
-            return (
-              <ModuleWrapper>
-                <DonationSuccess />
-              </ModuleWrapper>
-            );
-          }
-          return (
-            <ModuleWrapper>
-              <FundingCampaigns user={user} onAuthRequired={() => setShowAuthDialog(true)} />
-            </ModuleWrapper>
-          );
-        case "business-valuation":
-          return (
-            <ModuleWrapper>
-              <BusinessValuation />
-            </ModuleWrapper>
-          );
-        case "cash-flow":
-          return (
-            <ModuleWrapper>
-              <CashFlowSimulator />
-            </ModuleWrapper>
-          );
-        case "retirement-planning":
-          return (
-            <ModuleWrapper>
-              <RetirementPlanning />
-            </ModuleWrapper>
-          );
-        case "real-estate":
-          return (
-            <ModuleWrapper>
-              <RealEstateCalculatorContainer />
-            </ModuleWrapper>
-          );
-        case "real-estate-deal-sourcing":
-          return (
-            <ModuleWrapper>
-              <RealEstateDealSourcing />
-            </ModuleWrapper>
-          );
-        case "deal-sourcing-data-manager":
-          return (
-            <ModuleWrapper>
-              <DealSourcingDataManager />
-            </ModuleWrapper>
-          );
-        case "data-ingestion-pipeline":
-          return (
-            <ModuleWrapper>
-              <DataIngestionPipeline />
-            </ModuleWrapper>
-          );
-        case "data-scraping-engine":
-          return (
-            <ModuleWrapper>
-              <DataScrapingEngine />
-            </ModuleWrapper>
-          );
-        case "tax-delinquent-scraper":
-          return (
-            <ModuleWrapper>
-              <TaxDelinquentScraper />
-            </ModuleWrapper>
-          );
-        case "code-violation-scraper":
-          return (
-            <ModuleWrapper>
-              <CodeViolationScraper />
-            </ModuleWrapper>
-          );
-        case "pre-foreclosure-scraper":
-          return (
-            <ModuleWrapper>
-              <PreForeclosureScraper />
-            </ModuleWrapper>
-          );
-        case "subscription":
-          return (
-            <ModuleWrapper>
-              <SubscriptionStatus onUpgradeClick={() => setShowPricingDialog(true)} />
-            </ModuleWrapper>
-          );
-        case "enterprise-analytics":
-          return (
-            <ModuleWrapper>
-              <UsageAnalytics onUpgrade={() => setShowPricingDialog(true)} />
-            </ModuleWrapper>
-          );
-        case "enterprise-admin":
-          return (
-            <ModuleWrapper>
-              <AdminPanel />
-            </ModuleWrapper>
-          );
-        case "enterprise-whitelabel":
-          return (
-            <ModuleWrapper>
-              <WhiteLabelCustomizer onUpgrade={() => setShowPricingDialog(true)} />
-            </ModuleWrapper>
-          );
-        case "enterprise-reporting":
-          return (
-            <ModuleWrapper>
-              <AdvancedReporting onUpgrade={() => setShowPricingDialog(true)} />
-            </ModuleWrapper>
-          );
-        case "enterprise-performance":
-          return (
-            <ModuleWrapper>
-              <PerformanceMonitoring />
-            </ModuleWrapper>
-          );
-        case "enterprise-success":
-          return (
-            <ModuleWrapper>
-              <CustomerSuccessDashboard />
-            </ModuleWrapper>
-          );
-        case "enterprise-security":
-          return (
-            <ModuleWrapper>
-              <SecurityAuditDashboard />
-            </ModuleWrapper>
-          );
-        case "enterprise-tenant":
-          return (
-            <ModuleWrapper>
-              <MultiTenantArchitecture onUpgrade={() => setShowPricingDialog(true)} />
-            </ModuleWrapper>
-          );
-        case "privacy-policy":
-          return (
-            <ModuleWrapper>
-              <PrivacyPolicy />
-            </ModuleWrapper>
-          );
-        case "terms-of-service":
-          return (
-            <ModuleWrapper>
-              <TermsOfService />
-            </ModuleWrapper>
-          );
-        case "account-settings":
-          return (
-            <ModuleWrapper>
-              <AccountSettings />
-            </ModuleWrapper>
-          );
-        case "user-dashboard":
-          return (
-            <ModuleWrapper>
-              <UserDashboard />
-            </ModuleWrapper>
-          );
-        case "notifications":
-          return (
-            <ModuleWrapper>
-              <NotificationCenter />
-            </ModuleWrapper>
-          );
-        case "feedback":
-          return (
-            <ModuleWrapper>
-              <FeedbackHub />
-            </ModuleWrapper>
-          );
-        default:
-          return (
-            <ModuleWrapper>
-              {renderPlaceholder(modules.find(m => m.id === activeModule)?.name || "Tool")}
-            </ModuleWrapper>
-          );
-      }
-    } catch (error) {
-      reportError(error as Error, `render-content-${activeModule}`);
-      return (
-        <Card>
-          <CardContent className="p-8 text-center">
-            <p className="text-muted-foreground">
-              Something went wrong loading this module. Please try again.
-            </p>
-            <Button 
-              onClick={() => handleModuleChange('dashboard')} 
-              className="mt-4"
-            >
-              Return to Dashboard
-            </Button>
-          </CardContent>
-        </Card>
-      );
+    switch (activeModule) {
+      case "dashboard":
+        return <Dashboard />;
+      case "investor-guide":
+        return <InvestorGuide />;
+      case "stock-analysis":
+        return <StockAnalysis />;
+      case "trades":
+        return <Trades />;
+      case "watchlist":
+        return <WatchlistModule />;
+      case "business-valuation":
+        return <BusinessValuation />;
+      case "cash-flow":
+        return <CashFlowSimulator />;
+      case "retirement-planning":
+        return <RetirementPlanning />;
+              case "lead-gen":
+          return <LeadGenSearchPage />;
+        case "database-debug":
+          return <DatabaseDebug />;
+        case "database-test":
+          return <DatabaseTest />;
+        case "50-state-data-integration":
+          return <FiftyStateDataIntegration />;
+        case "expanded-data-sources":
+          return <ExpandedDataSourcesDashboard />;
+      case "account":
+        return (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center">
+              <h2 className="text-2xl font-semibold mb-4">Account Settings</h2>
+              <p className="text-gray-600 dark:text-gray-400">Account management coming soon...</p>
+            </div>
+          </div>
+        );
+      case "settings":
+        return (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center">
+              <h2 className="text-2xl font-semibold mb-4">Settings</h2>
+              <p className="text-gray-600 dark:text-gray-400">Application settings coming soon...</p>
+            </div>
+          </div>
+        );
+      default:
+        return <Dashboard />;
     }
   };
 

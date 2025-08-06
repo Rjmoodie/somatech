@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
@@ -118,148 +118,96 @@ export const calculateRetirement = (
 /**
  * Custom hook for retirement plan operations
  */
-export const useRetirementOperations = () => {
-  const [savedPlans, setSavedPlans] = useState<SavedPlan[]>([]);
-  const loadSavedPlans = async (): Promise<SavedPlan[]> => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
-
-      const { data, error } = await supabase
-        .from('retirement_plans')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return (data as any[])?.map(item => ({
-        ...item,
-        inputs: item.inputs as RetirementInputs,
-        results: item.results as RetirementResults
-      })) || [];
-    } catch (error) {
-      console.error('Error loading plans:', error);
-      return [];
-    }
+export const useRetirementOperations = (userId: string | undefined) => {
+  const fetchSavedPlans = async (): Promise<SavedPlan[]> => {
+    if (!userId) return [];
+    const { data, error } = await supabase
+      .from('retirement_plans')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return (data as any[])?.map(item => ({
+      ...item,
+      inputs: item.inputs as RetirementInputs,
+      results: item.results as RetirementResults
+    })) || [];
   };
 
-  const savePlan = async (
-    planName: string, 
-    inputs: RetirementInputs, 
-    results: RetirementResults, 
-    notes?: string
-  ): Promise<boolean> => {
-    if (!planName.trim()) return false;
+  return useQuery({
+    queryKey: ['retirement-plans', userId],
+    queryFn: fetchSavedPlans,
+    enabled: !!userId,
+    staleTime: 60000
+  });
+};
 
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast({
-          title: "Authentication Required",
-          description: "Please sign in to save retirement plans.",
-          variant: "destructive",
-        });
-        return false;
-      }
-
-      const { data, error } = await supabase
+export const useSavePlan = (userId: string | undefined) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ planName, inputs, results, notes }: { planName: string; inputs: RetirementInputs; results: RetirementResults; notes?: string }) => {
+      if (!userId) throw new Error('User not logged in');
+      const { error } = await supabase
         .from('retirement_plans')
         .insert({
+          user_id: userId,
           plan_name: planName,
-          user_id: user.id,
-          inputs: inputs as any,
-          results: results as any,
-          notes: notes,
-        })
-        .select()
-        .single();
-
+          inputs,
+          results,
+          notes
+        });
       if (error) throw error;
-
-      if (data) {
-        toast({
-          title: "Plan Saved",
-          description: `"${planName}" has been saved successfully.`,
-        });
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error('Error saving plan:', error);
-      if (error instanceof Error && error.message.includes('not authenticated')) {
-        toast({
-          title: "Sign In Required",
-          description: "Please sign in or create an account to save your retirement plans and access advanced features.",
-          variant: "default",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to save plan. Please try again.",
-          variant: "destructive",
-        });
-      }
-      return false;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['retirement-plans', userId] });
+      toast({ title: 'Plan Saved', description: 'Your retirement plan has been saved.' });
+    },
+    onError: (error: any) => {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
     }
-  };
+  });
+};
 
-  const deletePlan = async (planId: string, planName: string): Promise<boolean> => {
-    try {
+export const useDeletePlan = (userId: string | undefined) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (planId: string) => {
+      if (!userId) throw new Error('User not logged in');
       const { error } = await supabase
         .from('retirement_plans')
         .delete()
-        .eq('id', planId);
-
+        .eq('id', planId)
+        .eq('user_id', userId);
       if (error) throw error;
-      
-      toast({
-        title: "Plan Deleted",
-        description: `"${planName}" has been deleted.`,
-      });
-      
-      return true;
-    } catch (error) {
-      console.error('Error deleting plan:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete plan. Please try again.",
-        variant: "destructive",
-      });
-      return false;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['retirement-plans', userId] });
+      toast({ title: 'Plan Deleted', description: 'Your retirement plan has been deleted.' });
+    },
+    onError: (error: any) => {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
     }
-  };
+  });
+};
 
-  const updatePlanNotes = async (planId: string, planName: string, notes: string): Promise<boolean> => {
-    try {
+export const useUpdatePlanNotes = (userId: string | undefined) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ planId, planName, notes }: { planId: string; planName: string; notes: string }) => {
+      if (!userId) throw new Error('User not logged in');
       const { error } = await supabase
         .from('retirement_plans')
-        .update({ notes })
-        .eq('id', planId);
-
+        .update({ notes, plan_name: planName })
+        .eq('id', planId)
+        .eq('user_id', userId);
       if (error) throw error;
-      
-      toast({
-        title: "Notes Updated",
-        description: `Notes for "${planName}" have been updated.`,
-      });
-      
-      return true;
-    } catch (error) {
-      console.error('Error updating notes:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update notes. Please try again.",
-        variant: "destructive",
-      });
-      return false;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['retirement-plans', userId] });
+      toast({ title: 'Notes Updated', description: 'Plan notes have been updated.' });
+    },
+    onError: (error: any) => {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
     }
-  };
-
-  return {
-    savedPlans,
-    loadSavedPlans,
-    savePlan,
-    deletePlan,
-    updatePlanNotes,
-  };
+  });
 };

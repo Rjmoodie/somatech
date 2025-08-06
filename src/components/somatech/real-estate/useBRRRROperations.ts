@@ -1,33 +1,30 @@
-import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from "@/hooks/use-toast";
-import { BRRRRInputs, BRRRRResults, SavedDeal } from "./brrrrCalculations";
+import { BRRRRInputs, BRRRRResults, SavedDeal } from './brrrrCalculations';
 
-/**
- * Custom hook for BRRRR deal operations
- */
-export const useBRRRROperations = () => {
-  const loadSavedDeals = async (): Promise<SavedDeal[]> => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
-
-      const { data, error } = await supabase
-        .from('brrrr_deals')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return (data as any[])?.map(item => ({
-        ...item,
-        inputs: item.inputs as BRRRRInputs,
-        results: item.results as BRRRRResults
-      })) || [];
-    } catch (error) {
-      console.error('Error loading saved deals:', error);
-      return [];
-    }
+export const useBRRRROperations = (userId: string | undefined) => {
+  const fetchSavedDeals = async (): Promise<SavedDeal[]> => {
+    if (!userId) return [];
+    const { data, error } = await supabase
+      .from('brrrr_deals')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return (data as any[])?.map(item => ({
+      ...item,
+      inputs: item.inputs as BRRRRInputs,
+      results: item.results as BRRRRResults
+    })) || [];
   };
+
+  const query = useQuery({
+    queryKey: ['brrrr-deals', userId],
+    queryFn: fetchSavedDeals,
+    enabled: !!userId,
+    staleTime: 60000
+  });
 
   const saveDeal = async (
     dealName: string,
@@ -157,7 +154,7 @@ export const useBRRRROperations = () => {
   };
 
   return {
-    loadSavedDeals,
+    query,
     saveDeal,
     deleteDeal,
     updateDealNotes,

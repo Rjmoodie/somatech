@@ -39,22 +39,24 @@ export const LoadPlanDialog = ({
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
-          {savedPlans.length === 0 ? (
+          {Array.isArray(savedPlans) && savedPlans.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-muted-foreground">No saved plans found.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {savedPlans.map((plan) => (
-                <SavedPlanCard
-                  key={plan.id}
-                  plan={plan}
-                  onLoad={() => onLoadPlan(plan)}
-                  onDelete={() => onDeletePlan(plan.id, plan.plan_name)}
-                  onEditNotes={() => onEditNotes(plan)}
-                />
-              ))}
-            </div>
+            Array.isArray(savedPlans) && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {savedPlans.map((plan) => (
+                  <SavedPlanCard
+                    key={plan.id}
+                    plan={plan}
+                    onLoad={() => onLoadPlan(plan)}
+                    onDelete={() => onDeletePlan(plan.id, plan.plan_name)}
+                    onEditNotes={() => onEditNotes(plan)}
+                  />
+                ))}
+              </div>
+            )
           )}
         </div>
       </DialogContent>

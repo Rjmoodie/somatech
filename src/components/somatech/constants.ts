@@ -29,9 +29,65 @@ import {
   User,
   Building2,
   BarChart,
-  AlertTriangle
+  AlertTriangle,
+  BookOpen,
+  Map,
+  Globe
 } from "lucide-react";
 import { Module } from "./types";
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+
+// Define the property type (adjust fields as needed)
+export interface PropertyLead {
+  id: string;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+  latitude: number;
+  longitude: number;
+  owner_name: string;
+  owner_type: string;
+  property_type: string;
+  bedrooms: number;
+  bathrooms: number;
+  square_feet: number;
+  lot_size: number;
+  year_built: number;
+  assessed_value: number;
+  estimated_value: number;
+  equity_percent: number;
+  mortgage_status: string;
+  lien_status: string;
+  tags: string[];
+  status: string;
+  last_updated: string;
+}
+
+// Enhanced hook: supports optional filters for dynamic queries
+export function usePropertyLeads(filters?: Partial<PropertyLead>) {
+  return useQuery<PropertyLead[], Error>({
+    queryKey: ['property-leads', filters],
+    queryFn: async () => {
+      let query = supabase.from('properties').select('*').order('last_updated', { ascending: false });
+
+      // Apply filters dynamically
+      if (filters) {
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== "") {
+            query = query.eq(key, value);
+          }
+        });
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data as PropertyLead[];
+    },
+    staleTime: 60000, // 1 minute
+  });
+}
 
 export const modules: Module[] = [
   {
@@ -40,7 +96,27 @@ export const modules: Module[] = [
     description: "Overview of your financial portfolio and market insights",
     icon: "LayoutDashboard",
     category: "overview",
-    featured: true
+    navGroup: "dashboard",
+    featured: true,
+    seo: {
+      title: "Dashboard | SomaTech",
+      description: "Overview of your financial portfolio and market insights. Track investments, monitor performance, and stay updated with the latest market trends on SomaTech.",
+      keywords: "dashboard, financial overview, portfolio, market insights, investment tracking, SomaTech"
+    }
+  },
+  {
+    id: "investor-guide",
+    name: "Investor Guide",
+    description: "A guided, top-down investing research and education experience.",
+    icon: "BookOpen",
+    category: "education",
+    navGroup: "financial",
+    featured: true,
+    seo: {
+      title: "Investor Guide | SomaTech",
+      description: "A guided, top-down investing research and education experience. Learn investment strategies, market analysis, and financial planning with SomaTech.",
+      keywords: "investor guide, investing education, research, financial planning, market analysis, SomaTech"
+    }
   },
   {
     id: "stock-analysis",
@@ -48,7 +124,27 @@ export const modules: Module[] = [
     description: "Comprehensive stock research and technical analysis",
     icon: "TrendingUp",
     category: "investing",
-    featured: true
+    navGroup: "financial",
+    featured: true,
+    seo: {
+      title: "Stock Analysis | SomaTech",
+      description: "Comprehensive stock research and technical analysis. Analyze stocks, trends, and market data to make informed investment decisions.",
+      keywords: "stock analysis, technical analysis, stock research, market data, investment, SomaTech"
+    }
+  },
+  {
+    id: "trades",
+    name: "Trade Analysis",
+    description: "Connect brokerages, analyze trades, and review your trading performance.",
+    icon: "BarChart3",
+    category: "investing",
+    navGroup: "financial",
+    featured: true,
+    seo: {
+      title: "Trade Analysis | SomaTech",
+      description: "Connect brokerages, analyze trades, and review your trading performance. Optimize your trading strategy with SomaTech's analytics tools.",
+      keywords: "trade analysis, trading performance, brokerage, trading strategy, analytics, SomaTech"
+    }
   },
   {
     id: "watchlist",
@@ -56,7 +152,13 @@ export const modules: Module[] = [
     description: "Track your favorite stocks and market movements",
     icon: "Eye",
     category: "investing",
-    featured: false
+    navGroup: "financial",
+    featured: false,
+    seo: {
+      title: "Watchlist | SomaTech",
+      description: "Track your favorite stocks and market movements. Create and manage your personalized watchlist for timely investment decisions.",
+      keywords: "watchlist, stock tracking, market movements, investment, personalized watchlist, SomaTech"
+    }
   },
   {
     id: "business-valuation",
@@ -64,7 +166,13 @@ export const modules: Module[] = [
     description: "Professional business valuation and analysis tools",
     icon: "Building2",
     category: "business",
-    featured: true
+    navGroup: "financial",
+    featured: true,
+    seo: {
+      title: "Business Valuation | SomaTech",
+      description: "Professional business valuation and analysis tools. Get accurate, real-time valuations for startups, SaaS, and more.",
+      keywords: "business valuation, valuation tools, startup valuation, SaaS valuation, financial analysis, SomaTech"
+    }
   },
   {
     id: "cash-flow",
@@ -72,7 +180,13 @@ export const modules: Module[] = [
     description: "Model and analyze business cash flows",
     icon: "DollarSign",
     category: "business",
-    featured: false
+    navGroup: "financial",
+    featured: false,
+    seo: {
+      title: "Cash Flow Simulator | SomaTech",
+      description: "Model and analyze business cash flows. Simulate scenarios and optimize your company's financial health with SomaTech.",
+      keywords: "cash flow, cash flow simulator, business analysis, financial modeling, scenario simulation, SomaTech"
+    }
   },
   {
     id: "retirement-planning",
@@ -80,199 +194,111 @@ export const modules: Module[] = [
     description: "Plan your financial future with retirement tools",
     icon: "Calendar",
     category: "planning",
-    featured: false
+    navGroup: "financial",
+    featured: false,
+    seo: {
+      title: "Retirement Planning | SomaTech",
+      description: "Plan your financial future with retirement tools. Calculate retirement needs, analyze savings strategies, and optimize your retirement plan.",
+      keywords: "retirement planning, retirement calculator, financial planning, retirement savings, investment planning, SomaTech"
+    }
   },
   {
-    id: "real-estate",
-    name: "Real Estate Calculator",
-    description: "Real estate investment analysis and calculations",
-    icon: "Home",
-    category: "real-estate",
-    featured: true
-  },
-  {
-    id: "real-estate-deal-sourcing",
-    name: "Deal Sourcing",
-    description: "Access real estate leads from all 50 U.S. states",
+    id: "lead-gen",
+    name: "Real Estate Leads",
+    description: "Find investment properties across all 50 states with advanced search and analysis",
     icon: "Search",
     category: "real-estate",
-    featured: true
+    navGroup: "realEstate",
+    featured: true,
+    seo: {
+      title: "Real Estate Leads | SomaTech",
+      description: "Find investment properties across all 50 states. Search tax delinquent properties, pre-foreclosures, and high-equity opportunities with advanced filtering and analysis tools.",
+      keywords: "real estate leads, property search, investment properties, tax delinquent, pre-foreclosure, real estate analysis, SomaTech"
+    }
   },
   {
-    id: "deal-sourcing-data-manager",
-    name: "Data Manager",
-    description: "Manage data sources and ingestion pipelines",
+    id: "50-state-data-integration",
+    name: "50-State Data Integration",
+    description: "Pull real-world property data from all 50 states and 3,142 counties",
     icon: "Database",
     category: "real-estate",
-    featured: false
+    navGroup: "realEstate",
+    featured: true,
+    seo: {
+      title: "50-State Data Integration | SomaTech",
+      description: "Pull real-world property data from all 50 states and 3,142 counties. Access tax delinquent properties, pre-foreclosures, and federal data sources.",
+      keywords: "50 state data integration, real estate data, property data, county data, federal data, SomaTech"
+    }
   },
   {
-    id: "data-ingestion-pipeline",
-    name: "Data Pipeline",
-    description: "Monitor automated data collection and processing",
+    id: "expanded-data-sources",
+    name: "Expanded Data Sources",
+    description: "Advanced real estate data integration with 100+ sources across all categories",
+    icon: "Globe",
+    category: "real-estate",
+    navGroup: "realEstate",
+    featured: true,
+    seo: {
+      title: "Expanded Data Sources | SomaTech",
+      description: "Advanced real estate data integration with 100+ sources including MLS, auctions, court records, environmental data, demographics, and commercial properties.",
+      keywords: "expanded data sources, real estate data integration, MLS data, auction data, court records, environmental data, demographics, commercial properties, SomaTech"
+    }
+  },
+  {
+    id: "database-test",
+    name: "Database Test",
+    description: "Test database connection and view all properties",
+    icon: "Database",
+    category: "debug",
+    navGroup: "debug",
+    featured: false,
+    seo: {
+      title: "Database Test | SomaTech",
+      description: "Test database connection and view all properties in the database.",
+      keywords: "database test, debug, properties, SomaTech"
+    }
+  },
+  {
+    id: "database-debug",
+    name: "Database Debug",
+    description: "Advanced database debugging and search testing",
     icon: "RefreshCw",
-    category: "real-estate",
-    featured: false
+    category: "debug",
+    navGroup: "debug",
+    featured: false,
+    seo: {
+      title: "Database Debug | SomaTech",
+      description: "Advanced database debugging and search testing tools.",
+      keywords: "database debug, search test, debugging, SomaTech"
+    }
   },
   {
-    id: "data-scraping-engine",
-    name: "Scraping Engine",
-    description: "Automated data collection from public sources",
-    icon: "Database",
-    category: "real-estate",
-    featured: false
-  },
-  {
-    id: "tax-delinquent-scraper",
-    name: "Tax Delinquent Scraper",
-    description: "Extract tax delinquent property data",
-    icon: "DollarSign",
-    category: "real-estate",
-    featured: false
-  },
-  {
-    id: "code-violation-scraper",
-    name: "Code Violation Scraper",
-    description: "Extract code violation property data",
-    icon: "AlertTriangle",
-    category: "real-estate",
-    featured: false
-  },
-  {
-    id: "pre-foreclosure-scraper",
-    name: "Pre-Foreclosure Scraper",
-    description: "Extract pre-foreclosure property data",
-    icon: "Building2",
-    category: "real-estate",
-    featured: false
-  },
-  {
-    id: "marketplace",
-    name: "Marketplace",
-    description: "Buy and sell businesses in the marketplace",
-    icon: "Store",
-    category: "business",
-    featured: true
-  },
-  {
-    id: "funding-campaigns",
-    name: "Funding Campaigns",
-    description: "Create and manage funding campaigns",
-    icon: "Target",
-    category: "business",
-    featured: false
-  },
-  {
-    id: "campaign-projection",
-    name: "Campaign Projection",
-    description: "Project and analyze funding campaign performance",
-    icon: "BarChart3",
-    category: "business",
-    featured: false
-  },
-  {
-    id: "subscription",
-    name: "Subscription",
-    description: "Manage your subscription and billing",
-    icon: "CreditCard",
-    category: "account",
-    featured: false
-  },
-  {
-    id: "enterprise-analytics",
-    name: "Usage Analytics",
-    description: "Advanced analytics and usage insights",
-    icon: "BarChart",
-    category: "enterprise",
-    featured: false
-  },
-  {
-    id: "enterprise-admin",
-    name: "Admin Panel",
-    description: "Administrative tools and user management",
-    icon: "Settings",
-    category: "enterprise",
-    featured: false
-  },
-  {
-    id: "enterprise-whitelabel",
-    name: "White Label",
-    description: "Customize branding and white label options",
-    icon: "Palette",
-    category: "enterprise",
-    featured: false
-  },
-  {
-    id: "enterprise-reporting",
-    name: "Advanced Reporting",
-    description: "Comprehensive reporting and analytics",
-    icon: "FileText",
-    category: "enterprise",
-    featured: false
-  },
-  {
-    id: "enterprise-performance",
-    name: "Performance Monitoring",
-    description: "Monitor system performance and metrics",
-    icon: "Activity",
-    category: "enterprise",
-    featured: false
-  },
-  {
-    id: "enterprise-success",
-    name: "Customer Success",
-    description: "Customer success and support tools",
-    icon: "Users",
-    category: "enterprise",
-    featured: false
-  },
-  {
-    id: "enterprise-security",
-    name: "Security Audit",
-    description: "Security monitoring and audit tools",
-    icon: "Shield",
-    category: "enterprise",
-    featured: false
-  },
-  {
-    id: "enterprise-tenant",
-    name: "Multi-Tenant",
-    description: "Multi-tenant architecture management",
-    icon: "Building",
-    category: "enterprise",
-    featured: false
-  },
-  {
-    id: "account-settings",
-    name: "Account Settings",
-    description: "Manage your account and preferences",
+    id: "account",
+    name: "Account",
+    description: "Manage your account settings and preferences",
     icon: "User",
     category: "account",
-    featured: false
+    navGroup: "account",
+    featured: false,
+    seo: {
+      title: "Account | SomaTech",
+      description: "Manage your account settings and preferences. Update your profile, security settings, and account information.",
+      keywords: "account, settings, profile, security, preferences, SomaTech"
+    }
   },
   {
-    id: "user-dashboard",
-    name: "User Dashboard",
-    description: "Personal user dashboard and analytics",
-    icon: "LayoutDashboard",
-    category: "account",
-    featured: false
-  },
-  {
-    id: "notifications",
-    name: "Notifications",
-    description: "Manage notifications and alerts",
-    icon: "Bell",
-    category: "account",
-    featured: false
-  },
-  {
-    id: "feedback",
-    name: "Feedback Hub",
-    description: "Submit feedback and view responses",
-    icon: "MessageSquare",
-    category: "account",
-    featured: false
+    id: "settings",
+    name: "Settings",
+    description: "Configure application settings and preferences",
+    icon: "Settings",
+    category: "settings",
+    navGroup: "settings",
+    featured: false,
+    seo: {
+      title: "Settings | SomaTech",
+      description: "Configure application settings and preferences. Customize your experience with SomaTech's powerful tools.",
+      keywords: "settings, configuration, preferences, customization, SomaTech"
+    }
   }
 ];
 

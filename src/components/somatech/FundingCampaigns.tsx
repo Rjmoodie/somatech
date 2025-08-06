@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Search, Filter, Heart, Calendar, Target, TrendingUp, User } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from "@/integrations/supabase/client";
 import { FundingCampaign, CampaignFilters } from "./types";
 import { campaignCategories } from "./constants";
@@ -20,106 +21,105 @@ interface FundingCampaignsProps {
   onAuthRequired: () => void;
 }
 
+const fetchCampaigns = async (filters: CampaignFilters) => {
+  let query = supabase
+    .from('funding_campaigns')
+    .select('*')
+    .eq('visibility', 'public')
+    .eq('status', 'active');
+
+  if (filters.category) {
+    query = query.eq('category', filters.category);
+  }
+  if (filters.search) {
+    query = query.ilike('title', `%${filters.search}%`);
+  }
+  switch (filters.sortBy) {
+    case 'newest':
+      query = query.order('created_at', { ascending: false });
+      break;
+    case 'most_funded':
+      query = query.order('current_amount', { ascending: false });
+      break;
+    case 'ending_soon':
+      query = query.not('deadline', 'is', null).order('deadline', { ascending: true });
+      break;
+    default:
+      query = query.order('created_at', { ascending: false });
+  }
+  const { data, error } = await query;
+  if (error) throw error;
+  return data as FundingCampaign[];
+};
+
+const fetchMyCampaigns = async (userId: string) => {
+  const { data, error } = await supabase
+    .from('funding_campaigns')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return data as FundingCampaign[];
+};
+
+const createCampaign = async (newCampaign: Partial<FundingCampaign>) => {
+  const { data, error } = await supabase
+    .from('funding_campaigns')
+    .insert([newCampaign]);
+  if (error) throw error;
+  return data?.[0];
+};
+
 const FundingCampaigns = ({ user, onAuthRequired }: FundingCampaignsProps) => {
-  const [campaigns, setCampaigns] = useState<FundingCampaign[]>([]);
-  const [myCampaigns, setMyCampaigns] = useState<FundingCampaign[]>([]);
-  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'explore' | 'my-campaigns'>('explore');
   const [selectedCampaign, setSelectedCampaign] = useState<FundingCampaign | null>(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [filters, setFilters] = useState<CampaignFilters>({
-    sortBy: 'newest',
-    search: ''
+  const [filters, setFilters] = useState<CampaignFilters>({ sortBy: 'newest', search: '' });
+  const queryClient = useQueryClient();
+
+  const {
+    data: campaigns,
+    isLoading: loadingCampaigns,
+    error: errorCampaigns
+  } = useQuery({
+    queryKey: ['funding-campaigns', filters],
+    queryFn: () => fetchCampaigns(filters),
+    staleTime: 60000,
   });
 
-  useEffect(() => {
-    fetchCampaigns();
-  }, [filters]);
+  const {
+    data: myCampaigns,
+    isLoading: loadingMyCampaigns,
+    error: errorMyCampaigns
+  } = useQuery({
+    queryKey: ['my-funding-campaigns', user?.id],
+    queryFn: () => user ? fetchMyCampaigns(user.id) : Promise.resolve([]),
+    enabled: !!user,
+    staleTime: 60000,
+  });
 
-  const fetchCampaigns = async () => {
-    try {
-      setLoading(true);
-      
-      let query = supabase
-        .from('funding_campaigns')
-        .select('*')
-        .eq('visibility', 'public')
-        .eq('status', 'active');
-
-      // Apply filters
-      if (filters.category) {
-        query = query.eq('category', filters.category);
-      }
-
-      if (filters.search) {
-        query = query.ilike('title', `%${filters.search}%`);
-      }
-
-      // Apply sorting
-      switch (filters.sortBy) {
-        case 'newest':
-          query = query.order('created_at', { ascending: false });
-          break;
-        case 'most_funded':
-          query = query.order('current_amount', { ascending: false });
-          break;
-        case 'ending_soon':
-          query = query.not('deadline', 'is', null).order('deadline', { ascending: true });
-          break;
-        default:
-          query = query.order('created_at', { ascending: false });
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-
-      setCampaigns(data as FundingCampaign[] || []);
-    } catch (error) {
-      console.error('Error fetching campaigns:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load campaigns",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
+  const createMutation = useMutation({
+    mutationFn: createCampaign,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries(['my-funding-campaigns', user?.id]);
+      setShowCreateDialog(false);
+      toast({ title: 'Success!', description: 'Your campaign has been created successfully' });
+    },
+    onError: (error: any) => {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
     }
-  };
+  });
 
-  const fetchMyCampaigns = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data, error } = await supabase
-        .from('funding_campaigns')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setMyCampaigns(data as FundingCampaign[] || []);
-    } catch (error) {
-      console.error('Error fetching my campaigns:', error);
-    }
-  };
-
-  useEffect(() => {
-    if (activeTab === 'my-campaigns') {
-      fetchMyCampaigns();
-    }
-  }, [activeTab]);
-
-  const handleCreateCampaign = () => {
+  const handleCreateCampaign = (newCampaign: Partial<FundingCampaign>) => {
     if (!user) {
       onAuthRequired();
       return;
     }
-    setShowCreateDialog(true);
+    createMutation.mutate({ ...newCampaign, user_id: user.id });
   };
 
   const handleCampaignCreated = (newCampaign: FundingCampaign) => {
-    setMyCampaigns([newCampaign, ...myCampaigns]);
+    queryClient.invalidateQueries(['my-funding-campaigns', user?.id]);
     setShowCreateDialog(false);
     toast({
       title: "Success!",
@@ -166,7 +166,7 @@ const FundingCampaigns = ({ user, onAuthRequired }: FundingCampaignsProps) => {
         campaign={selectedCampaign}
         onBack={() => setSelectedCampaign(null)}
         onUpdate={(updated) => {
-          setCampaigns(campaigns.map(c => c.id === updated.id ? updated : c));
+          queryClient.invalidateQueries(['funding-campaigns']);
           setSelectedCampaign(updated);
         }}
       />
@@ -269,9 +269,7 @@ const FundingCampaigns = ({ user, onAuthRequired }: FundingCampaignsProps) => {
       )}
 
       {/* Campaign Grid */}
-      {(
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {loading ? (
+      {(loadingCampaigns || loadingMyCampaigns) ? (
           // Loading skeletons
           Array.from({ length: 6 }).map((_, i) => (
             <Card key={i} className="h-80">
@@ -294,16 +292,13 @@ const FundingCampaigns = ({ user, onAuthRequired }: FundingCampaignsProps) => {
               onClick={() => setSelectedCampaign(campaign)}
               showManageButton={activeTab === 'my-campaigns'}
               onDelete={() => {
-                setMyCampaigns(myCampaigns.filter(c => c.id !== campaign.id));
+                queryClient.invalidateQueries(['my-funding-campaigns', user?.id]);
               }}
             />
           ))
         )}
-      </div>
-      )}
-
       {/* Empty State with Better UX */}
-      {!loading && (activeTab === 'explore' ? campaigns : myCampaigns).length === 0 && (
+      {!loadingCampaigns && !loadingMyCampaigns && (activeTab === 'explore' ? campaigns : myCampaigns).length === 0 && (
         <Card className="text-center py-12">
           <CardContent>
             {activeTab === 'explore' ? (
@@ -324,12 +319,12 @@ const FundingCampaigns = ({ user, onAuthRequired }: FundingCampaignsProps) => {
                     >
                       Clear Filters
                     </Button>
-                    <Button onClick={handleCreateCampaign}>
+                    <Button onClick={() => handleCreateCampaign({})}>
                       Create Campaign
                     </Button>
                   </div>
                 ) : (
-                  <Button onClick={handleCreateCampaign}>
+                  <Button onClick={() => handleCreateCampaign({})}>
                     Create First Campaign
                   </Button>
                 )}
@@ -341,7 +336,7 @@ const FundingCampaigns = ({ user, onAuthRequired }: FundingCampaignsProps) => {
                 <p className="text-muted-foreground mb-4">
                   Ready to start your first funding campaign? It only takes a few minutes!
                 </p>
-                <Button onClick={handleCreateCampaign} className="gap-2">
+                <Button onClick={() => handleCreateCampaign({})} className="gap-2">
                   <Plus className="h-4 w-4" />
                   Create Your First Campaign
                 </Button>

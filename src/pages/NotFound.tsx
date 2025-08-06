@@ -1,18 +1,27 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Home, ArrowLeft, Search, HelpCircle } from 'lucide-react';
+import { Home, ArrowLeft, Search, HelpCircle, RefreshCw } from 'lucide-react';
 
 const NotFound = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleGoBack = () => {
     if (window.history.length > 1) {
       navigate(-1);
     } else {
-      navigate('/');
+      navigate('/somatech');
     }
+  };
+
+  const handleRefresh = () => {
+    window.location.reload();
+  };
+
+  const handleGoHome = () => {
+    navigate('/somatech');
   };
 
   return (
@@ -28,10 +37,15 @@ const NotFound = () => {
           <p className="text-lg text-muted-foreground max-w-md mx-auto">
             The page you're looking for doesn't exist or has been moved.
           </p>
+          {location.pathname && (
+            <p className="text-sm text-muted-foreground mt-2">
+              Attempted URL: <code className="bg-muted px-2 py-1 rounded text-xs">{location.pathname}</code>
+            </p>
+          )}
         </CardHeader>
         
         <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Button 
               onClick={handleGoBack}
               variant="outline" 
@@ -42,13 +56,20 @@ const NotFound = () => {
             </Button>
             
             <Button 
-              asChild 
+              onClick={handleGoHome}
               className="w-full gap-2"
             >
-              <Link to="/">
-                <Home className="h-4 w-4" />
-                Home
-              </Link>
+              <Home className="h-4 w-4" />
+              Home
+            </Button>
+
+            <Button 
+              onClick={handleRefresh}
+              variant="outline"
+              className="w-full gap-2"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Refresh
             </Button>
           </div>
           
@@ -80,6 +101,18 @@ const NotFound = () => {
                 className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
               >
                 Real Estate Calculator
+              </Link>
+              <Link 
+                to="/somatech?module=cash-flow" 
+                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+              >
+                Cash Flow Simulator
+              </Link>
+              <Link 
+                to="/somatech?module=retirement-planning" 
+                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+              >
+                Retirement Planning
               </Link>
             </div>
           </div>

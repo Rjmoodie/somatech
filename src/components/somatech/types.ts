@@ -228,6 +228,12 @@ export interface Module {
   icon: string;
   category: string;
   featured: boolean;
+  seo?: {
+    title: string;
+    description: string;
+    keywords: string;
+  };
+  navGroup?: string;
 }
 
 // Business Marketplace Types
@@ -378,4 +384,17 @@ export interface CampaignFilters {
   category?: string;
   sortBy: 'newest' | 'most_funded' | 'ending_soon' | 'most_recent';
   search?: string;
+}
+
+export interface Profile {
+  id: string;
+  username: string | null;
+  email: string | null;
+  avatar_url: string | null;
+  bio: string | null;
+  location: string | null;
+  website: string | null;
+  theme_preference: string;
+  onboarding_completed: boolean;
+  profile_completion_score: number;
 }

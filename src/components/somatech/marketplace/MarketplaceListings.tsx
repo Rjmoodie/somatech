@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from "@/integrations/supabase/client";
 import { BusinessListing, MarketplaceFilters } from "../types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,87 +11,78 @@ interface MarketplaceListingsProps {
   filters: MarketplaceFilters;
 }
 
+const fetchListings = async (filters: any) => {
+  let query = supabase
+    .from('business_listings')
+    .select('*')
+    .eq('status', 'live');
+
+  if (filters.industry) {
+    query = query.eq('industry', filters.industry);
+  }
+  if (filters.location) {
+    query = query.ilike('location', `%${filters.location}%`);
+  }
+  if (filters.priceMin) {
+    query = query.gte('asking_price', filters.priceMin);
+  }
+  if (filters.priceMax) {
+    query = query.lte('asking_price', filters.priceMax);
+  }
+  if (filters.ebitdaMin) {
+    query = query.gte('ebitda', filters.ebitdaMin);
+  }
+  if (filters.ebitdaMax) {
+    query = query.lte('ebitda', filters.ebitdaMax);
+  }
+  switch (filters.sortBy) {
+    case 'newest':
+      query = query.order('created_at', { ascending: false });
+      break;
+    case 'price_asc':
+      query = query.order('asking_price', { ascending: true });
+      break;
+    case 'price_desc':
+      query = query.order('asking_price', { ascending: false });
+      break;
+    case 'ebitda_desc':
+      query = query.order('ebitda', { ascending: false });
+      break;
+  }
+  const { data, error } = await query;
+  if (error) throw error;
+  return data;
+};
+
 const MarketplaceListings = ({ filters }: MarketplaceListingsProps) => {
-  const [listings, setListings] = useState<BusinessListing[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: listings, isLoading, error } = useQuery({
+    queryKey: ['marketplace-listings', filters],
+    queryFn: () => fetchListings(filters),
+    staleTime: 60000
+  });
   const { toast } = useToast();
 
-  useEffect(() => {
-    fetchListings();
-  }, [filters]);
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Loading skeletons */}
+        {Array.from({ length: 6 }).map((_, i) => (
+          <Card key={i} className="animate-pulse h-48" />
+        ))}
+      </div>
+    );
+  }
+  if (error) {
+    return <div className="text-red-500">Failed to load listings</div>;
+  }
 
-  const fetchListings = async () => {
-    try {
-      let query = supabase
-        .from('business_listings')
-        .select('*')
-        .eq('status', 'live');
-
-      // Apply filters
-      if (filters.industry) {
-        query = query.eq('industry', filters.industry);
-      }
-      if (filters.location) {
-        query = query.ilike('location', `%${filters.location}%`);
-      }
-      if (filters.priceMin) {
-        query = query.gte('asking_price', filters.priceMin);
-      }
-      if (filters.priceMax) {
-        query = query.lte('asking_price', filters.priceMax);
-      }
-      if (filters.ebitdaMin) {
-        query = query.gte('ebitda', filters.ebitdaMin);
-      }
-      if (filters.ebitdaMax) {
-        query = query.lte('ebitda', filters.ebitdaMax);
-      }
-
-      // Apply sorting
-      switch (filters.sortBy) {
-        case 'newest':
-          query = query.order('created_at', { ascending: false });
-          break;
-        case 'price_asc':
-          query = query.order('asking_price', { ascending: true });
-          break;
-        case 'price_desc':
-          query = query.order('asking_price', { ascending: false });
-          break;
-        case 'ebitda_desc':
-          query = query.order('ebitda', { ascending: false });
-          break;
-      }
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-      setListings((data || []).map(listing => ({
-        ...listing,
-        valuation_summary: listing.valuation_summary as BusinessListing['valuation_summary'],
-        visibility: listing.visibility as BusinessListing['visibility'],
-        status: listing.status as BusinessListing['status'],
-        bor_visibility: (listing.bor_visibility || 'public') as BusinessListing['bor_visibility'],
-        cash_flow: listing.cash_flow || undefined,
-        key_value_drivers: listing.key_value_drivers || undefined,
-        growth_potential: listing.growth_potential || undefined,
-        competitive_advantages: listing.competitive_advantages || undefined,
-        documents: listing.documents || undefined,
-        bor_documents: listing.bor_documents || undefined,
-        views_count: listing.views_count || 0,
-        contact_requests_count: listing.contact_requests_count || 0
-      })));
-    } catch (error) {
-      console.error('Error fetching listings:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load business listings",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  if (!listings || listings.length === 0) {
+    return (
+      <Card>
+        <CardContent className="text-center py-12">No listings found.</CardContent>
+      </Card>
+    );
+  }
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -111,42 +102,9 @@ const MarketplaceListings = ({ filters }: MarketplaceListingsProps) => {
     return formatCurrency(num);
   };
 
-  if (loading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[...Array(6)].map((_, i) => (
-          <Card key={i} className="animate-pulse">
-            <CardHeader>
-              <div className="h-4 bg-muted rounded w-3/4"></div>
-              <div className="h-3 bg-muted rounded w-1/2"></div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="h-3 bg-muted rounded"></div>
-                <div className="h-3 bg-muted rounded w-5/6"></div>
-                <div className="h-8 bg-muted rounded"></div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    );
-  }
-
-  if (listings.length === 0) {
-    return (
-      <Card>
-        <CardContent className="py-12 text-center">
-          <p className="text-muted-foreground">No businesses found matching your criteria.</p>
-          <p className="text-sm text-muted-foreground mt-1">Try adjusting your filters or check back later.</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {listings.map((listing) => (
+      {listings?.map((listing) => (
         <Card key={listing.id} className="hover:shadow-lg transition-shadow cursor-pointer">
           <CardHeader className="pb-3">
             <div className="flex items-start justify-between">

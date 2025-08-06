@@ -10,6 +10,10 @@ import { TraditionalCalculator } from "./real-estate/TraditionalCalculator";
 import { BRRRRCalculator } from "./real-estate/BRRRRCalculator";
 import { SavedDealsManager } from "./real-estate/SavedDealsManager";
 import { EnhancedSaveDialog } from "./real-estate/EnhancedSaveDialog";
+import { modules } from "./constants";
+import SEO from "../SEO";
+
+const module = modules.find(m => m.id === "real-estate");
 
 const RealEstateCalculatorContainer = () => {
   // BRRRR Calculator State
@@ -99,71 +103,96 @@ const RealEstateCalculatorContainer = () => {
     return await saveDeal(dealName, brrrrInputs, brrrrResults, dealNotes, currentDealId);
   };
 
+  // JSON-LD structured data for the real estate calculator
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": module?.name,
+    "description": module?.seo?.description,
+    "applicationCategory": "RealEstateApplication",
+    "operatingSystem": "All",
+    "publisher": {
+      "@type": "Organization",
+      "name": "SomaTech"
+    }
+  };
+
   return (
-    <div className="space-y-4 sm:space-y-6 w-full max-w-full overflow-hidden">
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 h-auto p-1">
-          <TabsTrigger value="traditional" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 py-2">
-            <Calculator className="h-3 w-3 sm:h-4 sm:w-4" />
-            <span className="hidden sm:inline">Traditional Analysis</span>
-            <span className="sm:hidden">Traditional</span>
-          </TabsTrigger>
-          <TabsTrigger value="brrrr" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 py-2">
-            <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4" />
-            <span className="hidden sm:inline">BRRRR Calculator</span>
-            <span className="sm:hidden">BRRRR</span>
-          </TabsTrigger>
-          <TabsTrigger value="saved-deals" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 py-2">
-            <FolderOpen className="h-3 w-3 sm:h-4 sm:w-4" />
-            <span className="hidden sm:inline">Saved Deals</span>
-            <span className="sm:hidden">Saved</span>
-          </TabsTrigger>
-        </TabsList>
+    <>
+      {module?.seo && (
+        <SEO
+          title={module.seo.title}
+          description={module.seo.description}
+          keywords={module.seo.keywords}
+          url={typeof window !== 'undefined' ? window.location.href : undefined}
+          jsonLd={jsonLd}
+        />
+      )}
+      <div className="space-y-4 sm:space-y-6 w-full max-w-full overflow-hidden">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-3 h-auto p-1">
+            <TabsTrigger value="traditional" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 py-2">
+              <Calculator className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Traditional Analysis</span>
+              <span className="sm:hidden">Traditional</span>
+            </TabsTrigger>
+            <TabsTrigger value="brrrr" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 py-2">
+              <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">BRRRR Calculator</span>
+              <span className="sm:hidden">BRRRR</span>
+            </TabsTrigger>
+            <TabsTrigger value="saved-deals" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 py-2">
+              <FolderOpen className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Saved Deals</span>
+              <span className="sm:hidden">Saved</span>
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="traditional" className="space-y-4 sm:space-y-6 mt-4">
-          <PropertyMap />
-          <TraditionalCalculator />
-        </TabsContent>
+          <TabsContent value="traditional" className="space-y-4 sm:space-y-6 mt-4">
+            <PropertyMap />
+            <TraditionalCalculator />
+          </TabsContent>
 
-        <TabsContent value="brrrr" className="space-y-4 sm:space-y-6 mt-4">
-          <PropertyMap />
-          <BRRRRCalculator
-            inputs={brrrrInputs}
-            onInputChange={updateBrrrrInput}
-            results={brrrrResults}
-            onResults={setBrrrrResults}
-            onSaveClick={() => setShowSaveDialog(true)}
-            isMobile={isMobile}
-            dealName={dealName}
-            dealNotes={dealNotes}
-            currentDealId={currentDealId}
-            onAutoSave={handleAutoSave}
-          />
-        </TabsContent>
+          <TabsContent value="brrrr" className="space-y-4 sm:space-y-6 mt-4">
+            <PropertyMap />
+            <BRRRRCalculator
+              inputs={brrrrInputs}
+              onInputChange={updateBrrrrInput}
+              results={brrrrResults}
+              onResults={setBrrrrResults}
+              onSaveClick={() => setShowSaveDialog(true)}
+              isMobile={isMobile}
+              dealName={dealName}
+              dealNotes={dealNotes}
+              currentDealId={currentDealId}
+              onAutoSave={handleAutoSave}
+            />
+          </TabsContent>
 
-        <TabsContent value="saved-deals" className="space-y-6">
-          <SavedDealsManager
-            savedDeals={savedDeals}
-            onLoadDeal={handleLoadDeal}
-            onSwitchToCalculator={() => setActiveTab("brrrr")}
-          />
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="saved-deals" className="space-y-6">
+            <SavedDealsManager
+              savedDeals={savedDeals}
+              onLoadDeal={handleLoadDeal}
+              onSwitchToCalculator={() => setActiveTab("brrrr")}
+            />
+          </TabsContent>
+        </Tabs>
 
-      {/* Enhanced Save Dialog */}
-      <EnhancedSaveDialog
-        open={showSaveDialog}
-        onOpenChange={setShowSaveDialog}
-        dealName={dealName}
-        setDealName={setDealName}
-        dealNotes={dealNotes}
-        setDealNotes={setDealNotes}
-        onSave={handleSaveDeal}
-        results={brrrrResults}
-        inputs={brrrrInputs}
-        isUpdate={!!currentDealId}
-      />
-    </div>
+        {/* Enhanced Save Dialog */}
+        <EnhancedSaveDialog
+          open={showSaveDialog}
+          onOpenChange={setShowSaveDialog}
+          dealName={dealName}
+          setDealName={setDealName}
+          dealNotes={dealNotes}
+          setDealNotes={setDealNotes}
+          onSave={handleSaveDeal}
+          results={brrrrResults}
+          inputs={brrrrInputs}
+          isUpdate={!!currentDealId}
+        />
+      </div>
+    </>
   );
 };
 

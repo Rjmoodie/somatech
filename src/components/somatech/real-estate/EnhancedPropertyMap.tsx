@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
+import * as mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,47 +18,22 @@ const PropertyMap: React.FC<PropertyMapProps> = ({ onLocationSelect, selectedLoc
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const marker = useRef<mapboxgl.Marker | null>(null);
-  const [mapboxToken, setMapboxToken] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [mapLoaded, setMapLoaded] = useState(false);
   const { reportError } = useError();
   const { trackPerformance, debounce } = usePerformance();
 
-  // Fetch Mapbox token from Supabase Edge Function
-  useEffect(() => {
-    const fetchMapboxToken = async () => {
-      try {
-        const response = await fetch('/functions/v1/get-mapbox-token', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setMapboxToken(data.token);
-        } else {
-          // Token fetch failed, show input for manual entry
-          console.warn('Failed to fetch Mapbox token from edge function');
-        }
-      } catch (error) {
-        console.warn('Error fetching Mapbox token:', error);
-      }
-    };
-
-    fetchMapboxToken();
-  }, []);
-
   // Initialize map
   useEffect(() => {
-    if (!mapContainer.current || !mapboxToken || map.current) return;
+    if (!mapContainer.current || map.current) return;
+
+    // Always set the access token from the environment variable
+    (window as any).mapboxgl = mapboxgl;
+    (window as any).mapboxgl.accessToken = 'pk.eyJ1Ijoicm9kenJqIiwiYSI6ImNtZGZibGtvdjBjMHIybG85aTlyYWExNncifQ.EUrooIX34z2SPRrR1WvnAQ';
 
     trackPerformance('mapInitialization', async () => {
       try {
-        mapboxgl.accessToken = mapboxToken;
-        
         map.current = new mapboxgl.Map({
           container: mapContainer.current!,
           style: 'mapbox://styles/mapbox/light-v11',
@@ -93,7 +68,7 @@ const PropertyMap: React.FC<PropertyMapProps> = ({ onLocationSelect, selectedLoc
 
         map.current.on('load', () => {
           setMapLoaded(true);
-          
+
           // Add property markers layer for future use
           map.current?.addSource('properties', {
             type: 'geojson',
@@ -115,7 +90,6 @@ const PropertyMap: React.FC<PropertyMapProps> = ({ onLocationSelect, selectedLoc
             },
           });
         });
-
       } catch (error) {
         reportError(error as Error, 'map-initialization');
       }
@@ -131,7 +105,7 @@ const PropertyMap: React.FC<PropertyMapProps> = ({ onLocationSelect, selectedLoc
         marker.current = null;
       }
     };
-  }, [mapboxToken, trackPerformance, reportError]);
+  }, [trackPerformance, reportError]);
 
   // Update marker when selected location changes
   useEffect(() => {
@@ -172,13 +146,13 @@ const PropertyMap: React.FC<PropertyMapProps> = ({ onLocationSelect, selectedLoc
     try {
       // Reverse geocoding
       const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${mapboxToken}&types=address`
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=pk.eyJ1Ijoicm9kenJqIiwiYSI6ImNtZGZibGtvdjBjMHIybG85aTlyYWExNncifQ.EUrooIX34z2SPRrR1WvnAQ&types=address`
       );
-      
+
       if (response.ok) {
         const data = await response.json();
         const address = data.features[0]?.place_name || `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-        
+
         onLocationSelect({
           lat,
           lng,
@@ -205,18 +179,18 @@ const PropertyMap: React.FC<PropertyMapProps> = ({ onLocationSelect, selectedLoc
   };
 
   const searchLocation = debounce(async (query: string) => {
-    if (!query.trim() || !mapboxToken) return;
+    if (!query.trim()) return;
 
     setLoading(true);
     try {
       const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${mapboxToken}&country=US&types=address,poi`
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=pk.eyJ1Ijoicm9kenJqIiwiYSI6ImNtZGZibGtvdjBjMHIybG85aTlyYWExNncifQ.EUrooIX34z2SPRrR1WvnAQ&country=US&types=address,poi`
       );
-      
+
       if (response.ok) {
         const data = await response.json();
         const firstResult = data.features[0];
-        
+
         if (firstResult) {
           const [lng, lat] = firstResult.center;
           await handleLocationSelect(lng, lat);
@@ -239,44 +213,6 @@ const PropertyMap: React.FC<PropertyMapProps> = ({ onLocationSelect, selectedLoc
     e.preventDefault();
     searchLocation(searchQuery);
   };
-
-  if (!mapboxToken) {
-    return (
-      <Card className="h-96">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MapPin className="h-5 w-5" />
-            Property Location Map
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            To use the map feature, please enter your Mapbox public token below. 
-            You can get one for free at{' '}
-            <a 
-              href="https://mapbox.com" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:underline"
-            >
-              mapbox.com
-            </a>
-          </p>
-          <div className="space-y-2">
-            <Input
-              type="text"
-              placeholder="Enter your Mapbox public token (pk.)"
-              value={mapboxToken}
-              onChange={(e) => setMapboxToken(e.target.value)}
-            />
-            <p className="text-xs text-muted-foreground">
-              Your token is stored locally and not sent to our servers.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
 
   return (
     <Card className="h-96">

@@ -1,5 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
-import { debounce } from "lodash";
+// Custom debounce implementation to replace lodash dependency
+const debounce = <T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): ((...args: Parameters<T>) => void) => {
+  let timeout: NodeJS.Timeout;
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+};
 import { toast } from "@/hooks/use-toast";
 import { Save, Wifi, WifiOff } from "lucide-react";
 import { Badge } from "@/components/ui/badge";

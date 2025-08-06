@@ -1,10 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { CardContent } from "@/components/ui/card";
 import { WatchlistHeader } from "./watchlist/WatchlistHeader";
 import { WatchlistCard } from "./watchlist/WatchlistCard";
 import { WatchlistEmptyState } from "./watchlist/WatchlistEmptyState";
 import { WatchlistLoading } from "./watchlist/WatchlistLoading";
 import { useWatchlistOperations } from "./watchlist/useWatchlistOperations";
+import { useAuth } from "./AuthProvider";
+import { modules } from "./constants";
+import SEO from "../SEO";
+
+const module = modules.find(m => m.id === "watchlist");
 
 interface WatchlistItem {
   id: string;
@@ -26,45 +31,29 @@ interface WatchlistModuleProps {
   setActiveModule: (module: string) => void;
 }
 
-/**
- * Main watchlist module component
- */
 const WatchlistModule = ({ setActiveModule }: WatchlistModuleProps) => {
-  const [watchlistItems, setWatchlistItems] = useState<WatchlistItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const { fetchWatchlist, removeFromWatchlist } = useWatchlistOperations();
-
-  const loadWatchlist = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const items = await fetchWatchlist();
-      setWatchlistItems(items);
-    } catch (err) {
-      setError('Failed to load your watchlist. Please try again.');
-      console.error('Error loading watchlist:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleRemoveItem = async (id: string) => {
-    const success = await removeFromWatchlist(id);
-    if (success) {
-      setWatchlistItems(items => items.filter(item => item.id !== id));
-    }
-  };
+  const { user } = useAuth();
+  const { data: watchlistItems = [], isLoading, error, refetch } = useWatchlistOperations(user?.id);
 
   const handleAddStock = () => {
     setActiveModule('stock-analysis');
   };
 
-  useEffect(() => {
-    loadWatchlist();
-  }, []);
+  // JSON-LD structured data for the watchlist
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": module?.name,
+    "description": module?.seo?.description,
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "All",
+    "publisher": {
+      "@type": "Organization",
+      "name": "SomaTech"
+    }
+  };
 
-  if (loading) {
+  if (isLoading) {
     return <WatchlistLoading />;
   }
 
@@ -77,9 +66,9 @@ const WatchlistModule = ({ setActiveModule }: WatchlistModuleProps) => {
         <h3 className="text-lg font-medium mb-2 text-red-800 dark:text-red-200">
           Unable to Load Watchlist
         </h3>
-        <p className="text-muted-foreground mb-4">{error}</p>
+        <p className="text-muted-foreground mb-4">{error.message || 'Failed to load your watchlist. Please try again.'}</p>
         <button 
-          onClick={loadWatchlist}
+          onClick={() => refetch()}
           className="btn-premium"
         >
           Try Again
@@ -89,25 +78,33 @@ const WatchlistModule = ({ setActiveModule }: WatchlistModuleProps) => {
   }
 
   return (
-    <div className="space-y-8">
+    <>
+      {module?.seo && (
+        <SEO
+          title={module.seo.title}
+          description={module.seo.description}
+          keywords={module.seo.keywords}
+          url={typeof window !== 'undefined' ? window.location.href : undefined}
+          jsonLd={jsonLd}
+        />
+      )}
       <WatchlistHeader onAddStock={handleAddStock} />
-      
       <CardContent>
-        {watchlistItems.length === 0 ? (
+        {Array.isArray(watchlistItems) && watchlistItems.length === 0 ? (
           <WatchlistEmptyState onAnalyzeStocks={handleAddStock} />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-            {watchlistItems.map((item) => (
+            {Array.isArray(watchlistItems) && watchlistItems.map((item) => (
               <WatchlistCard 
                 key={item.id} 
                 item={item} 
-                onRemove={handleRemoveItem}
+                onRemove={() => refetch()}
               />
             ))}
           </div>
         )}
       </CardContent>
-    </div>
+    </>
   );
 };
 

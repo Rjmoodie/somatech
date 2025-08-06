@@ -1,144 +1,12 @@
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "./AuthProvider";
-import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { BarChart3, TrendingUp, Clock, Target, Award, Calendar, Activity, FileText } from "lucide-react";
-
-interface UsageStats {
-  total_analyses: number;
-  watchlist_items: number;
-  saved_plans: number;
-  login_count: number;
-  last_login: string;
-  member_since: string;
-  profile_completion: number;
-}
+import { useUserStats } from './hooks/useUserStats';
 
 const UserDashboard = () => {
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const [stats, setStats] = useState<UsageStats>({
-    total_analyses: 0,
-    watchlist_items: 0,
-    saved_plans: 0,
-    login_count: 0,
-    last_login: '',
-    member_since: '',
-    profile_completion: 0
-  });
-  const [loading, setLoading] = useState(true);
-  const [recentActivity, setRecentActivity] = useState<any[]>([]);
-
-  useEffect(() => {
-    if (user) {
-      fetchUserStats();
-      fetchRecentActivity();
-    }
-  }, [user]);
-
-  const fetchUserStats = async () => {
-    if (!user) return;
-
-    try {
-      // Fetch profile data
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('login_count, last_login_at, created_at, profile_completion_score')
-        .eq('id', user.id)
-        .single();
-
-      if (profileError) throw profileError;
-
-      // Fetch watchlist count
-      const { count: watchlistCount, error: watchlistError } = await supabase
-        .from('watchlist')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id);
-
-      if (watchlistError) throw watchlistError;
-
-      // Fetch retirement plans count
-      const { count: plansCount, error: plansError } = await supabase
-        .from('retirement_plans')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id);
-
-      if (plansError) throw plansError;
-
-      // Fetch BRRRR deals count
-      const { count: dealsCount, error: dealsError } = await supabase
-        .from('brrrr_deals')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id);
-
-      if (dealsError) throw dealsError;
-
-      setStats({
-        total_analyses: (watchlistCount || 0),
-        watchlist_items: watchlistCount || 0,
-        saved_plans: (plansCount || 0) + (dealsCount || 0),
-        login_count: profile?.login_count || 0,
-        last_login: profile?.last_login_at || '',
-        member_since: profile?.created_at || user.created_at,
-        profile_completion: profile?.profile_completion_score || 0
-      });
-    } catch (error) {
-      console.error('Error fetching user stats:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchRecentActivity = async () => {
-    if (!user) return;
-
-    try {
-      // Get recent watchlist additions
-      const { data: watchlistData, error: watchlistError } = await supabase
-        .from('watchlist')
-        .select('ticker, added_at, company_name')
-        .eq('user_id', user.id)
-        .order('added_at', { ascending: false })
-        .limit(3);
-
-      if (watchlistError) throw watchlistError;
-
-      // Get recent plans
-      const { data: plansData, error: plansError } = await supabase
-        .from('retirement_plans')
-        .select('plan_name, created_at')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(2);
-
-      if (plansError) throw plansError;
-
-      const activity = [
-        ...(watchlistData || []).map(item => ({
-          type: 'watchlist',
-          title: `Added ${item.ticker} to watchlist`,
-          subtitle: item.company_name,
-          timestamp: item.added_at,
-          icon: TrendingUp
-        })),
-        ...(plansData || []).map(item => ({
-          type: 'plan',
-          title: `Created retirement plan: ${item.plan_name}`,
-          subtitle: 'Retirement Planning',
-          timestamp: item.created_at,
-          icon: Target
-        }))
-      ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 5);
-
-      setRecentActivity(activity);
-    } catch (error) {
-      console.error('Error fetching recent activity:', error);
-    }
-  };
+  const { stats, recentActivity, loading, error } = useUserStats();
 
   const formatDate = (dateString: string) => {
     if (!dateString) return 'Never';
@@ -156,7 +24,6 @@ const UserDashboard = () => {
     const now = new Date();
     const diffTime = Math.abs(now.getTime() - memberSince.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
     if (diffDays < 30) return `${diffDays} days`;
     if (diffDays < 365) return `${Math.floor(diffDays / 30)} months`;
     return `${Math.floor(diffDays / 365)} years`;
@@ -166,6 +33,14 @@ const UserDashboard = () => {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-red-500">{error}</div>
       </div>
     );
   }

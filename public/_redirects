@@ -1,3 +1,20 @@
+# SPA Routing - All routes should serve index.html
 /somatech    /index.html   200
 /somatech/*  /index.html   200
+
+# Direct module routes
+/dashboard   /index.html   200
+/stock-analysis   /index.html   200
+/business-valuation   /index.html   200
+/real-estate   /index.html   200
+/cash-flow   /index.html   200
+/retirement-planning   /index.html   200
+/marketplace   /index.html   200
+/funding-campaigns   /index.html   200
+
+# Error pages
+/404   /index.html   200
+/not-found   /index.html   200
+
+# Catch all - serve index.html for SPA routing
 /*           /index.html   200

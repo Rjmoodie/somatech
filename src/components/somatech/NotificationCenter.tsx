@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./AuthProvider";
 import { useToast } from "@/hooks/use-toast";
@@ -24,43 +25,28 @@ interface Notification {
   read_at: string | null;
 }
 
+const fetchNotifications = async (userId: string) => {
+  const { data, error } = await supabase
+    .from('notifications')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(50);
+  if (error) throw error;
+  return data;
+};
+
 const NotificationCenter = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'unread' | 'system' | 'analysis' | 'watchlist'>('all');
 
-  useEffect(() => {
-    if (user) {
-      fetchNotifications();
-      subscribeToNotifications();
-    }
-  }, [user]);
-
-  const fetchNotifications = async () => {
-    if (!user) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('notifications')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(50);
-
-      if (error) throw error;
-      setNotifications((data || []).map(item => ({
-        ...item,
-        type: item.type as Notification['type'],
-        category: item.category as Notification['category']
-      })));
-    } catch (error) {
-      console.error('Error fetching notifications:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data: notifications, isLoading, error } = useQuery({
+    queryKey: ['notifications', user?.id],
+    queryFn: () => user ? fetchNotifications(user.id) : Promise.resolve([]),
+    enabled: !!user,
+    staleTime: 60000
+  });
 
   const subscribeToNotifications = () => {
     const channel = supabase
@@ -75,7 +61,7 @@ const NotificationCenter = () => {
         },
         (payload) => {
           const newNotification = payload.new as Notification;
-          setNotifications(prev => [newNotification, ...prev]);
+          // setNotifications(prev => [newNotification, ...prev]); // This line is removed as notifications state is now managed by React Query
           
           // Show toast for high priority notifications
           if (newNotification.priority >= 3) {
@@ -96,9 +82,9 @@ const NotificationCenter = () => {
         },
         (payload) => {
           const updatedNotification = payload.new as Notification;
-          setNotifications(prev => 
-            prev.map(n => n.id === updatedNotification.id ? updatedNotification : n)
-          );
+          // setNotifications(prev => 
+          //   prev.map(n => n.id === updatedNotification.id ? updatedNotification : n)
+          // ); // This line is removed as notifications state is now managed by React Query
         }
       )
       .subscribe();
@@ -151,7 +137,7 @@ const NotificationCenter = () => {
 
       if (error) throw error;
 
-      setNotifications(prev => prev.filter(n => n.id !== notificationId));
+      // setNotifications(prev => prev.filter(n => n.id !== notificationId)); // This line is removed as notifications state is now managed by React Query
     } catch (error) {
       console.error('Error deleting notification:', error);
     }
@@ -179,17 +165,17 @@ const NotificationCenter = () => {
   const getFilteredNotifications = () => {
     switch (filter) {
       case 'unread':
-        return notifications.filter(n => !n.read);
+        return notifications?.filter(n => !n.read) || [];
       case 'system':
       case 'analysis':
       case 'watchlist':
-        return notifications.filter(n => n.category === filter);
+        return notifications?.filter(n => n.category === filter) || [];
       default:
-        return notifications;
+        return notifications || [];
     }
   };
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications?.filter(n => !n.read).length || 0;
   const filteredNotifications = getFilteredNotifications();
 
   const formatTime = (dateString: string) => {
@@ -202,10 +188,22 @@ const NotificationCenter = () => {
     return date.toLocaleDateString();
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <AlertCircle className="h-12 w-12 text-red-600 mb-4" />
+        <h3 className="text-lg font-medium mb-2">Error loading notifications</h3>
+        <p className="text-muted-foreground">
+          Failed to fetch notifications. Please try again later.
+        </p>
       </div>
     );
   }

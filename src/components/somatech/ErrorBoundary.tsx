@@ -1,62 +1,45 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
-import ErrorFallback from './ErrorFallback';
+import React from 'react';
 
-interface Props {
-  children: ReactNode;
-  fallback?: ReactNode;
-  context?: string;
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
 }
 
-interface State {
+interface ErrorBoundaryState {
   hasError: boolean;
-  error?: Error;
-  errorInfo?: ErrorInfo;
+  error: Error | null;
 }
 
-class ErrorBoundary extends Component<Props, State> {
-  public state: State = {
-    hasError: false,
-  };
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
 
-  public static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error: Error) {
     return { hasError: true, error };
   }
 
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
-    this.setState({
-      error,
-      errorInfo,
-    });
-
-    // Report to error tracking service if available
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', 'exception', {
-        description: error.message,
-        fatal: false,
-      });
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    // Log error to an error reporting service if needed
+    if (import.meta.env.MODE === 'development') {
+      console.error('ErrorBoundary caught an error:', error, errorInfo);
     }
   }
 
-  private handleReset = () => {
-    this.setState({ hasError: false, error: undefined, errorInfo: undefined });
-  };
-
-  public render() {
-    if (this.state.hasError && this.state.error) {
-      if (this.props.fallback) {
-        return this.props.fallback;
-      }
-
+  render() {
+    if (this.state.hasError) {
       return (
-        <ErrorFallback
-          error={this.state.error}
-          resetError={this.handleReset}
-          context={this.props.context}
-        />
+        <div className="flex flex-col items-center justify-center min-h-[400px] text-center p-8">
+          <h2 className="text-2xl font-bold text-red-600 mb-2">Something went wrong</h2>
+          <p className="text-muted-foreground mb-4">An unexpected error occurred. Please refresh the page or try again later.</p>
+          {this.state.error && (
+            <pre className="bg-red-50 text-red-700 rounded p-2 text-xs max-w-xl overflow-x-auto">
+              {this.state.error.message}
+            </pre>
+          )}
+        </div>
       );
     }
-
     return this.props.children;
   }
 }
