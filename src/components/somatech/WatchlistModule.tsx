@@ -7,7 +7,7 @@ import { WatchlistLoading } from "./watchlist/WatchlistLoading";
 import { useWatchlistOperations } from "./watchlist/useWatchlistOperations";
 import { useAuth } from "./AuthProvider";
 import { modules } from "./constants";
-import SEO from "../SEO";
+
 
 const module = modules.find(m => m.id === "watchlist");
 
@@ -79,15 +79,7 @@ const WatchlistModule = ({ setActiveModule }: WatchlistModuleProps) => {
 
   return (
     <>
-      {module?.seo && (
-        <SEO
-          title={module.seo.title}
-          description={module.seo.description}
-          keywords={module.seo.keywords}
-          url={typeof window !== 'undefined' ? window.location.href : undefined}
-          jsonLd={jsonLd}
-        />
-      )}
+
       <WatchlistHeader onAddStock={handleAddStock} />
       <CardContent>
         {Array.isArray(watchlistItems) && watchlistItems.length === 0 ? (

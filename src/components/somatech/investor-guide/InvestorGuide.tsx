@@ -5,7 +5,7 @@ import KeyHoldingsSection from "./KeyHoldingsSection";
 import RiskManagementSection from "./RiskManagementSection";
 import FundingSection from "./FundingSection";
 import { modules } from "../constants";
-import SEO from "../../SEO";
+
 
 const module = modules.find(m => m.id === "investor-guide");
 
@@ -43,15 +43,7 @@ const InvestorGuide: React.FC = () => {
 
   return (
     <>
-      {module?.seo && (
-        <SEO
-          title={module.seo.title}
-          description={module.seo.description}
-          keywords={module.seo.keywords}
-          url={typeof window !== 'undefined' ? window.location.href : undefined}
-          jsonLd={jsonLd}
-        />
-      )}
+
       <div className="flex flex-col md:flex-row max-w-6xl mx-auto">
         {/* TOC Sidebar */}
         <nav className="hidden md:block w-56 sticky top-8 self-start mr-8">

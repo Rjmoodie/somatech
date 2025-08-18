@@ -8,7 +8,7 @@ import DCFAnalysis from "../DCFAnalysis";
 import InvestmentThesisGenerator from "../InvestmentThesisGenerator";
 import ExportActions from "../ExportActions";
 import { modules } from "../../somatech/constants";
-import SEO from "../../SEO";
+
 import ValuedMetricsSection from "../ValuedMetricsSection";
 
 const module = modules.find(m => m.id === "stock-analysis");
@@ -56,15 +56,7 @@ const StockAnalysisContent = ({ globalTicker }: StockAnalysisContentProps) => {
 
   return (
     <>
-      {module?.seo && (
-        <SEO
-          title={module.seo.title}
-          description={module.seo.description}
-          keywords={module.seo.keywords}
-          url={typeof window !== 'undefined' ? window.location.href : undefined}
-          jsonLd={jsonLd}
-        />
-      )}
+
       <div className="space-y-8">
         <div className="glass-card smooth-transition">
           <CompanySnapshot ticker={globalTicker} stockData={stockData} />

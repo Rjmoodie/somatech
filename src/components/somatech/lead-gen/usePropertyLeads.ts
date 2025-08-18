@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { fiftyStateDataIntegration } from '@/services/50-state-data-integration';
 
 // Define the property type (adjust fields as needed)
 export interface PropertyLead {
@@ -248,35 +247,10 @@ export function usePropertyLeads(filters?: Partial<PropertyLead> & { _supabaseFi
       }
       
       try {
-        // Try to get data from 50-state integration first
-        console.log('usePropertyLeads: Attempting to get data from 50-state integration...');
+        // Query database directly
+        console.log('usePropertyLeads: Querying database for properties...');
         
-        try {
-          const integrationData = await fiftyStateDataIntegration.searchProperties(filters || {});
-          
-          if (integrationData && integrationData.properties && integrationData.properties.length > 0) {
-            console.log(`usePropertyLeads: Retrieved ${integrationData.properties.length} properties from 50-state integration`);
-            
-            // Filter properties with coordinates
-            const propertiesWithCoordinates = integrationData.properties.filter(prop => prop.latitude && prop.longitude);
-            const propertiesWithoutCoordinates = integrationData.properties.filter(prop => !prop.latitude || !prop.longitude);
-            
-            if (propertiesWithoutCoordinates.length > 0) {
-              console.warn('usePropertyLeads: 50-state integration returned properties without coordinates:', propertiesWithoutCoordinates);
-            }
-            
-            if (propertiesWithCoordinates.length > 0) {
-              console.log(`usePropertyLeads: Returning ${propertiesWithCoordinates.length} properties with coordinates from 50-state integration`);
-              return propertiesWithCoordinates as PropertyLead[];
-            } else {
-              console.warn('usePropertyLeads: No properties with coordinates from 50-state integration, falling back to database');
-            }
-          }
-        } catch (integrationError) {
-          console.warn('usePropertyLeads: 50-state integration not available, falling back to database:', integrationError);
-        }
-        
-        // Fallback to database query
+        // Database query
         let query = supabase.from('properties').select('*').order('last_updated', { ascending: false });
 
         // Advanced filter: use _supabaseFilter string if present

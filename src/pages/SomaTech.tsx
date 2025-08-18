@@ -28,6 +28,8 @@ import Trades from "@/components/somatech/Trades";
 // Lazy load modules for better performance
 const Dashboard = lazy(() => import("@/components/somatech/Dashboard"));
 const StockAnalysis = lazy(() => import("@/components/somatech/StockAnalysis"));
+const PDUFAPage = lazy(() => import("@/pages/PDUFAPage"));
+const EarningsPage = lazy(() => import("@/pages/EarningsPage"));
 const WatchlistModule = lazy(() => import("@/components/somatech/WatchlistModule"));
 const BusinessValuation = lazy(() => import("@/components/somatech/BusinessValuation"));
 const CashFlowSimulator = lazy(() => import("@/components/somatech/CashFlowSimulator"));
@@ -60,10 +62,9 @@ const MultiTenantArchitecture = lazy(() => import("@/components/somatech/enterpr
 
 import { toast } from "@/hooks/use-toast";
 import InvestorGuide from "@/components/somatech/investor-guide/InvestorGuide";
-const LeadGenSearchPage = lazy(() => import("@/components/somatech/lead-gen/SearchPage"));
-const DatabaseDebug = lazy(() => import("@/components/somatech/lead-gen/DatabaseDebug"));
-const DatabaseTest = lazy(() => import("@/components/somatech/lead-gen/DatabaseTest"));
-const FiftyStateDataIntegration = lazy(() => import("@/components/somatech/real-estate/50StateDataIntegrationDashboard"));
+const LeadGenDashboard = lazy(() => import("@/components/modules/lead-gen/LeadGenDashboard"));
+
+
 const ExpandedDataSourcesDashboard = lazy(() => import("@/components/somatech/real-estate/scrapers/ExpandedDataSourcesDashboard"));
 
 const SomaTech = () => {
@@ -212,6 +213,10 @@ const SomaTech = () => {
         return <InvestorGuide />;
       case "stock-analysis":
         return <StockAnalysis />;
+      case "pdufa":
+        return <PDUFAPage />;
+      case "earnings":
+        return <EarningsPage />;
       case "trades":
         return <Trades />;
       case "watchlist":
@@ -223,13 +228,9 @@ const SomaTech = () => {
       case "retirement-planning":
         return <RetirementPlanning />;
               case "lead-gen":
-          return <LeadGenSearchPage />;
-        case "database-debug":
-          return <DatabaseDebug />;
-        case "database-test":
-          return <DatabaseTest />;
-        case "50-state-data-integration":
-          return <FiftyStateDataIntegration />;
+          return <LeadGenDashboard />;
+
+
         case "expanded-data-sources":
           return <ExpandedDataSourcesDashboard />;
       case "account":

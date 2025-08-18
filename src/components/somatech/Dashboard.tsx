@@ -11,7 +11,7 @@ import LearningResources from "./dashboard/LearningResources";
 import LatestNews from "./dashboard/LatestNews";
 import { useDashboardData } from "./dashboard/useDashboardData";
 import { modules } from "./constants";
-import SEO from "../SEO";
+
 
 interface DashboardProps {
   globalTicker: string;
@@ -59,15 +59,7 @@ const Dashboard = ({ globalTicker, setGlobalTicker, setActiveModule }: Dashboard
 
   return (
     <>
-      {module?.seo && (
-        <SEO
-          title={module.seo.title}
-          description={module.seo.description}
-          keywords={module.seo.keywords}
-          url={typeof window !== 'undefined' ? window.location.href : undefined}
-          jsonLd={jsonLd}
-        />
-      )}
+
       <div className="space-y-8 animate-fade-in">
         {/* Hero Welcome Section */}
         <div className="text-center py-12 animate-slide-up">

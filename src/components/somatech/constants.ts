@@ -133,6 +133,34 @@ export const modules: Module[] = [
     }
   },
   {
+    id: "pdufa",
+    name: "PDUFA Calendar",
+    description: "FDA Prescription Drug User Fee Act decision dates and alerts",
+    icon: "Calendar",
+    category: "investing",
+    navGroup: "financial",
+    featured: true,
+    seo: {
+      title: "PDUFA Calendar | SomaTech",
+      description: "Track FDA Prescription Drug User Fee Act decision dates with automated alerts and real-time updates. Monitor biotech and pharmaceutical company regulatory milestones.",
+      keywords: "PDUFA, FDA calendar, drug approval dates, biotech, pharmaceutical, regulatory milestones, FDA decisions, SomaTech"
+    }
+  },
+  {
+    id: "earnings",
+    name: "Earnings Calendar",
+    description: "Track quarterly earnings announcements and financial results",
+    icon: "DollarSign",
+    category: "investing",
+    navGroup: "financial",
+    featured: true,
+    seo: {
+      title: "Earnings Calendar | SomaTech",
+      description: "Track quarterly earnings announcements and financial results with real-time updates. Monitor earnings dates, estimates, and actual results for informed investment decisions.",
+      keywords: "earnings calendar, quarterly earnings, earnings announcements, financial results, earnings dates, stock earnings, SomaTech"
+    }
+  },
+  {
     id: "trades",
     name: "Trade Analysis",
     description: "Connect brokerages, analyze trades, and review your trading performance.",
@@ -216,20 +244,7 @@ export const modules: Module[] = [
       keywords: "real estate leads, property search, investment properties, tax delinquent, pre-foreclosure, real estate analysis, SomaTech"
     }
   },
-  {
-    id: "50-state-data-integration",
-    name: "50-State Data Integration",
-    description: "Pull real-world property data from all 50 states and 3,142 counties",
-    icon: "Database",
-    category: "real-estate",
-    navGroup: "realEstate",
-    featured: true,
-    seo: {
-      title: "50-State Data Integration | SomaTech",
-      description: "Pull real-world property data from all 50 states and 3,142 counties. Access tax delinquent properties, pre-foreclosures, and federal data sources.",
-      keywords: "50 state data integration, real estate data, property data, county data, federal data, SomaTech"
-    }
-  },
+
   {
     id: "expanded-data-sources",
     name: "Expanded Data Sources",

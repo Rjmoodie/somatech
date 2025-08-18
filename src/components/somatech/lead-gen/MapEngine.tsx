@@ -1,407 +1,540 @@
-import React, { useRef, useEffect, useState } from "react";
-import { useSearchContext } from "./context";
-// NOTE: You must install mapbox-gl and @types/mapbox-gl, and set VITE_MAPBOX_TOKEN in your .env file
-import * as mapboxgl from "mapbox-gl";
-import { LoadingSpinner } from "./Microinteractions";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { AlertCircle, MapPin, DollarSign, Home } from "lucide-react";
-import { environment } from "@/config/environment";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { leadGenAPI, LeadGenData } from '../../../services/lead-gen-api';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Slider } from '@/components/ui/slider';
+import { Checkbox } from '@/components/ui/checkbox';
+import { 
+  MapPin, 
+  ZoomIn, 
+  ZoomOut, 
+  Layers, 
+  Filter,
+  Target,
+  Home,
+  Building,
+  AlertTriangle,
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  Maximize2,
+  Minimize2
+} from 'lucide-react';
 
-export const MapEngine = () => {
-  const { state, dispatch } = useSearchContext();
-  const [mapContainerElement, setMapContainerElement] = useState<HTMLDivElement | null>(null);
-  const mapRef = useRef<mapboxgl.Map | null>(null);
-  const [mapError, setMapError] = useState<string | null>(null);
-  const [isMapLoading, setIsMapLoading] = useState(true);
-  const [containerReady, setContainerReady] = useState(false);
+export interface MapEngineProps {
+  className?: string;
+  initialBounds?: {
+    north: number;
+    south: number;
+    east: number;
+    west: number;
+  };
+  onPropertyClick?: (property: LeadGenData) => void;
+  onMapBoundsChange?: (bounds: any) => void;
+}
 
-  // Get the Mapbox token
-  const mapboxToken = environment.MAPBOX_TOKEN;
-  
-  console.log('MapEngine Debug:', {
-    mapboxToken: mapboxToken ? 'Token exists' : 'No token',
-    tokenLength: mapboxToken?.length,
-    containerElement: mapContainerElement ? 'Container exists' : 'No container',
-    propertiesCount: state.results?.length || 0,
-    properties: state.results?.slice(0, 3) || [],
-    loading: state.loading,
-    error: state.error,
-    containerReady,
-    isMapLoading,
-    propertiesWithCoordinates: state.results?.filter(p => p.latitude && p.longitude).length || 0,
-    propertiesWithoutCoordinates: state.results?.filter(p => !p.latitude || !p.longitude).length || 0
+export interface MapMarker {
+  id: string;
+  position: [number, number];
+  property: LeadGenData;
+  cluster?: boolean;
+  clusterSize?: number;
+}
+
+export interface MapFilters {
+  showHighEquity: boolean;
+  showDistressed: boolean;
+  showVacant: boolean;
+  showAbsenteeOwners: boolean;
+  minEquity: number;
+  maxValue: number;
+  propertyTypes: string[];
+}
+
+export const MapEngine: React.FC<MapEngineProps> = ({
+  className,
+  initialBounds,
+  onPropertyClick,
+  onMapBoundsChange
+}) => {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const [mapInstance, setMapInstance] = useState<any>(null);
+  const [markers, setMarkers] = useState<MapMarker[]>([]);
+  const [clusters, setClusters] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [currentBounds, setCurrentBounds] = useState(initialBounds);
+  const [zoom, setZoom] = useState(10);
+  const [filters, setFilters] = useState<MapFilters>({
+    showHighEquity: true,
+    showDistressed: true,
+    showVacant: true,
+    showAbsenteeOwners: true,
+    minEquity: 0,
+    maxValue: 1000000,
+    propertyTypes: []
   });
+  const [showFilters, setShowFilters] = useState(false);
+  const [selectedProperty, setSelectedProperty] = useState<LeadGenData | null>(null);
+  const [mapStyle, setMapStyle] = useState<'streets' | 'satellite' | 'dark'>('streets');
 
-  // Effect to handle map initialization when container is ready
+  // Initialize map (placeholder for actual map library integration)
   useEffect(() => {
-    console.log('MapEngine useEffect triggered');
-    
-    if (!mapboxToken) {
-      console.log('No Mapbox token available');
-      setMapError("Mapbox token not configured");
-      setIsMapLoading(false);
-      return;
-    }
+    if (!mapRef.current) return;
 
-    if (mapRef.current) {
-      console.log('Map already exists');
-      return;
-    }
-
-    // Function to initialize the map
-    const initializeMap = () => {
-      if (!mapContainerElement) {
-        console.log('Container not ready yet, retrying...');
-        return false;
-      }
-
-      try {
-        console.log('Setting up Mapbox access token');
-        // Set the access token
-        (window as any).mapboxgl = mapboxgl;
-        (window as any).mapboxgl.accessToken = mapboxToken;
-        
-        console.log('Creating Mapbox map');
-        mapRef.current = new mapboxgl.Map({
-          container: mapContainerElement,
-          style: "mapbox://styles/mapbox/streets-v11",
-          center: [environment.DEFAULT_MAP_CENTER.lng, environment.DEFAULT_MAP_CENTER.lat],
-          zoom: environment.DEFAULT_MAP_ZOOM,
-        });
-
-        console.log('Map created, setting up load handler');
-        
-        mapRef.current.on("load", () => {
-          console.log('Map loaded successfully');
-          setIsMapLoading(false);
-          setContainerReady(true);
-          
-          // Add property markers after map loads
-          addPropertyMarkers();
-        });
-
-        mapRef.current.on("error", (e) => {
-          console.error("Mapbox error:", e);
-          setMapError("Map loading failed");
-          setIsMapLoading(false);
-        });
-
-        return true;
-      } catch (error) {
-        console.error("Error creating map:", error);
-        setMapError("Failed to create map");
-        setIsMapLoading(false);
-        return false;
-      }
+    // This would be replaced with actual map library initialization
+    // For now, we'll create a placeholder map container
+    const initMap = () => {
+      console.log('🗺️ Initializing map...');
+      // Placeholder for map initialization
+      setMapInstance({ type: 'placeholder' });
     };
 
-    // Function to add property markers to the map
-    const addPropertyMarkers = () => {
-      if (!mapRef.current) {
-        console.log('No map available for markers');
-        return;
-      }
+    initMap();
+  }, []);
 
-      // Use state results or fallback to test data
-      const propertiesToShow = state.results && state.results.length > 0 
-        ? state.results 
-        : [
-            {
-              id: "test-1",
-              address: "123 Test St",
-              city: "New York",
-              state: "NY",
-              zip: "10001",
-              latitude: 40.7128,
-              longitude: -74.0060,
-              owner_name: "Test Owner",
-              estimated_value: 400000,
-              equity_percent: 75,
-              bedrooms: 3,
-              bathrooms: 2
-            },
-            {
-              id: "test-2", 
-              address: "456 Test Ave",
-              city: "Los Angeles",
-              state: "CA",
-              zip: "90210",
-              latitude: 34.0522,
-              longitude: -118.2437,
-              owner_name: "Test Owner 2",
-              estimated_value: 650000,
-              equity_percent: 60,
-              bedrooms: 4,
-              bathrooms: 3
-            }
-          ];
+  // Load properties for current map bounds
+  const loadPropertiesForBounds = useCallback(async (bounds: any) => {
+    if (!bounds) return;
 
-      console.log(`Adding ${propertiesToShow.length} property markers to map`);
-      console.log('Properties to show:', propertiesToShow);
+    setLoading(true);
+    setError(null);
 
-      // Clear existing markers
-      const existingMarkers = document.querySelectorAll('.property-marker');
-      existingMarkers.forEach(marker => marker.remove());
+    try {
+      console.log('🔍 Loading properties for map bounds:', bounds);
 
-      propertiesToShow.forEach((property, index) => {
-        if (!property.latitude || !property.longitude) {
-          console.log(`Property ${property.id} missing coordinates:`, property);
-          return;
+      const area = {
+        type: 'polygon' as const,
+        coordinates: [
+          [bounds.west, bounds.south],
+          [bounds.east, bounds.south],
+          [bounds.east, bounds.north],
+          [bounds.west, bounds.north],
+          [bounds.west, bounds.south]
+        ]
+      };
+
+      const result = await leadGenAPI.getPropertiesByArea(area, {
+        maxProperties: 1000,
+        includeAnalytics: true,
+        filters: {
+          equityRange: { min: filters.minEquity, max: 100 },
+          valueRange: { min: 0, max: filters.maxValue }
         }
-
-        console.log(`Creating marker for property ${property.id} at ${property.latitude}, ${property.longitude}`);
-
-        // Create marker element
-        const markerEl = document.createElement('div');
-        markerEl.className = 'property-marker';
-        markerEl.style.width = '30px';
-        markerEl.style.height = '30px';
-        markerEl.style.background = '#3b82f6';
-        markerEl.style.borderRadius = '50%';
-        markerEl.style.border = '2px solid white';
-        markerEl.style.cursor = 'pointer';
-        markerEl.style.display = 'flex';
-        markerEl.style.alignItems = 'center';
-        markerEl.style.justifyContent = 'center';
-        markerEl.style.color = 'white';
-        markerEl.style.fontSize = '12px';
-        markerEl.style.fontWeight = 'bold';
-        markerEl.innerHTML = '$';
-
-        // Create popup
-        const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
-          <div style="min-width: 200px; padding: 8px;">
-            <h3 style="margin: 0 0 8px 0; font-weight: bold; color: #1f2937;">${property.address}</h3>
-            <p style="margin: 0 0 4px 0; font-size: 14px; color: #6b7280;">${property.city}, ${property.state} ${property.zip}</p>
-            <div style="display: flex; justify-content: space-between; margin: 8px 0;">
-              <span style="font-size: 12px; color: #6b7280;">Owner:</span>
-              <span style="font-size: 12px; font-weight: 500;">${property.owner_name || 'N/A'}</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; margin: 4px 0;">
-              <span style="font-size: 12px; color: #6b7280;">Value:</span>
-              <span style="font-size: 12px; font-weight: 500;">$${property.estimated_value?.toLocaleString() || 'N/A'}</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; margin: 4px 0;">
-              <span style="font-size: 12px; color: #6b7280;">Equity:</span>
-              <span style="font-size: 12px; font-weight: 500;">${property.equity_percent || 0}%</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; margin: 4px 0;">
-              <span style="font-size: 12px; color: #6b7280;">Beds/Baths:</span>
-              <span style="font-size: 12px; font-weight: 500;">${property.bedrooms || 0}/${property.bathrooms || 0}</span>
-            </div>
-          </div>
-        `);
-
-        // Create and add marker
-        const marker = new mapboxgl.Marker(markerEl)
-          .setLngLat([property.longitude, property.latitude])
-          .setPopup(popup)
-          .addTo(mapRef.current);
-
-        console.log(`Marker added for property ${property.id}`);
-
-        // Add click handler
-        markerEl.addEventListener('click', () => {
-          console.log('Property clicked:', property);
-          // Dispatch action to select property by ID
-          dispatch({ type: 'SELECT_PROPERTY', payload: property.id });
-        });
       });
 
-      // Fit map to show all markers if there are properties
-      if (propertiesToShow.length > 0) {
-        const bounds = new mapboxgl.LngLatBounds();
-        propertiesToShow.forEach(property => {
-          if (property.latitude && property.longitude) {
-            bounds.extend([property.longitude, property.latitude]);
-          }
-        });
-        
-        if (!bounds.isEmpty()) {
-          console.log('Fitting map to bounds:', bounds);
-          mapRef.current.fitBounds(bounds, {
-            padding: 50,
-            maxZoom: 15
-          });
-        }
-      }
+      // Transform properties to map markers
+      const newMarkers: MapMarker[] = result.properties
+        .filter(property => {
+          // Apply filters
+          if (!filters.showHighEquity && (property.equity_percent || 0) > 70) return false;
+          if (!filters.showDistressed && property.tags?.includes('distressed')) return false;
+          if (!filters.showVacant && property.tags?.includes('vacant')) return false;
+          if (!filters.showAbsenteeOwners && property.owner_type === 'absentee') return false;
+          if (filters.propertyTypes.length > 0 && !filters.propertyTypes.includes(property.property_type)) return false;
+          
+          return true;
+        })
+        .map(property => ({
+          id: property.id,
+          position: [property.latitude, property.longitude] as [number, number],
+          property
+        }));
+
+      setMarkers(newMarkers);
+      console.log(`✅ Loaded ${newMarkers.length} properties for map area`);
+
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load properties';
+      setError(errorMessage);
+      console.error('❌ Error loading properties for map:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [filters]);
+
+  // Update markers when filters change
+  useEffect(() => {
+    if (currentBounds) {
+      loadPropertiesForBounds(currentBounds);
+    }
+  }, [currentBounds, filters, loadPropertiesForBounds]);
+
+  // Handle map bounds change
+  const handleMapBoundsChange = useCallback((newBounds: any) => {
+    setCurrentBounds(newBounds);
+    onMapBoundsChange?.(newBounds);
+  }, [onMapBoundsChange]);
+
+  // Handle zoom change
+  const handleZoomChange = useCallback((newZoom: number) => {
+    setZoom(newZoom);
+  }, []);
+
+  // Handle marker click
+  const handleMarkerClick = useCallback((marker: MapMarker) => {
+    setSelectedProperty(marker.property);
+    onPropertyClick?.(marker.property);
+  }, [onPropertyClick]);
+
+  // Handle cluster click
+  const handleClusterClick = useCallback((cluster: any) => {
+    // Zoom to cluster bounds
+    console.log('🔍 Zooming to cluster:', cluster);
+  }, []);
+
+  // Format currency
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(amount);
+  };
+
+  // Format percentage
+  const formatPercentage = (value: number) => {
+    return `${value.toFixed(1)}%`;
+  };
+
+  // Get trend icon
+  const getTrendIcon = (trend?: 'up' | 'down' | 'stable') => {
+    switch (trend) {
+      case 'up': return <TrendingUp className="h-4 w-4 text-green-500" />;
+      case 'down': return <TrendingDown className="h-4 w-4 text-red-500" />;
+      default: return <Minus className="h-4 w-4 text-gray-500" />;
+    }
+  };
+
+  // Get marker color based on property type
+  const getMarkerColor = (property: LeadGenData) => {
+    if (property.tags?.includes('distressed')) return 'red';
+    if (property.tags?.includes('vacant')) return 'yellow';
+    if ((property.equity_percent || 0) > 70) return 'green';
+    return 'blue';
+  };
+
+  // Get marker icon based on property type
+  const getMarkerIcon = (property: LeadGenData) => {
+    if (property.property_type === 'commercial') return <Building className="h-4 w-4" />;
+    return <Home className="h-4 w-4" />;
+  };
+
+  // Memoized filtered markers
+  const filteredMarkers = useMemo(() => {
+    return markers.filter(marker => {
+      const property = marker.property;
+      
+      // Apply equity filter
+      if ((property.equity_percent || 0) < filters.minEquity) return false;
+      
+      // Apply value filter
+      if ((property.estimated_value || 0) > filters.maxValue) return false;
+      
+      // Apply property type filter
+      if (filters.propertyTypes.length > 0 && !filters.propertyTypes.includes(property.property_type)) return false;
+      
+      return true;
+    });
+  }, [markers, filters]);
+
+  // Memoized marker statistics
+  const markerStats = useMemo(() => {
+    const total = filteredMarkers.length;
+    const highEquity = filteredMarkers.filter(m => (m.property.equity_percent || 0) > 70).length;
+    const distressed = filteredMarkers.filter(m => m.property.tags?.includes('distressed')).length;
+    const vacant = filteredMarkers.filter(m => m.property.tags?.includes('vacant')).length;
+    const totalValue = filteredMarkers.reduce((sum, m) => sum + (m.property.estimated_value || 0), 0);
+
+    return {
+      total,
+      highEquity,
+      distressed,
+      vacant,
+      totalValue,
+      averageValue: total > 0 ? totalValue / total : 0
     };
-
-    // Try to initialize immediately
-    if (!initializeMap()) {
-      // If container not ready, retry after a short delay
-      const timer = setTimeout(() => {
-        console.log('Retrying map initialization...');
-        initializeMap();
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [mapContainerElement, mapboxToken]);
-
-  // Effect to update markers when properties change
-  useEffect(() => {
-    if (mapRef.current && containerReady && state.results) {
-      console.log('Properties updated, refreshing markers');
-      console.log('Total properties:', state.results.length);
-      console.log('Properties with coordinates:', state.results.filter(p => p.latitude && p.longitude).length);
-      console.log('Sample properties:', state.results.slice(0, 3));
-      addPropertyMarkers();
-    }
-  }, [state.results, containerReady]);
-
-  // Effect to handle container element changes
-  useEffect(() => {
-    if (mapContainerElement && mapboxToken && !mapRef.current) {
-      console.log('Container is now available, triggering map initialization');
-      // This will trigger the main useEffect
-    }
-  }, [mapContainerElement, mapboxToken]);
-
-  // Show loading state
-  if (isMapLoading) {
-    return (
-      <div className="flex items-center justify-center h-full bg-yellow-100 border-2 border-yellow-500">
-        <div className="text-center">
-          <LoadingSpinner />
-          <span className="ml-2">Loading map...</span>
-          <div className="text-xs text-gray-600 mt-2">
-            Properties: {state.results?.length || 0}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Show error state
-  if (mapError) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <Alert className="max-w-md">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            {mapError}
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="ml-2"
-              onClick={() => window.open('https://account.mapbox.com/access-tokens/', '_blank')}
-            >
-              Get Mapbox Token
-            </Button>
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
-
-  // Fallback simple map if Mapbox fails
-  if (!mapboxToken) {
-    return (
-      <div className="relative h-full w-full">
-        <div className="h-full w-full bg-gray-100 rounded-lg p-4">
-          <div className="text-center mb-4">
-            <MapPin className="h-12 w-12 mx-auto text-gray-400 mb-2" />
-            <h3 className="text-lg font-semibold text-gray-700">Simple Property Map</h3>
-            <p className="text-sm text-gray-500">Mapbox not configured - showing properties as grid</p>
-          </div>
-          
-          {/* Simple property grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {state.results && state.results.length > 0 ? (
-              state.results.slice(0, 6).map((property, index) => (
-                <div key={property.id || index} className="bg-white p-3 rounded border shadow-sm">
-                  <div className="font-medium text-sm">{property.address}</div>
-                  <div className="text-xs text-gray-500">{property.city}, {property.state}</div>
-                  <div className="text-xs text-blue-600 font-medium">
-                    ${property.estimated_value?.toLocaleString() || 'N/A'}
-                  </div>
-                </div>
-              ))
-            ) : (
-              // Test properties
-              [
-                { id: "test-1", address: "123 Test St", city: "New York", state: "NY", estimated_value: 400000 },
-                { id: "test-2", address: "456 Test Ave", city: "Los Angeles", state: "CA", estimated_value: 650000 },
-                { id: "test-3", address: "789 Test Blvd", city: "Houston", state: "TX", estimated_value: 300000 }
-              ].map((property) => (
-                <div key={property.id} className="bg-white p-3 rounded border shadow-sm">
-                  <div className="font-medium text-sm">{property.address}</div>
-                  <div className="text-xs text-gray-500">{property.city}, {property.state}</div>
-                  <div className="text-xs text-blue-600 font-medium">
-                    ${property.estimated_value?.toLocaleString()}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-          
-          <div className="mt-4 text-center">
-            <div className="text-xs text-gray-500">
-              {state.results?.length || 0} properties found
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  }, [filteredMarkers]);
 
   return (
-    <div className="relative h-full w-full">
+    <div className={`relative ${className}`}>
       {/* Map Container */}
-      <div 
-        ref={(el) => {
-          console.log('MapEngine: ref callback called with:', el);
-          setMapContainerElement(el);
-        }}
-        className="h-full w-full rounded-lg overflow-hidden" 
-        data-testid="map-container"
-      />
-      
-      {/* Map Controls Overlay */}
-      <div className="absolute top-4 right-4 bg-white p-2 rounded-lg shadow-lg border">
-        <div className="text-xs font-medium text-gray-700">
-          {state.results?.length || 0} Properties
+      <div className="relative h-[600px] w-full bg-gray-100 rounded-lg overflow-hidden">
+        {/* Placeholder Map */}
+        <div ref={mapRef} className="w-full h-full bg-gradient-to-br from-blue-50 to-indigo-100">
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-center">
+              <MapPin className="h-16 w-16 text-blue-500 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Interactive Map</h3>
+              <p className="text-muted-foreground mb-4">
+                Map integration with clustering, filtering, and real-time data
+              </p>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="bg-white p-3 rounded-lg shadow">
+                  <div className="font-semibold">{markerStats.total}</div>
+                  <div className="text-muted-foreground">Properties</div>
+                </div>
+                <div className="bg-white p-3 rounded-lg shadow">
+                  <div className="font-semibold">{formatCurrency(markerStats.totalValue)}</div>
+                  <div className="text-muted-foreground">Total Value</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        {state.results && state.results.length > 0 && (
-          <div className="text-xs text-gray-500">
-            {state.results.filter(p => p.latitude && p.longitude).length} with coordinates
+
+        {/* Map Controls */}
+        <div className="absolute top-4 right-4 flex flex-col gap-2">
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => setZoom(prev => Math.min(prev + 1, 20))}
+          >
+            <ZoomIn className="h-4 w-4" />
+          </Button>
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => setZoom(prev => Math.max(prev - 1, 1))}
+          >
+            <ZoomOut className="h-4 w-4" />
+          </Button>
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            <Filter className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Zoom Level Indicator */}
+        <div className="absolute bottom-4 left-4 bg-white px-3 py-1 rounded-lg shadow text-sm">
+          Zoom: {zoom}
+        </div>
+
+        {/* Loading Indicator */}
+        {loading && (
+          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="bg-white p-4 rounded-lg">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
+              <div className="text-sm">Loading properties...</div>
+            </div>
           </div>
         )}
-        {(!state.results || state.results.length === 0) && (
-          <div className="text-xs text-orange-600 font-medium">
-            Using test data
+
+        {/* Error Display */}
+        {error && (
+          <div className="absolute top-4 left-4 bg-red-100 border border-red-300 text-red-700 px-4 py-2 rounded-lg">
+            {error}
           </div>
         )}
       </div>
 
-      {/* Loading Overlay */}
-      {state.loading && (
-        <div className="absolute inset-0 bg-blue-50 bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-4 rounded-lg shadow-lg border">
-            <LoadingSpinner />
-            <div className="text-sm font-medium text-gray-700 mt-2">Loading properties...</div>
-          </div>
-        </div>
+      {/* Filters Panel */}
+      {showFilters && (
+        <Card className="absolute top-4 left-4 w-80 bg-white shadow-lg">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Filter className="h-5 w-5" />
+              Map Filters
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Property Type Filters */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Property Types</label>
+              <div className="space-y-2">
+                {['single-family', 'multi-family', 'condo', 'commercial'].map(type => (
+                  <div key={type} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={type}
+                      checked={filters.propertyTypes.includes(type)}
+                      onCheckedChange={(checked) => {
+                        setFilters(prev => ({
+                          ...prev,
+                          propertyTypes: checked
+                            ? [...prev.propertyTypes, type]
+                            : prev.propertyTypes.filter(t => t !== type)
+                        }));
+                      }}
+                    />
+                    <label htmlFor={type} className="text-sm capitalize">
+                      {type.replace('-', ' ')}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Equity Range */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                Minimum Equity: {filters.minEquity}%
+              </label>
+              <Slider
+                value={[filters.minEquity]}
+                onValueChange={([value]) => setFilters(prev => ({ ...prev, minEquity: value }))}
+                max={100}
+                step={5}
+                className="w-full"
+              />
+            </div>
+
+            {/* Value Range */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                Max Value: {formatCurrency(filters.maxValue)}
+              </label>
+              <Slider
+                value={[filters.maxValue]}
+                onValueChange={([value]) => setFilters(prev => ({ ...prev, maxValue: value }))}
+                max={2000000}
+                step={50000}
+                className="w-full"
+              />
+            </div>
+
+            {/* Property Status Filters */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Property Status</label>
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="high-equity"
+                    checked={filters.showHighEquity}
+                    onCheckedChange={(checked) => setFilters(prev => ({ ...prev, showHighEquity: !!checked }))}
+                  />
+                  <label htmlFor="high-equity" className="text-sm">High Equity (&gt;70%)</label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="distressed"
+                    checked={filters.showDistressed}
+                    onCheckedChange={(checked) => setFilters(prev => ({ ...prev, showDistressed: !!checked }))}
+                  />
+                  <label htmlFor="distressed" className="text-sm">Distressed</label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="vacant"
+                    checked={filters.showVacant}
+                    onCheckedChange={(checked) => setFilters(prev => ({ ...prev, showVacant: !!checked }))}
+                  />
+                  <label htmlFor="vacant" className="text-sm">Vacant</label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="absentee"
+                    checked={filters.showAbsenteeOwners}
+                    onCheckedChange={(checked) => setFilters(prev => ({ ...prev, showAbsenteeOwners: !!checked }))}
+                  />
+                  <label htmlFor="absentee" className="text-sm">Absentee Owners</label>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
-      {/* No Properties Message */}
-      {(!state.results || state.results.length === 0) && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-50 bg-opacity-90">
-          <div className="text-center p-6 bg-white rounded-lg shadow-lg border">
-            <MapPin className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-700 mb-2">No Properties Found</h3>
-            <p className="text-sm text-gray-500 mb-4">
-              Try adjusting your search filters to find properties in this area.
-            </p>
-            <div className="text-xs text-gray-400">
-              Properties with coordinates will appear as markers on the map
+      {/* Property Details Panel */}
+      {selectedProperty && (
+        <Card className="absolute bottom-4 right-4 w-96 bg-white shadow-lg">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center justify-between">
+              <span>Property Details</span>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setSelectedProperty(null)}
+              >
+                <Minimize2 className="h-4 w-4" />
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div>
+              <h3 className="font-semibold">{selectedProperty.address}</h3>
+              <p className="text-sm text-muted-foreground">
+                {selectedProperty.city}, {selectedProperty.state} {selectedProperty.zip}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div>
+                <div className="text-muted-foreground">Owner</div>
+                <div className="font-medium">{selectedProperty.owner_name}</div>
+              </div>
+              <div>
+                <div className="text-muted-foreground">Value</div>
+                <div className="font-medium">{formatCurrency(selectedProperty.estimated_value)}</div>
+              </div>
+              <div>
+                <div className="text-muted-foreground">Equity</div>
+                <div className="font-medium">{formatPercentage(selectedProperty.equity_percent)}</div>
+              </div>
+              <div>
+                <div className="text-muted-foreground">Type</div>
+                <div className="font-medium capitalize">{selectedProperty.property_type.replace('-', ' ')}</div>
+              </div>
+            </div>
+
+            {selectedProperty.opportunityScore && (
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary">
+                  {selectedProperty.opportunityScore}% Opportunity
+                </Badge>
+                {selectedProperty.marketTrend && getTrendIcon(selectedProperty.marketTrend)}
+              </div>
+            )}
+
+            <div className="flex flex-wrap gap-1">
+              {selectedProperty.tags.map((tag, index) => (
+                <Badge key={index} variant="outline" className="text-xs">
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+
+            <Button
+              size="sm"
+              className="w-full"
+              onClick={() => {
+                // This would open detailed property view
+                console.log('Opening detailed view for:', selectedProperty.id);
+              }}
+            >
+              View Full Details
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Map Statistics */}
+      <Card className="absolute top-4 left-4 bg-white shadow-lg">
+        <CardContent className="p-3">
+          <div className="grid grid-cols-2 gap-3 text-sm">
+            <div className="text-center">
+              <div className="font-bold text-blue-600">{markerStats.total}</div>
+              <div className="text-muted-foreground">Properties</div>
+            </div>
+            <div className="text-center">
+              <div className="font-bold text-green-600">{markerStats.highEquity}</div>
+              <div className="text-muted-foreground">High Equity</div>
+            </div>
+            <div className="text-center">
+              <div className="font-bold text-red-600">{markerStats.distressed}</div>
+              <div className="text-muted-foreground">Distressed</div>
+            </div>
+            <div className="text-center">
+              <div className="font-bold text-yellow-600">{markerStats.vacant}</div>
+              <div className="text-muted-foreground">Vacant</div>
             </div>
           </div>
-        </div>
-      )}
+        </CardContent>
+      </Card>
     </div>
   );
-};
-
-export default MapEngine; 
+}; 

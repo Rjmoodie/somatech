@@ -6,7 +6,7 @@ import BusinessValuationChart from "./business-valuation/BusinessValuationChart"
 import BusinessValuationExport from "./business-valuation/BusinessValuationExport";
 import { calculateBusinessValuation } from "./business-valuation/valuationEngine";
 import { modules } from "./constants";
-import SEO from "../SEO";
+
 
 const module = modules.find(m => m.id === "business-valuation");
 
@@ -77,15 +77,7 @@ const BusinessValuation = () => {
 
   return (
     <>
-      {module?.seo && (
-        <SEO
-          title={module.seo.title}
-          description={module.seo.description}
-          keywords={module.seo.keywords}
-          url={typeof window !== 'undefined' ? window.location.href : undefined}
-          jsonLd={jsonLd}
-        />
-      )}
+
       <div className="space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <BusinessValuationInputForm

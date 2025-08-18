@@ -12,7 +12,7 @@ import { useRetirementOperations, useSavePlan, useDeletePlan, useUpdatePlanNotes
 import { calculateRetirement } from "./retirement/retirementUtils";
 import { RetirementInputs, RetirementResults as IRetirementResults, SavedPlan } from "./retirement/retirementOperations";
 import { modules } from "./constants";
-import SEO from "../SEO";
+
 
 const module = modules.find(m => m.id === "retirement-planning");
 
@@ -128,15 +128,7 @@ const RetirementPlanning = () => {
 
   return (
     <>
-      {module?.seo && (
-        <SEO
-          title={module.seo.title}
-          description={module.seo.description}
-          keywords={module.seo.keywords}
-          url={typeof window !== 'undefined' ? window.location.href : undefined}
-          jsonLd={jsonLd}
-        />
-      )}
+
       <div className="space-y-6">
         <Tabs defaultValue="calculator" className="w-full">
           <TabsList className="grid w-full grid-cols-2">

@@ -6,7 +6,7 @@ import CashFlowChart from "./cash-flow/CashFlowChart";
 import CashFlowExport from "./cash-flow/CashFlowExport";
 import { calculateCashFlow } from "./cash-flow/cashFlowEngine";
 import { modules } from "./constants";
-import SEO from "../SEO";
+
 
 const module = modules.find(m => m.id === "cash-flow");
 
@@ -80,15 +80,7 @@ const CashFlowSimulator = () => {
 
   return (
     <>
-      {module?.seo && (
-        <SEO
-          title={module.seo.title}
-          description={module.seo.description}
-          keywords={module.seo.keywords}
-          url={typeof window !== 'undefined' ? window.location.href : undefined}
-          jsonLd={jsonLd}
-        />
-      )}
+
       <div className="space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-6">
